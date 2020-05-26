@@ -53,6 +53,7 @@ return array(
     'Swoft\\Aop\\' => array($vendorDir . '/swoft/aop/src'),
     'Swoft\\Annotation\\' => array($vendorDir . '/swoft/annotation/src'),
     'Swoft\\' => array($vendorDir . '/swoft/framework/src'),
+    'SwoftMongo\\' => array($vendorDir . '/yumufeng/swoft-mongodb/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
     'Psr\\Http\\Server\\' => array($vendorDir . '/psr/http-server-handler/src', $vendorDir . '/psr/http-server-middleware/src'),

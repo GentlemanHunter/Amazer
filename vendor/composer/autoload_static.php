@@ -76,6 +76,7 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
             'Swoft\\Aop\\' => 10,
             'Swoft\\Annotation\\' => 17,
             'Swoft\\' => 6,
+            'SwoftMongo\\' => 11,
         ),
         'P' => 
         array (
@@ -305,6 +306,10 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         'Swoft\\' => 
         array (
             0 => __DIR__ . '/..' . '/swoft/framework/src',
+        ),
+        'SwoftMongo\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yumufeng/swoft-mongodb/src',
         ),
         'Psr\\SimpleCache\\' => 
         array (
