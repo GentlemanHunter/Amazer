@@ -5113,54 +5113,5 @@
             "check",
             "validate"
         ]
-    },
-    {
-        "name": "yumufeng/swoft-mongodb",
-        "version": "v1.0.6",
-        "version_normalized": "1.0.6.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/yumufeng/swoft-mongodb.git",
-            "reference": "b271d2f36762d11244b022e8a9c578d5e9908812"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/yumufeng/swoft-mongodb/zipball/b271d2f36762d11244b022e8a9c578d5e9908812",
-            "reference": "b271d2f36762d11244b022e8a9c578d5e9908812",
-            "shasum": "",
-            "mirrors": [
-                {
-                    "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                    "preferred": true
-                }
-            ]
-        },
-        "require": {
-            "ext-mongodb": "*",
-            "ext-swoole": ">=2.1",
-            "php": ">=7.0"
-        },
-        "require-dev": {
-            "swoft/db": "^1.1",
-            "swoft/framework": "^1.0"
-        },
-        "time": "2019-08-08T08:04:12+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "SwoftMongo\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "Apache-2.0"
-        ],
-        "authors": [
-            {
-                "name": "yumufeng",
-                "email": "admin@yumufeng.com"
-            }
-        ]
     }
 ]
