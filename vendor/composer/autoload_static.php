@@ -98,6 +98,10 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         array (
             'Leuffen\\TextTemplate\\' => 21,
         ),
+        'F' => 
+        array (
+            'Firebase\\JWT\\' => 13,
+        ),
         'D' => 
         array (
             'Dotenv\\' => 7,
@@ -354,6 +358,10 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         'Leuffen\\TextTemplate\\' => 
         array (
             0 => __DIR__ . '/..' . '/text/template/src',
+        ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'Dotenv\\' => 
         array (
