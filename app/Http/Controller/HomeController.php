@@ -10,6 +10,7 @@
 
 namespace App\Http\Controller;
 
+use App\Model\Dao\UserDao;
 use App\Model\Data\GoodsData;
 use Swoft;
 use Swoft\Http\Message\ContentType;
@@ -81,5 +82,14 @@ class HomeController
     public function dataConfig(): array
     {
         return bean(GoodsData::class)->getConfig();
+    }
+
+    /**
+     * @RequestMapping("/mongo",method={"GET"})
+     * @return mixed
+     */
+    public function mongoTest()
+    {
+        return bean(UserDao::class)->insert(['username'=>'root','password'=>123456,'filed'=>'fucker']);
     }
 }

@@ -36,7 +36,7 @@
     "swoft/crontab": "~2.0.0",
     "swoft/session": "~2.0.0",
     "swoft/devtool": "~2.0.0",
-    "yumufeng/swoft-mongodb": "^1.0"
+    "zhijia/swoft2-mongodb": "dev-master"
   },
   "require-dev": {
     "swoft/swoole-ide-helper": "dev-master",

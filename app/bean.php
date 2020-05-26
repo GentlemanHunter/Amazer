@@ -31,7 +31,7 @@ return [
     'logger'             => [
         'flushRequest' => false,
         'enable'       => false,
-        'json'         => true,
+        'json'         => false,
     ],
     'httpServer'         => [
         'class'    => HttpServer::class,

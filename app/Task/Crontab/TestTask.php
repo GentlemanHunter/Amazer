@@ -5,7 +5,6 @@ namespace App\Task\Crontab;
 
 use Swoft\Crontab\Annotaion\Mapping\Cron;
 use Swoft\Crontab\Annotaion\Mapping\Scheduled;
-use Swoft\Redis\Redis;
 
 /**
  * Class TestTask

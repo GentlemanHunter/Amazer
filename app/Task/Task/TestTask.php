@@ -10,9 +10,6 @@
 
 namespace App\Task\Task;
 
-use App\Model\Dao\Test3Dao;
-use App\Model\Entity\Test;
-use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Task\Annotation\Mapping\Task;
 use Swoft\Task\Annotation\Mapping\TaskMapping;
 
@@ -78,29 +75,5 @@ class TestTask
     public function returnVoid(string $name): void
     {
         return;
-    }
-
-    /**
-     * @Inject()
-     * @var Test3Dao
-     */
-    private $test3Dao;
-
-    /**
-     * @TaskMapping()
-     * @param $name
-     * @param $run_time
-     */
-    public function test($name,$run_time)
-    {
-        // TODO: 消费task
-        $data = [
-            'name' => $name,
-            'runTime' => $run_time,
-            'createtime' => time(),
-            'updatetime' => time(),
-            'status' => 0
-        ];
-        $id = $this->test3Dao->addData($data);
     }
 }
