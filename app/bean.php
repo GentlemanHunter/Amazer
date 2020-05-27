@@ -29,8 +29,8 @@ return [
         'logFile' => '@runtime/logs/error-%d{Y-m-d}.log',
     ],
     'logger'             => [
-        'flushRequest' => false,
-        'enable'       => false,
+        'flushRequest' => true,
+        'enable'       => true,
         'json'         => false,
     ],
     'httpServer'         => [
@@ -56,8 +56,8 @@ return [
             'task_enable_coroutine' => true,
             'worker_num'            => 6,
             // static handle
-            // 'enable_static_handler'    => true,
-            // 'document_root'            => dirname(__DIR__) . '/public',
+             'enable_static_handler'    => true,
+             'document_root'            => dirname(__DIR__) . '/public',
         ]
     ],
     'httpDispatcher'     => [
@@ -72,6 +72,10 @@ return [
         'afterMiddlewares' => [
             \Swoft\Http\Server\Middleware\ValidatorMiddleware::class
         ]
+    ],
+    'sessionManager' => [
+        'class' => \Swoft\Http\Session\SessionManager::class,
+        'name' => 'IM_SESSION_ID'
     ],
     'db'                 => [
         'class'    => Database::class,
@@ -95,16 +99,6 @@ return [
     'db2.pool'           => [
         'class'    => Pool::class,
         'database' => bean('db2'),
-    ],
-    'db3'                => [
-        'class'    => Database::class,
-        'dsn'      => 'mysql:dbname=test2;host=127.0.0.1',
-        'username' => 'root',
-        'password' => 'swoft123456'
-    ],
-    'db3.pool'           => [
-        'class'    => Pool::class,
-        'database' => bean('db3')
     ],
     'migrationManager'   => [
         'migrationPath' => '@database/Migration',

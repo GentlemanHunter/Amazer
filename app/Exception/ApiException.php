@@ -10,13 +10,19 @@
 
 namespace App\Exception;
 
-use Exception;
+use App\ExceptionCode\ApiCode;
+use Throwable;
 
 /**
  * Class ApiException
  *
  * @since 2.0
  */
-class ApiException extends Exception
+class ApiException extends \Exception
 {
+    public function __construct($message = "", $code = 0, Throwable $previous = null)
+    {
+        empty($message) && $message = ApiCode::$errorMessages[$code];
+        parent::__construct($message, $code, $previous);
+    }
 }

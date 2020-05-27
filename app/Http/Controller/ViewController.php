@@ -22,7 +22,7 @@ use Throwable;
  *
  * @since 2.0
  *
- * @Controller(prefix="view")
+ * @Controller(prefix="/views")
  */
 class ViewController
 {
@@ -53,5 +53,25 @@ class ViewController
         return [
             'msg' => 'hello'
         ];
+    }
+
+    /**
+     * @RequestMapping(route="login", method={"GET"})
+     * @return Response
+     * @throws Throwable
+     */
+    public function login()
+    {
+        return view('home/login');
+    }
+
+    /**
+     * @RequestMapping(route="register", method={"GET"})
+     * @return Response
+     * @throws Throwable
+     */
+    public function register()
+    {
+        return view('home/register');
     }
 }
