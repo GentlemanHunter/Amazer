@@ -36,7 +36,8 @@
     "swoft/crontab": "~2.0.0",
     "swoft/session": "~2.0.0",
     "swoft/devtool": "~2.0.0",
-    "firebase/php-jwt": "^5.2"
+    "firebase/php-jwt": "^5.2",
+    "guzzlehttp/guzzle": "^6.5"
   },
   "require-dev": {
     "swoft/swoole-ide-helper": "dev-master",
