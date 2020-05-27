@@ -32,8 +32,7 @@ class KtpTaskWork extends BaseMigration
             $table->char('describe',50)->nullable()->comment('任务描述');
             $table->integer('execution')->comment('执行时间');
             $table->integer('retry')->default(1)->comment("任务重试次数 默认1 重试一次");
-            $table->integer('overtime')->default(0)->comment("超时时间 默认0 单位秒 0不超时");
-            $table->string('bodys')->comment('执行体');
+            $table->json('bodys')->comment('执行体');// 方法体 {url:"http://baidu.com",method:"GET"}
             $table->integer('status')->default(0)->comment('虚拟状态 由模型去控制 默认 0 ');
 
             $table->integer('uid')->comment("用户id");

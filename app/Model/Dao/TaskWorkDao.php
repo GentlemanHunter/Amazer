@@ -28,21 +28,32 @@ class TaskWorkDao
      * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
      * @throws \Swoft\Db\Exception\DbException
      */
-    public function findByTaskId(string $taskId,int $status = TaskStatus::UNEXECUTED){
+    public function findByTaskId(string $taskId, int $status = TaskStatus::UNEXECUTED)
+    {
         $where = [
-            'taskId' => $taskId,
+            'task_id' => $taskId,
             'status' => $status
         ];
         return $this->taskWorkEntity::where($where)->first();
     }
 
     /**
-     * 新增数据
      * @param array $data
-     * @return string
+     * @return bool
      */
     public function createTask(array $data)
     {
-        return $this->taskWorkEntity::insertGetId($data);
+        return $this->taskWorkEntity::insert($data);
+    }
+
+    /**
+     * @param $taskId
+     * @param $data
+     * @return int
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function updateBytaskId($taskId, $data)
+    {
+        return $this->taskWorkEntity::where('task_id', '=', $taskId)->update($data);
     }
 }

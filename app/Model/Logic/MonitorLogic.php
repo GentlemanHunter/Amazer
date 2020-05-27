@@ -38,18 +38,18 @@ class MonitorLogic
         $process->name('ktp-task-monitor');
 
         while (true) {
-            $connections = context()->getServer()->getSwooleServer()->connections;
-            CLog::info('monitor = ' . json_encode($connections));
+//            $connections = context()->getServer()->getSwooleServer()->connections;
+//            CLog::info('monitor = ' . json_encode($connections));
 
             // Database
             $data = $this->getDate();
             CLog::info('data_count=' . count($data));
 
             foreach ($data as $key => $value) {
-                Redis::zAdd(env('MASTER_REDIS', 'default_'), [$value['taskId'] => $value['runTime']]);
+                Redis::zAdd(env('MASTER_REDIS', 'default_'), [$value['taskId'] => $value['execution']]);
             }
 
-            Coroutine::sleep(3);
+            Coroutine::sleep(1);
         }
     }
 
@@ -62,18 +62,18 @@ class MonitorLogic
     {
         $data = [];
         $time = time();
-        $start = $time - env('HOT_LOAD_TIME', 60);
-        $taskCount = TaskWork::whereBetween('execution', [$start, $time])->count();
+        $start = $time + env('HOT_LOAD_TIME', 60);
+        $taskCount = TaskWork::whereBetween('execution', [$time, $start])->count();
 
         if ($taskCount > env('TASK_COUNT', 1000)) {
             $userCount = ceil($taskCount / env('TASK_COUNT', 1000));
             for ($i = 0; $i <= $userCount; $i++) {
                 $skip = $i * 10;
-                $tmpArray = TaskWork::whereBetween('execution', [$start, $time])->skip($skip)->limit(10)->get()->toArray() ?? [];
+                $tmpArray = TaskWork::whereBetween('execution', [$time, $start])->skip($skip)->limit(env('TASK_COUNT', 1000))->get()->toArray() ?? [];
                 $data = array_merge($data, $tmpArray);
             }
         } else {
-            $data = array_merge($data, (array)TaskWork::whereBetween('execution', [$start, $time])->get()->toArray() ?? []);
+            $data = array_merge($data, (array)TaskWork::whereBetween('execution', [$time, $start])->get()->toArray() ?? []);
         }
 
         return $data;

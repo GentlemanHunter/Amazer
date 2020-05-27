@@ -24,7 +24,7 @@ class TaskWork extends Model
      *
      * @Column()
      *
-     * @var string
+     * @var array
      */
     private $bodys;
 
@@ -63,15 +63,6 @@ class TaskWork extends Model
      * @var string
      */
     private $names;
-
-    /**
-     * 超时时间 默认0 单位秒 0不超时
-     *
-     * @Column()
-     *
-     * @var int
-     */
-    private $overtime;
 
     /**
      * 任务重试次数 默认1 重试一次
@@ -120,11 +111,11 @@ class TaskWork extends Model
 
 
     /**
-     * @param string $bodys
+     * @param array $bodys
      *
      * @return self
      */
-    public function setBodys(string $bodys): self
+    public function setBodys(array $bodys): self
     {
         $this->bodys = $bodys;
 
@@ -175,18 +166,6 @@ class TaskWork extends Model
     public function setNames(string $names): self
     {
         $this->names = $names;
-
-        return $this;
-    }
-
-    /**
-     * @param int $overtime
-     *
-     * @return self
-     */
-    public function setOvertime(int $overtime): self
-    {
-        $this->overtime = $overtime;
 
         return $this;
     }
@@ -252,9 +231,9 @@ class TaskWork extends Model
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getBodys(): ?string
+    public function getBodys(): ?array
     
     {
         return $this->bodys;
@@ -294,15 +273,6 @@ class TaskWork extends Model
     
     {
         return $this->names;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOvertime(): ?int
-    
-    {
-        return $this->overtime;
     }
 
     /**

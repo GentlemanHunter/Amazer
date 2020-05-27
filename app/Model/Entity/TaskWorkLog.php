@@ -276,16 +276,16 @@ class TaskWorkLog extends Model
      * @return string
      */
     public function getBodys(): ?string
-    
+
     {
-        return $this->bodys;
+        return json_decode($this->bodys,true);
     }
 
     /**
      * @return int
      */
     public function getComplete(): ?int
-    
+
     {
         return $this->complete;
     }
@@ -294,7 +294,7 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getCreatedAt(): ?int
-    
+
     {
         return $this->createdAt;
     }
@@ -303,7 +303,7 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getExecution(): ?int
-    
+
     {
         return $this->execution;
     }
@@ -312,7 +312,7 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getId(): ?int
-    
+
     {
         return $this->id;
     }
@@ -321,7 +321,7 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getImplement(): ?int
-    
+
     {
         return $this->implement;
     }
@@ -330,7 +330,7 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getLength(): ?int
-    
+
     {
         return $this->length;
     }
@@ -339,7 +339,7 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getOvertime(): ?int
-    
+
     {
         return $this->overtime;
     }
@@ -348,7 +348,7 @@ class TaskWorkLog extends Model
      * @return string
      */
     public function getResult(): ?string
-    
+
     {
         return $this->result;
     }
@@ -357,7 +357,7 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getStatus(): ?int
-    
+
     {
         return $this->status;
     }
@@ -366,7 +366,7 @@ class TaskWorkLog extends Model
      * @return string
      */
     public function getTaskId(): ?string
-    
+
     {
         return $this->taskId;
     }
@@ -375,9 +375,10 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getUpdatedAt(): ?int
-    
+
     {
         return $this->updatedAt;
-    }
+    }
+
 
 }

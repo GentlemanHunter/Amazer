@@ -1,6 +1,6 @@
 <?php
 /**
- * @author gaobinzhan <gaobinzhan@gmail.com>
+ * @author yxk yangxiukang@ketangpai.com
  */
 
 

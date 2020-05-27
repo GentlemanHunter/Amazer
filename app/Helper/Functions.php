@@ -9,6 +9,7 @@
  * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
  */
 
+use App\Exception\ApiException;
 use App\ExceptionCode\ApiCode;
 use App\Helper\JwtHelper;
 
@@ -115,17 +116,18 @@ if (!function_exists('getGuid')) {
     function getGuid($namespace = '')
     {
         static $guid = '';
+        $server = context()->getResponse();
         $uid = uniqid("", true);
         $data = $namespace;
-        $data .= $_SERVER['REQUEST_TIME'];
-        $data .= $_SERVER['HTTP_USER_AGENT'];
-        $data .= $_SERVER['LOCAL_ADDR'];
-        $data .= $_SERVER['LOCAL_PORT'];
-        $data .= $_SERVER['REMOTE_ADDR'];
-        $data .= $_SERVER['REMOTE_PORT'];
+        $data .= $server->getHeaderLine('request_time');
+        $data .= $server->getHeaderLine('HTTP_USER_AGENT');
+        $data .= $server->getHeaderLine('LOCAL_ADDR');
+        $data .= $server->getHeaderLine('LOCAL_PORT');
+        $data .= $server->getHeaderLine('REMOTE_ADDR');
+        $data .= $server->getHeaderLine('REMOTE_PORT');
+        $data .= $server->getHeaderLine('REMOTE_PORT');
         $hash = strtoupper(hash('ripemd128', $uid . $guid . md5($data)));
-        $guid = '{' .
-            substr($hash, 0, 8) .
+        $guid = substr($hash, 0, 8) .
             '-' .
             substr($hash, 8, 4) .
             '-' .
@@ -133,8 +135,55 @@ if (!function_exists('getGuid')) {
             '-' .
             substr($hash, 16, 4) .
             '-' .
-            substr($hash, 20, 12) .
-            '}';
+            substr($hash, 20, 12);
         return $guid;
+    }
+}
+
+if (!function_exists('isJSON')) {
+    /**
+     * 判断是否json
+     * @param $string
+     * @return bool
+     */
+    function isJSON($string)
+    {
+        return is_string($string) &&
+        is_array(json_decode($string, true)) &&
+        (json_last_error() == JSON_ERROR_NONE) ? true : false;
+    }
+}
+
+if (!function_exists('keyExists')) {
+    /**
+     * @param $array
+     * @param $key
+     * @throws ApiException
+     */
+    function keyExists($array, $key)
+    {
+        if (!is_array($array)) {
+            if (!isJSON($array)) {
+                throw new ApiException("array 不是 json", -1);
+            }
+            $array = json_decode($array, true);
+        }
+        if (!array_key_exists($key, $array))
+            throw new ApiException("{" . $key . "} 不存在", -1);
+    }
+}
+
+if (!function_exists('UID')) {
+    /**
+     * 获取用户 uid
+     * @param \Swoft\Http\Message\Request|null $request
+     * @return mixed
+     */
+    function UID(\Swoft\Http\Message\Request $request = null)
+    {
+        if ($request === null) {
+            $request = context()->getRequest();
+        }
+        return $request->userInfo->getId();
     }
 }

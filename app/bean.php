@@ -43,7 +43,7 @@ return [
         'process'  => [
 //            'monitor' => bean(\App\Process\MonitorProcess::class),
 //            'dispatch' => bean(\App\Process\DispatchProcess::class),
-//            'crontab' => bean(\Swoft\Crontab\Process\CrontabProcess::class)
+            'crontab' => bean(\Swoft\Crontab\Process\CrontabProcess::class)
         ],
         'on'       => [
 //            SwooleEvent::TASK   => bean(SyncTaskListener::class),  // Enable sync task
