@@ -5,9 +5,9 @@
  */
 
 return [
-    'private_key' => 'ktp_Wharfs',
-    'public_key' => 'ktp_Wharf',
-    'iss' => env('APP_HOST'),
-    'aud' => env('APP_HOST'),
-    'alg' => 'HS256'
+    'private_key' => 'Wharfs20200505',
+    'public_key' => 'Wharfs20200505',
+    'iss' => env('APP_HOST','http://localhost:18306'),
+    'aud' => env('APP_HOST','http://localhost:18306'),
+    'alg' => 'HS256' // 为RS256 需要修改私钥和公钥
 ];

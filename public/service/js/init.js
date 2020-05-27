@@ -15,7 +15,7 @@ layui.use('layim', function (layim) {
       url: user_init,
       type: 'get',
       data: {
-        token: getCookie('IM_TOKEN')
+        token: getCookie('TOKEN_WHARF')
       }
     }
 
@@ -23,14 +23,14 @@ layui.use('layim', function (layim) {
       url: group_get_relation
       , type: 'get'
       , data: {
-        token: getCookie('IM_TOKEN')
+        token: getCookie('TOKEN_WHARF')
       }
     }
     , uploadImage: {
-      url: util_upload_img + '?token=' + getCookie('IM_TOKEN')
+      url: util_upload_img + '?token=' + getCookie('TOKEN_WHARF')
     }
     , uploadFile: {
-      url: util_upload_file + '?token=' + getCookie('IM_TOKEN')
+      url: util_upload_file + '?token=' + getCookie('TOKEN_WHARF')
     }
     , tool: [
       {

@@ -75,7 +75,7 @@ return [
     ],
     'sessionManager' => [
         'class' => \Swoft\Http\Session\SessionManager::class,
-        'name' => 'IM_SESSION_ID'
+        'name' => 'Wharf_SESSION_ID'
     ],
     'db'                 => [
         'class'    => Database::class,
@@ -146,11 +146,11 @@ return [
             SwooleEvent::TASK    => bean(TaskListener::class),
             SwooleEvent::FINISH  => bean(FinishListener::class)
         ],
-        'debug'    => 1,
+        'debug'    => env('SWOFT_DEBUG',0),
         // 'debug'   => env('SWOFT_DEBUG', 0),
         /* @see WebSocketServer::$setting */
         'setting'  => [
-            'task_worker_num'       => 6,
+            'task_worker_num'       => 12,
             'task_enable_coroutine' => true,
             'worker_num'            => 6,
             'log_file'              => alias('@runtime/swoole.log'),

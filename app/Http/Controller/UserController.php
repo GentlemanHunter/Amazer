@@ -70,22 +70,15 @@ class UserController
             /** @var User $userInfo */
             $userInfo = $this->userLogic->login($account, $password);
 
-            $token = $this->encrypt($userInfo['id']);
+            $token = JwtHelper::encrypt($userInfo['id']);
             $userInfo['token'] = $token;
-            return apiSuccess($userInfo);
+            return $response->withCookie('TOKEN_WHARF', [
+                'value' => $token,
+                'path' => '/',
+            ])->withData(['code' => 0, 'msg' => 'Success', 'data' => $userInfo]);
         } catch (\Throwable $throwable) {
             return apiError($throwable->getCode(), $throwable->getMessage());
         }
-    }
-
-    /**
-     * 获取用户菜单
-     * @RequestMapping(route="home",method={RequestMethod::GET})
-     */
-    public function home(Request $request, Response $response)
-    {
-        $menus = config('menu');
-        return apiSuccess($menus);
     }
 
     /**
@@ -96,5 +89,23 @@ class UserController
     public function signOut(Request $request, Response $response)
     {
         return apiSuccess();
+    }
+
+    /**
+     * 获取用户菜单
+     * @RequestMapping(route="home", method={"GET"})
+     */
+    public function home(Request $request, Response $response)
+    {
+        if (!$userId = checkAuth()) return $response->redirect('/views/login');
+        $menus = config('menu');
+        $userInfo = $request->userInfo;
+        return view('home/home', [
+            'menus' => $menus,
+            'userInfo' => $userInfo,
+            'wsUrl' => env('WS_URL'),
+            'webRtcUrl' => env('WEB_RTC_URL'),
+            'stunServer' => 'stun:stun.xten.com'
+        ]);
     }
 }

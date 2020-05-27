@@ -19,14 +19,6 @@ class DispatchProcess extends UserProcess
     public function run(Process $process): void
     {
         // TODO: 消费者
-        $time = time();
-        CLog::info("test");
-        $TimeId = Timer::after(1000, function () use ($time) {
-            CLog::info("timeOr: {" . date('Y-m-d H:i:s', $time) . "}");
-            CLog::info("time:{" . date('Y-m-d H:i:s', time()) . "}");
-        });
 
-//        Timer::clear($TimeId);
-        CLog::info("end" . $TimeId);
     }
 }

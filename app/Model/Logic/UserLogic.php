@@ -101,6 +101,7 @@ class UserLogic
         if (!password_verify($password, $userInfo['password'])) {
             throw new \Exception('', ApiCode::USER_PASSWORD_ERROR);
         }
+
         $this->updateUserLogVisitor($userInfo->getId());
 
         return $userInfo->toArray();

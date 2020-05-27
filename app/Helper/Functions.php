@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /**
  * This file is part of Swoft.
  *
@@ -77,5 +78,63 @@ if (!function_exists('throwApiException')) {
             ]);
         }
         return context()->getResponse()->withStatus(200)->withData($result);
+    }
+}
+
+if (!function_exists('checkAuth')) {
+    /**
+     * @return bool|int
+     * @throws \App\Exception\ApiException
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    function checkAuth()
+    {
+        $request = context()->getRequest();
+        $token = $request->getCookieParams()['TOKEN_WHARF'] ?? '';
+        if (!$token || !is_string($token) || !$userId = JwtHelper::decrypt($token)) {
+            vdump($token);
+            return false;
+        }
+        $userInfo = bean('App\Model\Dao\UserDao')->findUserInfoById($userId);
+        if (!$userInfo) {
+            vdump($userInfo);
+            return false;
+        }
+        $request->user = $userId;
+        $request->userInfo = $userInfo;
+
+        return $userId;
+    }
+}
+
+if (!function_exists('getGuid')) {
+    /**
+     * @param string $namespace
+     * @return string
+     */
+    function getGuid($namespace = '')
+    {
+        static $guid = '';
+        $uid = uniqid("", true);
+        $data = $namespace;
+        $data .= $_SERVER['REQUEST_TIME'];
+        $data .= $_SERVER['HTTP_USER_AGENT'];
+        $data .= $_SERVER['LOCAL_ADDR'];
+        $data .= $_SERVER['LOCAL_PORT'];
+        $data .= $_SERVER['REMOTE_ADDR'];
+        $data .= $_SERVER['REMOTE_PORT'];
+        $hash = strtoupper(hash('ripemd128', $uid . $guid . md5($data)));
+        $guid = '{' .
+            substr($hash, 0, 8) .
+            '-' .
+            substr($hash, 8, 4) .
+            '-' .
+            substr($hash, 12, 4) .
+            '-' .
+            substr($hash, 16, 4) .
+            '-' .
+            substr($hash, 20, 12) .
+            '}';
+        return $guid;
     }
 }

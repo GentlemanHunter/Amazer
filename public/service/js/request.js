@@ -18,7 +18,7 @@ function Request(type, url, params, success_callback, fail_callback) {
       data: params,
       type: type,
       beforeSend: function (request) {
-        request.setRequestHeader("Authorization", 'Bearer ' + getCookie("IM_TOKEN"));
+        request.setRequestHeader("Authorization", 'Bearer ' + getCookie("TOKEN_WHARF"));
       },
       success: function (data) {
         output(data, url);

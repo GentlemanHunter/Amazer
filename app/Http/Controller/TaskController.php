@@ -10,6 +10,7 @@
 
 namespace App\Http\Controller;
 
+use Swoft\Http\Message\Request;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
 use Swoft\Task\Exception\TaskException;
@@ -117,5 +118,10 @@ class TaskController
         $data[] = $result2;
         $data[] = $result3;
         return $data;
+    }
+
+    public function createTask(Request $request)
+    {
+
     }
 }
