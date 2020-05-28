@@ -10,21 +10,20 @@
 
 namespace App\Http\Controller;
 
-use App\Exception\ApiException;
-use App\Exception\TaskStatus;
-use App\Model\Entity\User;
-use App\Model\Logic\RedisLogic;
-use App\Model\Logic\TaskWorkLogic;
+use App\Helper\MemoryTable;
 use Exception;
-use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Timer;
+use Swoft\Redis\Redis;
+use Swoft\Log\Helper\Log;
+use App\Model\Entity\User;
 use Swoft\Http\Message\Request;
+use App\Exception\ApiException;
+use App\Model\Logic\RedisLogic;
+use Swoft\Stdlib\Helper\JsonHelper;
+use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\Middleware;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
-use Swoft\Log\Helper\Log;
-use Swoft\Redis\Redis;
-use Swoft\Stdlib\Helper\JsonHelper;
-use Swoft\Timer;
 use Swoft\Validator\Annotation\Mapping\Validate;
 use App\Http\Middleware\AuthMiddleware;
 use Swoft\Http\Server\Annotation\Mapping\RequestMethod;
@@ -135,6 +134,26 @@ class TimerController
             return apiSuccess(['taskId' => $id]);
         } catch (\Throwable $throwable) {
             return apiError($throwable->getCode(), $throwable->getMessage());
+        }
+    }
+
+    public function delTaskWork(Request $request)
+    {
+        try {
+            $taskId = $request->parsedBody('taskId');
+
+            /** @var MemoryTable $memoryTable */
+            $memoryTable = bean('App\Helper\MemoryTable');
+            $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID,(string)$taskId);
+            if ($timerId){
+                // 取消定时器
+                $memoryTable->forget(MemoryTable::TASK_TO_ID,(string)$taskId);
+            }
+
+
+
+        } catch (\Throwable $throwable){
+
         }
     }
 }
