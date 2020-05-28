@@ -119,9 +119,4 @@ class TaskController
         $data[] = $result3;
         return $data;
     }
-
-    public function createTask(Request $request)
-    {
-
-    }
 }

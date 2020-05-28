@@ -5,6 +5,7 @@ namespace App\Model\Logic;
 
 use App\Exception\TaskStatus;
 use App\Model\Dao\TaskWorkDao;
+use App\Model\Dao\TaskWorkLogDao;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
 
@@ -20,6 +21,12 @@ class TaskWorkLogic
      * @var TaskWorkDao
      */
     private $taskWorkDao;
+
+    /**
+     * @Inject()
+     * @var TaskWorkLogDao
+     */
+    private $taskWorkLogDao;
 
     /**
      * 创建一个 task
@@ -84,5 +91,15 @@ class TaskWorkLogic
     public function findByTaskId($taskId,$status = TaskStatus::EXECUTED)
     {
         return $this->taskWorkDao->findByTaskId($taskId,$status);
+    }
+
+    /**
+     * 写入日志
+     * @param array $data
+     * @return string
+     */
+    public function createTaskLogData(array $data)
+    {
+        return $this->taskWorkLogDao->createLogData($data);
     }
 }

@@ -21,7 +21,6 @@ class TaskWorkLogDao
     private $taskWorkLogEntity;
 
     /**
-     * 记录日志
      * @param array $data
      * @return string
      */

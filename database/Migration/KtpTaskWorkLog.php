@@ -31,7 +31,7 @@ class KtpTaskWorkLog extends BaseMigration
             $table->string('task_id', 50)->comment('任务id');
             $table->integer('length')->default(1)->comment("当前执行次数 排序");
             $table->integer('overtime')->default(0)->comment("超时时间 默认0 单位秒 0不超时");
-            $table->string('bodys')->comment('执行体');
+            $table->json('bodys')->comment('执行体');
 
             $table->integer('execution')->comment('开始时间');
             $table->integer('complete')->comment('完成时间');

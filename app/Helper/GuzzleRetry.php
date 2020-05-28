@@ -3,12 +3,16 @@
 namespace App\Helper;
 
 
+use App\Exception\TaskStatus;
+use App\Model\Logic\RedisLogic;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Swoft\Bean\Annotation\Mapping\Bean;
+use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Log\Helper\CLog;
+use Swoft\Redis\Redis;
 
 /**
  * Class GuzzleRetry
@@ -16,6 +20,17 @@ use Swoft\Log\Helper\CLog;
  */
 class GuzzleRetry
 {
+    /**
+     * @Inject()
+     * @var RedisLogic
+     */
+    private $redisLogic;
+
+    protected static $taskid = '';
+    protected static $startTime = '';
+    protected static $overtime = 0;
+    protected static $bodys = '';
+
     protected static $retry = 1;
 
     /**
@@ -30,25 +45,26 @@ class GuzzleRetry
             Response $response = null,
             RequestException $exception = null
         ) {
-            CLog::info("Curl:" . json_encode($request));
-            vdump($request,$response);
             // Limit the number of retries to 5
             if ($retries >= self::$retry) {
+                $this->log($response, "超过最大重试次数", TaskStatus::EXECUTEDFAIL);
                 return false;
             }
 
             // Retry connection exceptions
             if ($exception instanceof ConnectException) {
+                $this->log($response, "连接异常", TaskStatus::EXECUTEDFAIL);
                 return true;
             }
 
             if ($response) {
                 // Retry on server errors
                 if ($response->getStatusCode() >= 500) {
+                    $this->log($response, "客户端错误", TaskStatus::EXECUTEDFAIL);
                     return true;
                 }
             }
-
+            $this->log($response, "执行成功", TaskStatus::EXECUTEDSUCCESS);
             return false;
         };
     }
@@ -68,13 +84,59 @@ class GuzzleRetry
      * 管理 重试次数
      * @author yxk yangxiukang@ketangpai.com
      */
-    public function setRetry(int $retry): void
+    public function setRetry(int $retry)
     {
         self::$retry = $retry;
+        return $this;
+    }
+    public function setTaskId($task)
+    {
+        self::$taskid = $task;
+        return $this;
+    }
+    public function setStartTime($startTime)
+    {
+        self::$startTime = $startTime;
+        return $this;
+    }
+    public function setOvertime($overtime)
+    {
+        self::$overtime = $overtime;
+        return $this;
+    }
+    public function setBodys($bodys)
+    {
+        self::$bodys = $bodys;
+        return $this;
     }
 
     public function getRetry(): ?int
     {
         return self::$retry;
+    }
+
+    /**
+     * 记录日志
+     * @param $response
+     * @param $message
+     * @param $status
+     * @throws \App\Exception\ApiException
+     */
+    private function log($response, $message, $status): void
+    {
+        $result = "{$message}" . json_encode($response->getBody());
+        $osTime = time();
+        $endTime = $osTime - self::$startTime;
+        $this->redisLogic->addTaskWorkLog(
+            self::$taskid,
+            self::$retry,
+            self::$overtime,
+            self::$bodys,
+            self::$startTime,
+            $osTime,
+            $endTime,
+            $result,
+            $status
+        );
     }
 }

@@ -44,7 +44,7 @@ class WorkTask
      *      version => '请求要使用到的协议版本',// string, float
      * ]
      */
-    public function consumptionTimer(int $runTime, string $taskId, int $retry, array $data): void
+    public function consumptionTimer(int $runTime, $taskId, $retry, array $data): void
     {
         $url = $data['url'] ?? '';
         $method = $data['method'] ?? 'GET';
@@ -52,44 +52,39 @@ class WorkTask
         unset($data['method']);
 
         /** TODO: 待完善 */
-        $timerId = Timer::after($runTime, function ($url, $method, $data, $retry) {
+        $timerId = Timer::after($runTime, function ($url, $method, $data, $retry,$taskId) {
             /** @var GuzzleRetry $handRetry */
             $handRetry = bean('App\Helper\GuzzleRetry');
-            $handRetry->setRetry($retry);
+            $handRetry->setRetry($retry)->setBodys($data)->setTaskId($taskId)->setStartTime(time());
 
-            // TODO 可以迭代
-            /*if ($method === 'POST'){
-
-            }*/
+            if (isset($data['timeout'])){
+                $handRetry->setOvertime($data['timeout']);
+            }
 
             $handlerState = HandlerStack::create(new CurlHandler());
             $handlerState->push(Middleware::retry($handRetry->retryDecider(), $handRetry->retryDelay()));
             $client = new Client(['handler' => $handlerState]);
             $reponse = $client->request($method, $url, $data);
 
-            CLog::info('reponse:' . json_encode($reponse));
-            vdump($reponse);
+            CLog::info("response:".json_encode($reponse));
 
-        }, $url, $method, $data, $retry);
-
-        vdump($timerId);
+            /** @var MemoryTable $memoryTable */
+            $memoryTable = bean('App\Helper\MemoryTable');
+            $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
+            Redis::hDel('hash_data',$taskId);
+        }, $url, $method, $data, $retry,$taskId);
 
         /** @var MemoryTable $memoryTable */
-//        $memoryTable = bean('App\Helper\MemoryTable');
-//        $memoryTable->store(MemoryTable::TASK_TO_ID, (string)$taskId, ['timerId' => $timerId]);
+        $memoryTable = bean('App\Helper\MemoryTable');
+        $memoryTable->store(MemoryTable::TASK_TO_ID, (string)$taskId, ['timerId' => $timerId]);
     }
 
     /**
-     * @TaskMapping(name="taskConsumption")
+     * 插入 task
+     * @TaskMapping(name="insertQueue")
      */
-    public function taskConsumption($data, $runTime): void
+    public function insertQueueData($taskId, $runTime): void
     {
-        foreach ($data as $item) {
-            $task = $this->taskWorkLogic->findByTaskId($item);
-            \Swoft\Task\Task::async('work', 'consumption',
-                [$runTime, $task->getTaskId(), $task->getRetry(), $task->getBodys()]
-            );
-            Redis::zRem(env('MASTER_REDIS', 'default_'),$task->getTaskId());
-        }
+        Redis::zAdd('zset_data', [$taskId => $runTime]);
     }
 }

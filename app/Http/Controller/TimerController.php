@@ -11,7 +11,9 @@
 namespace App\Http\Controller;
 
 use App\Exception\ApiException;
+use App\Exception\TaskStatus;
 use App\Model\Entity\User;
+use App\Model\Logic\RedisLogic;
 use App\Model\Logic\TaskWorkLogic;
 use Exception;
 use Swoft\Bean\Annotation\Mapping\Inject;
@@ -94,9 +96,9 @@ class TimerController
 
     /**
      * @Inject()
-     * @var TaskWorkLogic
+     * @var RedisLogic
      */
-    private $taskWorkLogic;
+    private $redisLogic;
 
     /**
      * @RequestMapping(route="/add/task",method={RequestMethod::POST})
@@ -119,7 +121,10 @@ class TimerController
             $bodys = json_decode($bodys, true);
             keyExists($bodys, 'url');
             keyExists($bodys, 'method');
-            $id = $this->taskWorkLogic->createTaskWork(
+            if (time() >= $execution || ($execution - time()) < 5) {
+                throw new ApiException("不允许 设定 超过时间", -1);
+            }
+            $id = $this->redisLogic->createTaskWork(
                 $names,
                 $describe,
                 $execution,

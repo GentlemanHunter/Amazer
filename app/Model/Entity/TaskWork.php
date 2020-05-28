@@ -20,22 +20,22 @@ use Swoft\Db\Eloquent\Model;
 class TaskWork extends Model
 {
     /**
-     * 执行体
+     * 任务id
+     * @Id(incrementing=false)
+     * @Column(name="task_id", prop="taskId")
+     *
+     * @var string
+     */
+    private $taskId;
+
+    /**
+     * 任务名称
      *
      * @Column()
      *
-     * @var array
+     * @var string
      */
-    private $bodys;
-
-    /**
-     * 创建时间
-     *
-     * @Column(name="created_at", prop="createdAt")
-     *
-     * @var int
-     */
-    private $createdAt;
+    private $names;
 
     /**
      * 任务描述
@@ -56,15 +56,6 @@ class TaskWork extends Model
     private $execution;
 
     /**
-     * 任务名称
-     *
-     * @Column()
-     *
-     * @var string
-     */
-    private $names;
-
-    /**
      * 任务重试次数 默认1 重试一次
      *
      * @Column()
@@ -72,6 +63,15 @@ class TaskWork extends Model
      * @var int
      */
     private $retry;
+
+    /**
+     * 执行体
+     *
+     * @Column()
+     *
+     * @var array
+     */
+    private $bodys;
 
     /**
      * 虚拟状态 由模型去控制 默认 0
@@ -83,15 +83,6 @@ class TaskWork extends Model
     private $status;
 
     /**
-     * 任务id
-     * @Id(incrementing=false)
-     * @Column(name="task_id", prop="taskId")
-     *
-     * @var string
-     */
-    private $taskId;
-
-    /**
      * 用户id
      *
      * @Column()
@@ -99,6 +90,15 @@ class TaskWork extends Model
      * @var int
      */
     private $uid;
+
+    /**
+     * 创建时间
+     *
+     * @Column(name="created_at", prop="createdAt")
+     *
+     * @var int
+     */
+    private $createdAt;
 
     /**
      * 更新时间
@@ -111,25 +111,25 @@ class TaskWork extends Model
 
 
     /**
-     * @param array $bodys
+     * @param string $taskId
      *
      * @return self
      */
-    public function setBodys(array $bodys): self
+    public function setTaskId(string $taskId): self
     {
-        $this->bodys = $bodys;
+        $this->taskId = $taskId;
 
         return $this;
     }
 
     /**
-     * @param int $createdAt
+     * @param string $names
      *
      * @return self
      */
-    public function setCreatedAt(int $createdAt): self
+    public function setNames(string $names): self
     {
-        $this->createdAt = $createdAt;
+        $this->names = $names;
 
         return $this;
     }
@@ -159,18 +159,6 @@ class TaskWork extends Model
     }
 
     /**
-     * @param string $names
-     *
-     * @return self
-     */
-    public function setNames(string $names): self
-    {
-        $this->names = $names;
-
-        return $this;
-    }
-
-    /**
      * @param int $retry
      *
      * @return self
@@ -178,6 +166,18 @@ class TaskWork extends Model
     public function setRetry(int $retry): self
     {
         $this->retry = $retry;
+
+        return $this;
+    }
+
+    /**
+     * @param array $bodys
+     *
+     * @return self
+     */
+    public function setBodys(array $bodys): self
+    {
+        $this->bodys = $bodys;
 
         return $this;
     }
@@ -195,18 +195,6 @@ class TaskWork extends Model
     }
 
     /**
-     * @param string $taskId
-     *
-     * @return self
-     */
-    public function setTaskId(string $taskId): self
-    {
-        $this->taskId = $taskId;
-
-        return $this;
-    }
-
-    /**
      * @param int $uid
      *
      * @return self
@@ -214,6 +202,18 @@ class TaskWork extends Model
     public function setUid(int $uid): self
     {
         $this->uid = $uid;
+
+        return $this;
+    }
+
+    /**
+     * @param int $createdAt
+     *
+     * @return self
+     */
+    public function setCreatedAt(int $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -231,21 +231,21 @@ class TaskWork extends Model
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getBodys(): ?array
+    public function getTaskId(): ?string
     
     {
-        return $this->bodys;
+        return $this->taskId;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getCreatedAt(): ?int
+    public function getNames(): ?string
     
     {
-        return $this->createdAt;
+        return $this->names;
     }
 
     /**
@@ -267,21 +267,21 @@ class TaskWork extends Model
     }
 
     /**
-     * @return string
-     */
-    public function getNames(): ?string
-    
-    {
-        return $this->names;
-    }
-
-    /**
      * @return int
      */
     public function getRetry(): ?int
     
     {
         return $this->retry;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBodys(): ?array
+    
+    {
+        return $this->bodys;
     }
 
     /**
@@ -294,21 +294,21 @@ class TaskWork extends Model
     }
 
     /**
-     * @return string
-     */
-    public function getTaskId(): ?string
-    
-    {
-        return $this->taskId;
-    }
-
-    /**
      * @return int
      */
     public function getUid(): ?int
     
     {
         return $this->uid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatedAt(): ?int
+    
+    {
+        return $this->createdAt;
     }
 
     /**

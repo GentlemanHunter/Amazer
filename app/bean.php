@@ -37,12 +37,12 @@ return [
         'class'    => HttpServer::class,
         'port'     => env('HTTP_PORT',18306),
         'listener' => [
-             'rpc' => bean('rpcServer'),
-             'tcp' => bean('tcpServer'),
+//             'rpc' => bean('rpcServer'),
+//             'tcp' => bean('tcpServer'),
         ],
         'process'  => [
 //            'monitor' => bean(\App\Process\MonitorProcess::class),
-//            'dispatch' => bean(\App\Process\DispatchProcess::class),
+            'logconsump' => bean(\App\Process\LogConsumptionProcess::class),
             'crontab' => bean(\Swoft\Crontab\Process\CrontabProcess::class)
         ],
         'on'       => [

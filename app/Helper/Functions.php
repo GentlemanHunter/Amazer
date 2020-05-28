@@ -187,3 +187,17 @@ if (!function_exists('UID')) {
         return $request->userInfo->getId();
     }
 }
+
+if (!function_exists('redisHashArray')){
+    /**
+     * 反序列化 redis 数据
+     * @param $value
+     * @return mixed
+     */
+    function redisHashArray($value)
+    {
+        $lists = array();
+        array_push($lists,unserialize($value));
+        return $lists[0];
+    }
+}
