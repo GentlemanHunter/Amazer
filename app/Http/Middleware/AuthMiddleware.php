@@ -13,6 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
+ * 用户基本 token 认证体系
  * Class AuthMiddleware
  * @Bean()
  * @package App\Http\Middleware

@@ -75,4 +75,22 @@ class ViewController
     {
         return view('home/register');
     }
+
+    /**
+     * 获取用户菜单
+     * @RequestMapping(route="home", method={"GET"})
+     */
+    public function home(Request $request, Response $response)
+    {
+        if (!$userId = checkAuth()) return $response->redirect('/views/login');
+        $menus = config('menu');
+        $userInfo = $request->userInfo;
+        return view('home/home', [
+            'menus' => $menus,
+            'userInfo' => $userInfo,
+            'wsUrl' => env('WS_URL'),
+            'webRtcUrl' => env('WEB_RTC_URL'),
+            'stunServer' => 'stun:stun.xten.com'
+        ]);
+    }
 }

@@ -11,7 +11,9 @@
 namespace App\Http\Controller;
 
 use App\Helper\MemoryTable;
+use App\Model\Dao\RedisHashDao;
 use Exception;
+use Swoft\Task\Task;
 use Swoft\Timer;
 use Swoft\Redis\Redis;
 use Swoft\Log\Helper\Log;
@@ -38,62 +40,6 @@ use Swoft\Http\Server\Annotation\Mapping\RequestMethod;
 class TimerController
 {
     /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws Exception
-     */
-    public function after(): array
-    {
-        Timer::after(3 * 1000, function (int $timerId) {
-            $user = new User();
-            $user->setAge(random_int(1, 100));
-            $user->setUserDesc('desc');
-
-            $user->save();
-            $id = $user->getId();
-
-            Redis::set("$id", $user->toArray());
-            Log::info('用户ID=' . $id . ' timerId=' . $timerId);
-            sgo(function () use ($id) {
-                $user = User::find($id)->toArray();
-                Log::info(JsonHelper::encode($user));
-                Redis::del("$id");
-            });
-        });
-
-        return ['after'];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws Exception
-     */
-    public function tick(): array
-    {
-        Timer::tick(3 * 1000, function (int $timerId) {
-            $user = new User();
-            $user->setAge(random_int(1, 100));
-            $user->setUserDesc('desc');
-
-            $user->save();
-            $id = $user->getId();
-
-            Redis::set("$id", $user->toArray());
-            Log::info('用户ID=' . $id . ' timerId=' . $timerId);
-            sgo(function () use ($id) {
-                $user = User::find($id)->toArray();
-                Log::info(JsonHelper::encode($user));
-                Redis::del("$id");
-            });
-        });
-
-        return ['tick'];
-    }
-
-    /**
      * @Inject()
      * @var RedisLogic
      */
@@ -101,7 +47,6 @@ class TimerController
 
     /**
      * @RequestMapping(route="/add/task",method={RequestMethod::POST})
-     * @Middleware(AuthMiddleware::class)
      * @Validate(validator="TaskWorkValidator",fields={"names","describe","execution","retry","bodys"})
      * @param Request $request
      * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
@@ -129,7 +74,7 @@ class TimerController
                 $execution,
                 $retry,
                 $bodys,
-                UID()
+                1
             );
             return apiSuccess(['taskId' => $id]);
         } catch (\Throwable $throwable) {
@@ -137,23 +82,34 @@ class TimerController
         }
     }
 
+    /**
+     * @RequestMapping(route="/del/task",method={RequestMethod::POST,RequestMethod::GET})
+     * @Validate(validator="TaskWorkValidator",fields={"taskId"})
+     * @param Request $request
+     * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     */
     public function delTaskWork(Request $request)
     {
         try {
             $taskId = $request->parsedBody('taskId');
 
-            /** @var MemoryTable $memoryTable */
-            $memoryTable = bean('App\Helper\MemoryTable');
-            $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID,(string)$taskId);
-            if ($timerId){
-                // 取消定时器
-                $memoryTable->forget(MemoryTable::TASK_TO_ID,(string)$taskId);
+            /** @var RedisHashDao $redisHashDao */
+            $redisHashDao = bean('App\Model\Dao\RedisHashDao');
+            $value = redisHashArray($redisHashDao->findByKeyAux($taskId));
+
+            if (!$value) {
+                throw new ApiException("任务不存在！", -1);
             }
 
+            if (($value['execution'] - time()) <= 2) {
+                throw new ApiException("任务执行时间 小于 2秒 禁止操作!!", -1);
+            }
 
+            Task::co('work', 'delQueue', [$taskId]);
 
-        } catch (\Throwable $throwable){
-
+            return apiSuccess(['taskId' => $taskId]);
+        } catch (\Throwable $throwable) {
+            return apiError($throwable->getCode(), $throwable->getMessage());
         }
     }
 }

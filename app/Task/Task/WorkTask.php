@@ -5,6 +5,7 @@ namespace App\Task\Task;
 
 use App\Helper\GuzzleRetry;
 use App\Helper\MemoryTable;
+use App\Model\Logic\RedisLogic;
 use App\Model\Logic\TaskWorkLogic;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
@@ -29,6 +30,12 @@ class WorkTask
      * @var TaskWorkLogic
      */
     private $taskWorkLogic;
+
+    /**
+     * @Inject()
+     * @var RedisLogic
+     */
+    private $redisLogic;
 
     /**
      * @TaskMapping(name="consumption")
@@ -66,7 +73,7 @@ class WorkTask
             $client = new Client(['handler' => $handlerState]);
             $reponse = $client->request($method, $url, $data);
 
-            CLog::info("response:".json_encode($reponse));
+//            CLog::info("response:".json_encode($reponse));
 
             /** @var MemoryTable $memoryTable */
             $memoryTable = bean('App\Helper\MemoryTable');
@@ -86,5 +93,22 @@ class WorkTask
     public function insertQueueData($taskId, $runTime): void
     {
         Redis::zAdd('zset_data', [$taskId => $runTime]);
+    }
+
+    /**
+     * 取消任务
+     * @TaskMapping(name="delQueue")
+     */
+    public function delQueueData($taskId) :void
+    {
+        /** @var MemoryTable $memoryTable */
+        $memoryTable = bean('App\Helper\MemoryTable');
+        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID,(string)$taskId);
+        if ($timerId){
+            // 取消定时器
+            $memoryTable->forget(MemoryTable::TASK_TO_ID,(string)$taskId);
+            Timer::clear((int)$timerId['timerId']);
+        }
+        $this->redisLogic->delTaskData($taskId);
     }
 }

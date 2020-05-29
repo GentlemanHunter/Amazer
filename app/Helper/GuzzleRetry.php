@@ -3,16 +3,14 @@
 namespace App\Helper;
 
 
-use App\Exception\TaskStatus;
-use App\Model\Logic\RedisLogic;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use App\Exception\TaskStatus;
 use GuzzleHttp\Psr7\Response;
+use App\Model\Logic\RedisLogic;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
-use Swoft\Log\Helper\CLog;
-use Swoft\Redis\Redis;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Class GuzzleRetry

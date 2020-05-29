@@ -32,14 +32,13 @@ class HomeController
     {
         /** @var Renderer $renderer */
         $renderer = Swoft::getBean('view');
-        $content  = $renderer->render('home/index');
+        $content = $renderer->render('home/index');
 
         return context()->getResponse()->withContentType(ContentType::HTML)->withContent($content);
     }
 
     /**
      * @RequestMapping("/hi")
-     *
      * @return Response
      */
     public function hi(): Response

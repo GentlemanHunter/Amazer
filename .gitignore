@@ -12,3 +12,4 @@ runtime/
 .DS_Store
 public/devtool/
 bin/php-cs-fixer
+docker-compose.yml

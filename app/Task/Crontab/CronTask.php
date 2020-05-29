@@ -44,11 +44,9 @@ class CronTask
                 \Swoft\Task\Task::async('work', 'consumption',
                     [$msec, $item, $value['retry'], $value['bodys']]
                 );
-                CLog::info("scoure:" . $score . "  value:" . json_encode($value));
+//                CLog::info("scoure:" . $score . "  value:" . json_encode($value));
                 Redis::zRem('zset_data', $item);
             }
-        }else{
-            CLog::info("没有任务");
         }
     }
 }

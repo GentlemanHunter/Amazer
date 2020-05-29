@@ -61,4 +61,12 @@ class TaskWorkValidator
      * @var string
      */
     protected $bodys = '';
+
+    /**
+     * @IsString()
+     * @Required()
+     * @NotEmpty(message="任务ID 不能为空")
+     * @var string
+     */
+    protected $taskId = '';
 }

@@ -7,8 +7,8 @@ use App\Exception\ApiException;
 use App\Exception\TaskStatus;
 use App\Model\Dao\RedisHashDao;
 use App\Model\Dao\RedisListDao;
+use App\Model\Dao\RedisSsetDao;
 use App\Model\Dao\TaskWorkDao;
-use App\Model\Entity\TaskWorkLog;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Task\Task;
@@ -37,6 +37,18 @@ class RedisLogic
      * @var RedisListDao
      */
     private $redisListDao;
+
+    /**
+     * @Inject()
+     * @var RedisSsetDao
+     */
+    private $redisSsetDao;
+
+    /**
+     * @Inject()
+     * @var TaskWorkLogic
+     */
+    private $taskWorkLogic;
 
     /**
      * 创建一个 redis hash
@@ -126,5 +138,62 @@ class RedisLogic
         }
 
         throw new ApiException("redis 存储异常", -1);
+    }
+
+    /**
+     * 取消 一个 任务
+     * @param $taskId
+     * @return string
+     * @throws ApiException
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function delTaskData($taskId)
+    {
+        $this->redisHashDao->delByKeyAux($taskId);
+        $this->redisSsetDao->delByValueAux($taskId);
+        $this->taskWorkDao->updateBytaskId($taskId, ['status' => TaskStatus::EXECUTEDCANCEL]);
+        return $this->addTaskLogAux(
+            $taskId,
+            1,
+            -1,
+            -1,
+            '用户取消任务',
+            TaskStatus::EXECUTEDCANCEL
+        );
+    }
+
+    /**
+     * 新增 同步 日志
+     * @param $taskId
+     * @param $length
+     * @param $complete
+     * @param $implement
+     * @param $result
+     * @param $status
+     * @return string
+     * @throws ApiException
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function addTaskLogAux($taskId, $length, $complete, $implement, $result, $status)
+    {
+        $data = $this->taskWorkLogic->findByTaskId($taskId);
+        if (!$data || is_null($data)) {
+            throw new ApiException("任务不存在???", -1);
+        }
+
+        $bodys = $data->getBodys();
+        $timesout = $bodys['timeout'] ?? -1;
+
+        return $this->taskWorkLogic->createTaskLogAux(
+            $data->getTaskId(),
+            $length,
+            $timesout,
+            $data->getBodys(),
+            $data->getExecution(),
+            $complete,
+            $implement,
+            $result,
+            $status
+        );
     }
 }

@@ -88,9 +88,9 @@ class TaskWorkLogic
      * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
      * @throws \Swoft\Db\Exception\DbException
      */
-    public function findByTaskId($taskId,$status = TaskStatus::EXECUTED)
+    public function findByTaskId($taskId, $status = TaskStatus::EXECUTEDSUCCESS)
     {
-        return $this->taskWorkDao->findByTaskId($taskId,$status);
+        return $this->taskWorkDao->findByTaskId($taskId, $status);
     }
 
     /**
@@ -100,6 +100,45 @@ class TaskWorkLogic
      */
     public function createTaskLogData(array $data)
     {
+        return $this->taskWorkLogDao->createLogData($data);
+    }
+
+    /**
+     * 创建一个 构建 日志
+     * @param $taskId
+     * @param $length
+     * @param $overtime
+     * @param $bodys
+     * @param $execution
+     * @param int $complete
+     * @param int $implement
+     * @param string $result
+     * @param int $status
+     * @return string
+     */
+    public function createTaskLogAux(
+        $taskId,
+        $length,
+        $overtime,
+        $bodys,
+        $execution,
+        $complete = 0,
+        $implement = 0,
+        $result = '',
+        $status = TaskStatus::UNEXECUTED
+    )
+    {
+        $data = [
+            'task_id' => $taskId,
+            'length' => $length,
+            'overtime' => $overtime,
+            'bodys' => $bodys,
+            'execution' => $execution,
+            'complete' => $complete,
+            'implement' => $implement,
+            'result' => $result,
+            'status' => $status
+        ];
         return $this->taskWorkLogDao->createLogData($data);
     }
 }
