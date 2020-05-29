@@ -5,7 +5,7 @@
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Swoft Framework 2.0 - PHP microservices coroutine framework</title>
+  <title>Wharf-S</title>
   <style type="text/css">
     *,
     *::before,
@@ -255,7 +255,7 @@
     <ul class="clearfix">
       <li><a href="/views/login">登录</a></li>
       <li><a href="/views/register">注册</a></li>
-      <li><a href="">Swoft.org</a></li>
+      <li><a href="/views/home">工作面板</a></li>
       <li><a href="">Gitter.im</a></li>
     </ul>
   </nav>
@@ -272,7 +272,7 @@
   <ul class="clearfix">
     <li><a href="/views/login">登录</a></li>
     <li><a href="/views/register">注册</a></li>
-    <li><a href="">Swoft.org</a></li>
+    <li><a href="/views/home">工作面板</a></li>
     <li><a href="">Gitter.im</a></li>
   </ul>
 </nav>

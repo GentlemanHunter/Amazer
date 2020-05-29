@@ -20,7 +20,7 @@ import {addFriend, addGroup} from "./panel.js";
 function ready() {
   layui.layim.on('ready', function (options) {
     var wsUrl = layui.jquery(".wsUrl").val();
-    var webSocket = createSocketConnection(wsUrl, getCookie('IM_TOKEN'));
+    var webSocket = createSocketConnection(wsUrl, getCookie('TOKEN_WHARF'));
     socketEvent(webSocket);
   });
 };

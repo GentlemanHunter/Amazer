@@ -184,7 +184,7 @@ if (!function_exists('UID')) {
         if ($request === null) {
             $request = context()->getRequest();
         }
-        return $request->userInfo->getId();
+        return $request->user;
     }
 }
 

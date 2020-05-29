@@ -15,9 +15,9 @@ class TaskStatus
 
 
     public static $errorMessages = [
-        self::UNEXECUTED => 'Task not yet performed!(:>',
-        self::EXECUTEDCANCEL => 'Task executed cancel !(:<',
-        self::EXECUTEDFAIL => 'Task execution failed!(:<',
-        self::EXECUTEDSUCCESS => 'Task executed successfully!(:'
+        self::UNEXECUTED => '待执行!(:>',
+        self::EXECUTEDCANCEL => '执行取消!(:<',
+        self::EXECUTEDFAIL => '执行失败(:<',
+        self::EXECUTEDSUCCESS => '执行成功!(:'
     ];
 }

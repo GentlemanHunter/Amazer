@@ -3,6 +3,7 @@
 
 namespace App\Model\Entity;
 
+use App\Exception\TaskStatus;
 use Swoft\Db\Annotation\Mapping\Column;
 use Swoft\Db\Annotation\Mapping\Entity;
 use Swoft\Db\Annotation\Mapping\Id;
@@ -234,7 +235,7 @@ class TaskWork extends Model
      * @return string
      */
     public function getTaskId(): ?string
-    
+
     {
         return $this->taskId;
     }
@@ -243,7 +244,7 @@ class TaskWork extends Model
      * @return string
      */
     public function getNames(): ?string
-    
+
     {
         return $this->names;
     }
@@ -252,25 +253,25 @@ class TaskWork extends Model
      * @return string|null
      */
     public function getDescribe(): ?string
-    
+
     {
         return $this->describe;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getExecution(): ?int
-    
+    public function getExecution(): ?string
+
     {
-        return $this->execution;
+        return date('Y-m-d H:i:s',$this->execution);
     }
 
     /**
      * @return int
      */
     public function getRetry(): ?int
-    
+
     {
         return $this->retry;
     }
@@ -279,45 +280,44 @@ class TaskWork extends Model
      * @return array
      */
     public function getBodys(): ?array
-    
+
     {
         return $this->bodys;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getStatus(): ?int
-    
+    public function getStatus(): ?string
     {
-        return $this->status;
+        return TaskStatus::$errorMessages[$this->status];
     }
 
     /**
      * @return int
      */
     public function getUid(): ?int
-    
+
     {
         return $this->uid;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getCreatedAt(): ?int
-    
+    public function getCreatedAt(): ?string
+
     {
-        return $this->createdAt;
+        return date('Y-m-d H:i:s',$this->createdAt);
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getUpdatedAt(): ?int
-    
+    public function getUpdatedAt(): ?string
     {
-        return $this->updatedAt;
-    }
+        return date('Y-m-d H:i:s',$this->updatedAt);
+    }
+
 
 }

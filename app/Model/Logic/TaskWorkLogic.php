@@ -141,4 +141,20 @@ class TaskWorkLogic
         ];
         return $this->taskWorkLogDao->createLogData($data);
     }
+
+    /**
+     * 根据 用户 获取 task 分页 列表
+     * @param $uid
+     * @param $page
+     * @param $pageSize
+     * @return array
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function getTaskWorkPagingByUid($uid, $page, $pageSize)
+    {
+        $count = $this->taskWorkDao->getCount(['uid', '=', (string)$uid]) ?? 0;
+        $data = $this->taskWorkDao->getPaging(['uid', '=', (string)$uid], $page, $pageSize) ?? [];
+
+        return ['data' => $data, 'total' => $count];
+    }
 }

@@ -189,7 +189,7 @@ class RedisLogic
             $length,
             $timesout,
             $data->getBodys(),
-            $data->getExecution(),
+            strtotime($data->getExecution()),
             $complete,
             $implement,
             $result,

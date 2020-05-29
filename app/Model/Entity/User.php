@@ -192,7 +192,7 @@ class User extends Model
      * @return int
      */
     public function getId(): ?int
-    
+
     {
         return $this->id;
     }
@@ -201,7 +201,7 @@ class User extends Model
      * @return string
      */
     public function getAccount(): ?string
-    
+
     {
         return $this->account;
     }
@@ -210,7 +210,7 @@ class User extends Model
      * @return string
      */
     public function getUsername(): ?string
-    
+
     {
         return $this->username;
     }
@@ -219,7 +219,7 @@ class User extends Model
      * @return string
      */
     public function getPassword(): ?string
-    
+
     {
         return $this->password;
     }
@@ -228,25 +228,25 @@ class User extends Model
      * @return string
      */
     public function getVisitor(): ?string
-    
+
     {
         return $this->visitor;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getCreateAt(): ?int
-    
+    public function getCreateAt(): ?string
+
     {
-        return $this->createAt;
+        return date('Y-m-d H:i:s',$this->createAt);
     }
 
     /**
      * @return int
      */
     public function getUpdateAt(): ?int
-    
+
     {
         return $this->updateAt;
     }
@@ -255,9 +255,10 @@ class User extends Model
      * @return int|null
      */
     public function getDeleteAt(): ?int
-    
+
     {
         return $this->deleteAt;
-    }
+    }
+
 
 }

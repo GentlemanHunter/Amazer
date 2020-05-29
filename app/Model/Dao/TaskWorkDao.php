@@ -7,6 +7,7 @@ use App\Exception\TaskStatus;
 use App\Model\Entity\TaskWork;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Log\Helper\CLog;
 
 /**
  * Class TaskWorkDao
@@ -55,5 +56,33 @@ class TaskWorkDao
     public function updateBytaskId($taskId, $data)
     {
         return $this->taskWorkEntity::where('task_id', '=', $taskId)->update($data);
+    }
+
+    /**
+     * task 分页 获取
+     * @param array $where
+     * @param int $page
+     * @param int $pageSize
+     * @param array|string[] $field
+     * @return \Swoft\Db\Eloquent\Collection
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function getPaging(array $where, int $page, int $pageSize, array $field = ['*'])
+    {
+        return $this->taskWorkEntity::where([$where])
+            ->forPage($page, $pageSize)
+            ->orderBy('execution', 'desc')
+            ->get($field);
+    }
+
+    /**
+     * 根据条件返回 总条数
+     * @param array $where
+     * @param string $field
+     * @return int
+     */
+    public function getCount(array $where,$field = '*')
+    {
+        return $this->taskWorkEntity::where([$where])->count($field);
     }
 }

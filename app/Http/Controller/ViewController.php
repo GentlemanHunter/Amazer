@@ -15,7 +15,9 @@ use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
+use Swoft\Http\Server\Annotation\Mapping\Middleware;
 use Swoft\View\Annotation\Mapping\View;
+use App\Http\Middleware\ViewsMiddleware;
 use Throwable;
 
 /**
@@ -79,18 +81,45 @@ class ViewController
     /**
      * 获取用户菜单
      * @RequestMapping(route="home", method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
      */
     public function home(Request $request, Response $response)
     {
-        if (!$userId = checkAuth()) return $response->redirect('/views/login');
         $menus = config('menu');
         $userInfo = $request->userInfo;
         return view('home/home', [
             'menus' => $menus,
-            'userInfo' => $userInfo,
-            'wsUrl' => env('WS_URL'),
-            'webRtcUrl' => env('WEB_RTC_URL'),
-            'stunServer' => 'stun:stun.xten.com'
+            'userInfo' => $userInfo
         ]);
+    }
+
+    /**
+     * @RequestMapping(route="userInfo",method={"GET"})
+     */
+    public function userInfo(Request $request, Response $response)
+    {
+        return view('user/info');
+    }
+
+    /**
+     * @RequestMapping(route="machine",method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
+     * @return Response
+     * @throws Throwable
+     */
+    public function machine()
+    {
+        return view('machine/list');
+    }
+
+    /**
+     * @RequestMapping(route="task",method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
+     * @return Response
+     * @throws Throwable
+     */
+    public function task()
+    {
+        return view('task/list');
     }
 }

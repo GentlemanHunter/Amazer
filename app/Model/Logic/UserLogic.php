@@ -123,4 +123,18 @@ class UserLogic
         ];
         return $this->userDao->updateById($userId, $data);
     }
+
+    /**
+     * 更新用户信息
+     * @param int $userId
+     * @param string $username
+     * @return int
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function updateInfo(int $userId, string $username)
+    {
+        return $this->userDao->updateById($userId, [
+            'username' => $username
+        ]);
+    }
 }

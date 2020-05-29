@@ -3,10 +3,10 @@
 
 namespace App\Http\Controller;
 
-use App\Model\Entity\User;
 use Swoft\Db\DB;
 use App\Helper\JwtHelper;
 use App\Helper\AuthHelper;
+use App\Model\Entity\User;
 use App\Model\Logic\UserLogic;
 use Swoft\Http\Message\Request;
 use Swoft\Bean\Annotation\Mapping\Inject;
@@ -17,6 +17,7 @@ use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\RequestMethod;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
 use App\Http\Middleware\AuthMiddleware;
+use App\Http\Middleware\ViewsMiddleware;
 
 /**
  * Class UserController
@@ -83,11 +84,43 @@ class UserController
 
     /**
      * 用户退出
-     * @RequestMapping(route="signOut",method={RequestMethod::GET})
+     * @RequestMapping(route="signout",method={RequestMethod::GET})
+     * @Middleware(ViewsMiddleware::class)
+     */
+    public function signout(Request $request, Response $response)
+    {
+        return context()->getResponse()->withCookie('TOKEN_WHARF', [
+            'value' => '',
+            'path' => '/'
+        ])->redirect('/views/login');
+    }
+
+    /**
+     * @RequestMapping(route="info",method={RequestMethod::GET})
      * @Middleware(AuthMiddleware::class)
      */
-    public function signOut(Request $request, Response $response)
+    public function userInfo(Request $request)
     {
-        return apiSuccess();
+        try {
+            return apiSuccess($request->userInfo);
+        } catch (\Throwable $throwable) {
+            return apiError($throwable->getCode(), $throwable->getMessage());
+        }
+    }
+
+    /**
+     * @RequestMapping(route="update",method={RequestMethod::POST})
+     * @Middleware(AuthMiddleware::class)
+     * @Validate(validator="UserValidator",fields={"username"})
+     */
+    public function changeUserInfo(Request $request)
+    {
+        try {
+            $username = $request->parsedBody('username');
+            $result = $this->userLogic->updateInfo($request->user, $username);
+            return apiSuccess($result);
+        } catch (\Throwable $throwable) {
+            return apiError($throwable->getCode(), $throwable->getMessage());
+        }
     }
 }

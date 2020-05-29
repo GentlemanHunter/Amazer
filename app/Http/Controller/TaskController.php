@@ -11,10 +11,13 @@
 namespace App\Http\Controller;
 
 use Swoft\Http\Message\Request;
+use Swoft\Http\Message\Response;
+use App\Model\Logic\TaskWorkLogic;
+use App\Http\Middleware\AuthMiddleware;
+use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
+use Swoft\Http\Server\Annotation\Mapping\Middleware;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
-use Swoft\Task\Exception\TaskException;
-use Swoft\Task\Task;
 
 /**
  * Class TaskController
@@ -26,97 +29,24 @@ use Swoft\Task\Task;
 class TaskController
 {
     /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
+     * @Inject()
+     * @var TaskWorkLogic
      */
-    public function getListByCo(): array
-    {
-        return Task::co('testTask', 'list', [12]);
-    }
+    private $taskWorkLogic;
 
     /**
-     * @RequestMapping(route="deleteByCo")
-     *
-     * @return array
-     * @throws TaskException
+     * @RequestMapping(route="list",method={"GET"})
+     * @Middleware(AuthMiddleware::class)
+     * @param Request $request
+     * @param Response $response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @throws \Swoft\Db\Exception\DbException
      */
-    public function deleteByCo(): array
+    public function getList(Request $request, Response $response)
     {
-        $data = Task::co('testTask', 'delete', [12]);
-        if (is_bool($data)) {
-            return ['bool'];
-        }
+        $page = $request->parsedBody('page') ?? 1;
+        $limit = $request->parsedBody('limit') ?? 10;
 
-        return ['notBool'];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function getListByAsync(): array
-    {
-        $data = Task::async('testTask', 'list', [12]);
-
-        return [$data];
-    }
-
-    /**
-     * @RequestMapping(route="deleteByAsync")
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function deleteByAsync(): array
-    {
-        $data = Task::async('testTask', 'delete', [12]);
-
-        return [$data];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function returnNull(): array
-    {
-        $result = Task::co('testTask', 'returnNull', ['name']);
-        return [$result];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function returnVoid(): array
-    {
-        $result = Task::co('testTask', 'returnVoid', ['name']);
-        return [$result];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function syncTask(): array
-    {
-        $result  = Task::co('sync', 'test', ['name']);
-        $result2 = Task::co('sync', 'testBool');
-        $result3 = Task::co('sync', 'testNull');
-
-        $data[] = $result;
-        $data[] = $result2;
-        $data[] = $result3;
-        return $data;
+        return apiSuccess($this->taskWorkLogic->getTaskWorkPagingByUid(UID(), (int)$page, (int)$limit));
     }
 }
