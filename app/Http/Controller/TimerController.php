@@ -95,11 +95,13 @@ class TimerController
 
             /** @var RedisHashDao $redisHashDao */
             $redisHashDao = bean('App\Model\Dao\RedisHashDao');
-            $value = redisHashArray($redisHashDao->findByKeyAux($taskId));
+            $value = $redisHashDao->findByKeyAux($taskId);
 
             if (!$value) {
-                throw new ApiException("任务不存在！", -1);
+                throw new ApiException("任务不存在！或者已经超过执行时间！", -1);
             }
+
+            $value = redisHashArray($value);
 
             if (($value['execution'] - time()) <= 2) {
                 throw new ApiException("任务执行时间 小于 2秒 禁止操作!!", -1);

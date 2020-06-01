@@ -13,11 +13,14 @@
 </body>
 
 <script type="text/html" id="operation">
+  <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
   <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 
 <script type="module">
-  import {getCookie} from '/service/js/util.js'
+  import {getCookie} from '/service/js/util.js';
+  import {task_delete} from '/service/js/api.js';
+  import {postRequest} from '/service/js/request.js';
 
   layui.use(['table', 'code'], function () {
     var table = layui.table;
@@ -51,22 +54,33 @@
         , last: false //不显示尾页
 
       }
-      ,cellMinHeight : 100
+      , cellMinHeight: 100
       , cols: [[
-        {field: 'taskId', minWidth: 80, title: 'taskId', sort: true, rowspan: 2}
+        {fixed: 'left', title: '操作', toolbar: '#operation', rowspan: 2, width: 120}
+        , {field: 'taskId', minWidth: 80, title: 'taskId', sort: true, rowspan: 2}
         , {field: 'names', minWidth: 100, title: '任务名称', rowspan: 2}
         , {field: 'describe', minWidth: 100, title: '任务描述', rowspan: 2}
         , {field: 'execution', minWidth: 80, title: '执行时间', sort: true, rowspan: 2}
         , {field: 'retry', minWidth: 80, title: '重试次数', sort: true, rowspan: 2}
-        , {title: '请求体', align: 'center', minWidth:80,colspan:9}
+        , {title: '请求体', align: 'center', minWidth: 80, colspan: 12}
         , {field: 'status', minWidth: 80, title: '状态', rowspan: 2}
         , {field: 'createdAt', minWidth: 80, title: '创建时间', rowspan: 2}
         , {field: 'updatedAt', minWidth: 80, title: '更新时间', rowspan: 2}
-        , {fixed: 'right', title: '操作', toolbar: '#operation', rowspan: 2}
-      ],[
-        {field: 'body.url',title: "URL",templet: '<div>{{d.bodys.url}}</div>'}
-        ,{field: 'bodys.method',title: "Method", templet: '<div>{{d.bodys.method}}</div>'}
-        ,{field: 'bodys.cookies',title: "Cookie", templet: '<div>{{d.bodys.cookies??"没有定义"}}</div>'}
+      ], [
+        {field: 'body.url', title: "URL", templet: '<div>{{d.bodys.url}}</div>'}
+        , {field: 'bodys.method', title: "Method", templet: '<div>{{d.bodys.method}}</div>'}
+        , {field: 'bodys.cookies', title: "Cookie", templet: '<div>{{d.bodys.cookies??"没有传参"}}</div>'}
+        , {field: 'bodys.body', title: "Body", templet: '<div>{{d.bodys.body??"没有传参"}}</div>'}
+        , {field: 'bodys.headers', title: "Headers", templet: '<div>{{d.bodys.headers??"没有传参"}}</div>'}
+        , {field: 'bodys.form_params', title: "FormParams", templet: '<div>{{d.bodys.form_params??"没有传参"}}</div>'}
+        , {field: 'bodys.timeout', title: "Timeout", templet: '<div>{{d.bodys.timeout??"没有传参"}}</div>'}
+        , {field: 'bodys.version', title: "Version", templet: '<div>{{d.bodys.version??"没有传参"}}</div>'}
+        , {
+          field: 'bodys.connect_timeout',
+          title: "ConnectTimeout",
+          templet: '<div>{{d.bodys.connect_timeout??"没有传参"}}</div>'
+        }
+        , {field: 'bodys.verify', title: "Verify", templet: '<div>{{d.bodys.verify??"没有传参"}}</div>'}
       ]]
     });
 
@@ -76,9 +90,14 @@
       console.log(obj)
       if (obj.event === 'del') {
         layer.confirm('真的删除行么', function (index) {
-          obj.del();
-          layer.close(index);
+          postRequest(task_delete, {'taskId': data.taskId}, function (result) {
+            console.log(result);
+            obj.del();
+            layer.close(index);
+          });
         });
+      } else if (obj.event === 'detail') {
+        layer.msg('TASKID：' + data.taskId + ' 的查看操作');
       }
     });
   });

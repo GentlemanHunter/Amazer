@@ -5,6 +5,7 @@ var user_login = '/user/login';
 var static_user_info = '/views/userInfo';
 var user_info = '/user/info';
 var user_change_name_info = '/user/update';
+var task_delete = '/del/task';
 
 export {
   user_register,
@@ -13,5 +14,6 @@ export {
   user_login,
   static_user_info,
   user_info,
-  user_change_name_info
+  user_change_name_info,
+  task_delete
 };
