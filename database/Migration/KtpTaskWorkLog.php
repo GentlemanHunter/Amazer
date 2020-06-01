@@ -44,7 +44,7 @@ class KtpTaskWorkLog extends BaseMigration
             $table->integer('created_at')->comment("创建时间");
             $table->integer('updated_at')->comment("更新时间");
 
-            $table->unique('task_id');
+            $table->index('task_id');
             $table->comment('系统任务日志表');
             $table->charset = 'utf8mb4';
 
