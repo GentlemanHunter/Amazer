@@ -201,3 +201,17 @@ if (!function_exists('redisHashArray')){
         return $lists[0];
     }
 }
+
+if (!function_exists('getUserInfo')){
+    /**
+     * 获取用户的 姓名
+     * @param $uid
+     * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Collection|\Swoft\Db\Eloquent\Model|null
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    function getUserInfo($uid){
+        /** @var \App\Model\Dao\UserDao $userDao */
+        $userDao = bean('App\Model\Dao\UserDao');
+        return $userDao->findUserInfoById($uid);
+    }
+}

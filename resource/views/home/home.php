@@ -48,13 +48,13 @@ EOF;
     <!-- 内容主体区域 -->
     <div style="padding: 15px;">
       <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
-        <legend>OS</legend>
+        <legend>OS信息</legend>
       </fieldset>
       <div class="layui-collapse" lay-filter="test">
         <div class="layui-colla-item">
-          <h2 class="layui-colla-title">队列处理任务</h2>
+          <h2 class="layui-colla-title">Task Total</h2>
           <div class="layui-colla-content">
-            <p><b>当前任务面板 暂未考虑 敬请期待</b></p>
+            <div id="main"></div>
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@ EOF;
             <div class="layui-card-header">联系开发人员</div>
             <div class="layui-card-body">
               <p align="center">
-                 暂无：
+                暂无：
               </p>
             </div>
           </div>
@@ -95,7 +95,6 @@ EOF;
 </div>
 <script type="module">
   import {static_user_info} from '/service/js/api.js';
-
   layui.use(['layer', 'jquery', 'element', 'code'], function () {
     var layer = layui.layer;
     var $ = layui.jquery;
@@ -136,7 +135,6 @@ EOF;
         success: function (layero) {
         }
       });
-
     });
   });
 </script>

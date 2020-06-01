@@ -8,6 +8,7 @@ use App\Model\Dao\TaskWorkDao;
 use App\Model\Dao\TaskWorkLogDao;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Log\Helper\CLog;
 
 /**
  * Class TaskWorkLogic
@@ -155,6 +156,26 @@ class TaskWorkLogic
         $count = $this->taskWorkDao->getCount(['uid', '=', (string)$uid]) ?? 0;
         $data = $this->taskWorkDao->getPaging(['uid', '=', (string)$uid], $page, $pageSize) ?? [];
 
+        if ($data) {
+            $data = $data->toArray();
+        }
+        $username = getUserInfo($uid)->getUsername() ?? '此用户异常';
+        foreach ($data as &$item) {
+            $item['username'] = $username;
+            $item['status'] = TaskStatus::$errorMessages[$item['status']];
+        }
+
         return ['data' => $data, 'total' => $count];
+    }
+
+    /**
+     * 返回 task 主体
+     * @param $taskId
+     * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function findByTaskIdInfo($taskId)
+    {
+        return $this->taskWorkDao->findByTaskId($taskId);
     }
 }

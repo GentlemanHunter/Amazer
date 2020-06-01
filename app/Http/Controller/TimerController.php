@@ -10,9 +10,12 @@
 
 namespace App\Http\Controller;
 
+use App\Exception\TaskStatus;
 use App\Helper\MemoryTable;
 use App\Model\Dao\RedisHashDao;
+use App\Model\Logic\TaskWorkLogic;
 use Exception;
+use Swoft\Log\Helper\CLog;
 use Swoft\Task\Task;
 use Swoft\Timer;
 use Swoft\Redis\Redis;
@@ -98,13 +101,22 @@ class TimerController
             $value = $redisHashDao->findByKeyAux($taskId);
 
             if (!$value) {
-                throw new ApiException("任务不存在！或者已经超过执行时间！", -1);
-            }
+                /** @var TaskWorkLogic $taskWorkLogic */
+                $taskWorkLogic = bean('App\Model\Logic\TaskWorkLogic');
+                $value = $taskWorkLogic->findByTaskIdInfo($taskId);
 
-            $value = redisHashArray($value);
+                if (!$value) throw new ApiException("任务不存在", -1);
 
-            if (($value['execution'] - time()) <= 2) {
-                throw new ApiException("任务执行时间 小于 2秒 禁止操作!!", -1);
+                if ($value->getStatus(true) > TaskStatus::UNEXECUTED)
+                    throw new ApiException(TaskStatus::$errorMessages[$value->getStatus(true)], -1);
+
+                if (($value->getExecution(true) - time()) <= 2)
+                    throw new ApiException("任务执行时间小于 2 秒 禁止操作!!", -1);
+
+            } else {
+                $value = redisHashArray($value);
+                if (($value['execution'] - time()) <= 2)
+                    throw new ApiException("任务执行时间 小于 2秒 禁止操作!!", -1);
             }
 
             Task::co('work', 'delQueue', [$taskId]);

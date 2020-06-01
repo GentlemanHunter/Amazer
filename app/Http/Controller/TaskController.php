@@ -10,6 +10,7 @@
 
 namespace App\Http\Controller;
 
+use App\Exception\TaskStatus;
 use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
 use App\Model\Logic\TaskWorkLogic;
@@ -18,6 +19,7 @@ use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\Middleware;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
+use Swoft\Log\Helper\CLog;
 
 /**
  * Class TaskController
@@ -44,9 +46,9 @@ class TaskController
      */
     public function getList(Request $request, Response $response)
     {
-        $page = $request->parsedBody('page') ?? 1;
-        $limit = $request->parsedBody('limit') ?? 10;
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 10);
 
-        return apiSuccess($this->taskWorkLogic->getTaskWorkPagingByUid(UID(), (int)$page, (int)$limit));
+        return apiSuccess($this->taskWorkLogic->getTaskWorkPagingByUid(UID(),(int)$page,(int)$limit));
     }
 }

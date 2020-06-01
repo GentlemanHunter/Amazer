@@ -20,15 +20,6 @@ use Swoft\Db\Eloquent\Model;
 class User extends Model
 {
     /**
-     * 主键
-     * @Id()
-     * @Column()
-     *
-     * @var int
-     */
-    private $id;
-
-    /**
      * 用户登录帐号
      *
      * @Column()
@@ -36,33 +27,6 @@ class User extends Model
      * @var string
      */
     private $account;
-
-    /**
-     * 用户昵称
-     *
-     * @Column()
-     *
-     * @var string
-     */
-    private $username;
-
-    /**
-     * 用户密码
-     *
-     * @Column(hidden=true)
-     *
-     * @var string
-     */
-    private $password;
-
-    /**
-     * 用户上次登录ip地址
-     *
-     * @Column()
-     *
-     * @var string
-     */
-    private $visitor;
 
     /**
      * 创建时间
@@ -74,6 +38,33 @@ class User extends Model
     private $createAt;
 
     /**
+     * 删除时间 为NULL未删除
+     *
+     * @Column(name="delete_at", prop="deleteAt")
+     *
+     * @var int|null
+     */
+    private $deleteAt;
+
+    /**
+     * 主键
+     * @Id()
+     * @Column()
+     *
+     * @var int
+     */
+    private $id;
+
+    /**
+     * 用户密码
+     *
+     * @Column(hidden=true)
+     *
+     * @var string
+     */
+    private $password;
+
+    /**
      * 更新时间
      *
      * @Column(name="update_at", prop="updateAt")
@@ -83,26 +74,23 @@ class User extends Model
     private $updateAt;
 
     /**
-     * 删除时间 为NULL未删除
+     * 用户昵称
      *
-     * @Column(name="delete_at", prop="deleteAt")
+     * @Column()
      *
-     * @var int|null
+     * @var string
      */
-    private $deleteAt;
-
+    private $username;
 
     /**
-     * @param int $id
+     * 用户上次登录ip地址
      *
-     * @return self
+     * @Column()
+     *
+     * @var string
      */
-    public function setId(int $id): self
-    {
-        $this->id = $id;
+    private $visitor;
 
-        return $this;
-    }
 
     /**
      * @param string $account
@@ -112,42 +100,6 @@ class User extends Model
     public function setAccount(string $account): self
     {
         $this->account = $account;
-
-        return $this;
-    }
-
-    /**
-     * @param string $username
-     *
-     * @return self
-     */
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    /**
-     * @param string $password
-     *
-     * @return self
-     */
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * @param string $visitor
-     *
-     * @return self
-     */
-    public function setVisitor(string $visitor): self
-    {
-        $this->visitor = $visitor;
 
         return $this;
     }
@@ -165,18 +117,6 @@ class User extends Model
     }
 
     /**
-     * @param int $updateAt
-     *
-     * @return self
-     */
-    public function setUpdateAt(int $updateAt): self
-    {
-        $this->updateAt = $updateAt;
-
-        return $this;
-    }
-
-    /**
      * @param int|null $deleteAt
      *
      * @return self
@@ -189,10 +129,97 @@ class User extends Model
     }
 
     /**
+     * @param int $id
+     *
+     * @return self
+     */
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @param string $password
+     *
+     * @return self
+     */
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @param int $updateAt
+     *
+     * @return self
+     */
+    public function setUpdateAt(int $updateAt): self
+    {
+        $this->updateAt = $updateAt;
+
+        return $this;
+    }
+
+    /**
+     * @param string $username
+     *
+     * @return self
+     */
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * @param string $visitor
+     *
+     * @return self
+     */
+    public function setVisitor(string $visitor): self
+    {
+        $this->visitor = $visitor;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccount(): ?string
+    
+    {
+        return $this->account;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreateAt(): ?int
+    
+    {
+        return $this->createAt;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeleteAt(): ?int
+    
+    {
+        return $this->deleteAt;
+    }
+
+    /**
      * @return int
      */
     public function getId(): ?int
-
+    
     {
         return $this->id;
     }
@@ -200,17 +227,26 @@ class User extends Model
     /**
      * @return string
      */
-    public function getAccount(): ?string
-
+    public function getPassword(): ?string
+    
     {
-        return $this->account;
+        return $this->password;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdateAt(): ?int
+    
+    {
+        return $this->updateAt;
     }
 
     /**
      * @return string
      */
     public function getUsername(): ?string
-
+    
     {
         return $this->username;
     }
@@ -218,47 +254,10 @@ class User extends Model
     /**
      * @return string
      */
-    public function getPassword(): ?string
-
-    {
-        return $this->password;
-    }
-
-    /**
-     * @return string
-     */
     public function getVisitor(): ?string
-
+    
     {
         return $this->visitor;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCreateAt(): ?string
-
-    {
-        return date('Y-m-d H:i:s',$this->createAt);
-    }
-
-    /**
-     * @return int
-     */
-    public function getUpdateAt(): ?int
-
-    {
-        return $this->updateAt;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getDeleteAt(): ?int
-
-    {
-        return $this->deleteAt;
-    }
-
+    }
 
 }

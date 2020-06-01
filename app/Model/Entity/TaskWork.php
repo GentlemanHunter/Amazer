@@ -3,7 +3,6 @@
 
 namespace App\Model\Entity;
 
-use App\Exception\TaskStatus;
 use Swoft\Db\Annotation\Mapping\Column;
 use Swoft\Db\Annotation\Mapping\Entity;
 use Swoft\Db\Annotation\Mapping\Id;
@@ -21,22 +20,22 @@ use Swoft\Db\Eloquent\Model;
 class TaskWork extends Model
 {
     /**
-     * 任务id
-     * @Id(incrementing=false)
-     * @Column(name="task_id", prop="taskId")
-     *
-     * @var string
-     */
-    private $taskId;
-
-    /**
-     * 任务名称
+     * 执行体
      *
      * @Column()
      *
-     * @var string
+     * @var array
      */
-    private $names;
+    private $bodys;
+
+    /**
+     * 创建时间
+     *
+     * @Column(name="created_at", prop="createdAt")
+     *
+     * @var int
+     */
+    private $createdAt;
 
     /**
      * 任务描述
@@ -57,6 +56,15 @@ class TaskWork extends Model
     private $execution;
 
     /**
+     * 任务名称
+     *
+     * @Column()
+     *
+     * @var string
+     */
+    private $names;
+
+    /**
      * 任务重试次数 默认1 重试一次
      *
      * @Column()
@@ -64,15 +72,6 @@ class TaskWork extends Model
      * @var int
      */
     private $retry;
-
-    /**
-     * 执行体
-     *
-     * @Column()
-     *
-     * @var array
-     */
-    private $bodys;
 
     /**
      * 虚拟状态 由模型去控制 默认 0
@@ -84,6 +83,15 @@ class TaskWork extends Model
     private $status;
 
     /**
+     * 任务id
+     * @Id(incrementing=false)
+     * @Column(name="task_id", prop="taskId")
+     *
+     * @var string
+     */
+    private $taskId;
+
+    /**
      * 用户id
      *
      * @Column()
@@ -91,15 +99,6 @@ class TaskWork extends Model
      * @var int
      */
     private $uid;
-
-    /**
-     * 创建时间
-     *
-     * @Column(name="created_at", prop="createdAt")
-     *
-     * @var int
-     */
-    private $createdAt;
 
     /**
      * 更新时间
@@ -112,25 +111,25 @@ class TaskWork extends Model
 
 
     /**
-     * @param string $taskId
+     * @param array $bodys
      *
      * @return self
      */
-    public function setTaskId(string $taskId): self
+    public function setBodys(array $bodys): self
     {
-        $this->taskId = $taskId;
+        $this->bodys = $bodys;
 
         return $this;
     }
 
     /**
-     * @param string $names
+     * @param int $createdAt
      *
      * @return self
      */
-    public function setNames(string $names): self
+    public function setCreatedAt(int $createdAt): self
     {
-        $this->names = $names;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -160,6 +159,18 @@ class TaskWork extends Model
     }
 
     /**
+     * @param string $names
+     *
+     * @return self
+     */
+    public function setNames(string $names): self
+    {
+        $this->names = $names;
+
+        return $this;
+    }
+
+    /**
      * @param int $retry
      *
      * @return self
@@ -167,18 +178,6 @@ class TaskWork extends Model
     public function setRetry(int $retry): self
     {
         $this->retry = $retry;
-
-        return $this;
-    }
-
-    /**
-     * @param array $bodys
-     *
-     * @return self
-     */
-    public function setBodys(array $bodys): self
-    {
-        $this->bodys = $bodys;
 
         return $this;
     }
@@ -196,6 +195,18 @@ class TaskWork extends Model
     }
 
     /**
+     * @param string $taskId
+     *
+     * @return self
+     */
+    public function setTaskId(string $taskId): self
+    {
+        $this->taskId = $taskId;
+
+        return $this;
+    }
+
+    /**
      * @param int $uid
      *
      * @return self
@@ -203,18 +214,6 @@ class TaskWork extends Model
     public function setUid(int $uid): self
     {
         $this->uid = $uid;
-
-        return $this;
-    }
-
-    /**
-     * @param int $createdAt
-     *
-     * @return self
-     */
-    public function setCreatedAt(int $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -232,92 +231,93 @@ class TaskWork extends Model
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getTaskId(): ?string
-
+    public function getBodys(): ?array
+    
     {
-        return $this->taskId;
+        return $this->bodys;
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getNames(): ?string
-
+    public function getCreatedAt(): ?int
+    
     {
-        return $this->names;
+        return $this->createdAt;
     }
 
     /**
      * @return string|null
      */
     public function getDescribe(): ?string
-
+    
     {
         return $this->describe;
     }
 
     /**
+     * @return int
+     */
+    public function getExecution(): ?int
+    
+    {
+        return $this->execution;
+    }
+
+    /**
      * @return string
      */
-    public function getExecution(): ?string
-
+    public function getNames(): ?string
+    
     {
-        return date('Y-m-d H:i:s',$this->execution);
+        return $this->names;
     }
 
     /**
      * @return int
      */
     public function getRetry(): ?int
-
+    
     {
         return $this->retry;
     }
 
     /**
-     * @return array
+     * @return int
      */
-    public function getBodys(): ?array
-
+    public function getStatus(): ?int
+    
     {
-        return $this->bodys;
+        return $this->status;
     }
 
     /**
      * @return string
      */
-    public function getStatus(): ?string
+    public function getTaskId(): ?string
+    
     {
-        return TaskStatus::$errorMessages[$this->status];
+        return $this->taskId;
     }
 
     /**
      * @return int
      */
     public function getUid(): ?int
-
+    
     {
         return $this->uid;
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getCreatedAt(): ?string
-
+    public function getUpdatedAt(): ?int
+    
     {
-        return date('Y-m-d H:i:s',$this->createdAt);
-    }
-
-    /**
-     * @return string
-     */
-    public function getUpdatedAt(): ?string
-    {
-        return date('Y-m-d H:i:s',$this->updatedAt);
-    }
-
+        return $this->updatedAt;
+    }
 
 }

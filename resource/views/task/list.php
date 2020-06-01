@@ -14,7 +14,7 @@
 
 <script type="text/html" id="operation">
   <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
-  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">取消</a>
 </script>
 
 <script type="module">
@@ -22,8 +22,9 @@
   import {task_delete} from '/service/js/api.js';
   import {postRequest} from '/service/js/request.js';
 
-  layui.use(['table', 'code'], function () {
+  layui.use(['table', 'code', 'util'], function () {
     var table = layui.table;
+    var util = layui.util;
     table.render({
       elem: '#table'
       , url: '/task/list'
@@ -60,12 +61,24 @@
         , {field: 'taskId', minWidth: 80, title: 'taskId', sort: true, rowspan: 2}
         , {field: 'names', minWidth: 100, title: '任务名称', rowspan: 2}
         , {field: 'describe', minWidth: 100, title: '任务描述', rowspan: 2}
-        , {field: 'execution', minWidth: 80, title: '执行时间', sort: true, rowspan: 2}
+        , {
+          field: 'execution', minWidth: 80, title: '执行时间', sort: true, rowspan: 2, templet: function (d) {
+            return util.toDateString(d.execution * 1000);
+          }
+        }
         , {field: 'retry', minWidth: 80, title: '重试次数', sort: true, rowspan: 2}
         , {title: '请求体', align: 'center', minWidth: 80, colspan: 12}
-        , {field: 'status', minWidth: 80, title: '状态', rowspan: 2}
-        , {field: 'createdAt', minWidth: 80, title: '创建时间', rowspan: 2}
-        , {field: 'updatedAt', minWidth: 80, title: '更新时间', rowspan: 2}
+        , {field: 'status', minWidth: 80, title: '状态', sort: true, rowspan: 2}
+        , {
+          field: 'createdAt', minWidth: 80, title: '创建时间', rowspan: 2, sort: true, templet: function (d) {
+            return util.toDateString(d.createdAt * 1000);
+          }
+        }
+        , {
+          field: 'updatedAt', minWidth: 80, title: '更新时间', rowspan: 2, sort: true, templet: function (d) {
+            return util.toDateString(d.updatedAt * 1000);
+          }
+        }
       ], [
         {field: 'body.url', title: "URL", templet: '<div>{{d.bodys.url}}</div>'}
         , {field: 'bodys.method', title: "Method", templet: '<div>{{d.bodys.method}}</div>'}
@@ -87,14 +100,14 @@
     //监听行工具事件
     table.on('tool(table)', function (obj) {
       var data = obj.data;
-      console.log(obj)
       if (obj.event === 'del') {
-        layer.confirm('真的删除行么', function (index) {
+        layer.confirm('真的要取消任务吗？', function (index) {
           postRequest(task_delete, {'taskId': data.taskId}, function (result) {
-            console.log(result);
-            obj.del();
-            layer.close(index);
+            obj.update({
+              status: "执行取消!(:<"
+            });
           });
+          layer.close(index);
         });
       } else if (obj.event === 'detail') {
         layer.msg('TASKID：' + data.taskId + ' 的查看操作');

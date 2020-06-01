@@ -29,12 +29,16 @@ class TaskWorkDao
      * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
      * @throws \Swoft\Db\Exception\DbException
      */
-    public function findByTaskId(string $taskId, int $status = TaskStatus::UNEXECUTED)
+    public function findByTaskId(string $taskId, int $status = 0)
     {
         $where = [
-            'task_id' => $taskId,
-            'status' => $status
+            'task_id' => $taskId
         ];
+
+        if ($status !== 0) {
+            $where['status'] = $status;
+        }
+
         return $this->taskWorkEntity::where($where)->first();
     }
 
@@ -48,12 +52,12 @@ class TaskWorkDao
     }
 
     /**
-     * @param $taskId
-     * @param $data
-     * @return int
+     * @param string $taskId
+     * @param array $data
+     * @return bool|int
      * @throws \Swoft\Db\Exception\DbException
      */
-    public function updateBytaskId($taskId, $data)
+    public function updateBytaskId(string $taskId, array $data)
     {
         return $this->taskWorkEntity::where('task_id', '=', $taskId)->update($data);
     }
@@ -81,7 +85,7 @@ class TaskWorkDao
      * @param string $field
      * @return int
      */
-    public function getCount(array $where,$field = '*')
+    public function getCount(array $where, $field = '*')
     {
         return $this->taskWorkEntity::where([$where])->count($field);
     }

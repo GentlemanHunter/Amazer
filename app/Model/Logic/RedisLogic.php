@@ -11,6 +11,7 @@ use App\Model\Dao\RedisSsetDao;
 use App\Model\Dao\TaskWorkDao;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Log\Helper\CLog;
 use Swoft\Task\Task;
 
 /**
@@ -149,9 +150,11 @@ class RedisLogic
      */
     public function delTaskData($taskId)
     {
+        if (!$this->taskWorkDao->findByTaskId($taskId, TaskStatus::UNEXECUTED))
+            throw new ApiException("任务已注销 或者 不存在", -1);
         $this->redisHashDao->delByKeyAux($taskId);
         $this->redisSsetDao->delByValueAux($taskId);
-        $this->taskWorkDao->updateBytaskId($taskId, ['status' => TaskStatus::EXECUTEDCANCEL]);
+        $this->taskWorkLogic->updateByTaskId($taskId, TaskStatus::EXECUTEDCANCEL);
         return $this->addTaskLogAux(
             $taskId,
             1,
@@ -176,7 +179,7 @@ class RedisLogic
      */
     public function addTaskLogAux($taskId, $length, $complete, $implement, $result, $status)
     {
-        $data = $this->taskWorkLogic->findByTaskId($taskId);
+        $data = $this->taskWorkLogic->findByTaskIdInfo($taskId);
         if (!$data || is_null($data)) {
             throw new ApiException("任务不存在???", -1);
         }
@@ -189,7 +192,7 @@ class RedisLogic
             $length,
             $timesout,
             $data->getBodys(),
-            strtotime($data->getExecution()),
+            $data->getExecution(true),
             $complete,
             $implement,
             $result,
