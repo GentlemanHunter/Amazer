@@ -85,7 +85,9 @@ class RedisLogic
             'updated_at' => time()
         ];
 
-        Task::async('work', 'insertQueue', [$taskId, $execution]);
+        if (($execution - time()) < env('TIMEOUT',60)){
+            Task::async('work', 'insertQueue', [$taskId, $execution]);
+        }
 
         if ($result = $this->redisHashDao->addHashDataAux($taskId, $data)) {
             $data['task_id'] = $taskId;
@@ -150,11 +152,8 @@ class RedisLogic
      */
     public function delTaskData($taskId)
     {
-        if (!$this->taskWorkDao->findByTaskId($taskId, TaskStatus::UNEXECUTED))
-            throw new ApiException("任务已注销 或者 不存在", -1);
-        $this->redisHashDao->delByKeyAux($taskId);
-        $this->redisSsetDao->delByValueAux($taskId);
-        $this->taskWorkLogic->updateByTaskId($taskId, TaskStatus::EXECUTEDCANCEL);
+        $this->clearRedisData($taskId);
+
         return $this->addTaskLogAux(
             $taskId,
             1,
@@ -198,5 +197,64 @@ class RedisLogic
             $result,
             $status
         );
+    }
+
+    /**
+     * 编辑 原来的 老数据
+     * @param $taskId
+     * @param $names
+     * @param $describe
+     * @param $execution
+     * @param $retry
+     * @param $bodys
+     * @param $uid
+     * @param bool $auxBool
+     * @return bool|int|string
+     * @throws ApiException
+     * @throws \Swoft\Db\Exception\DbException
+     * @throws \Swoft\Task\Exception\TaskException
+     */
+    public function editTask(
+        $taskId,
+        $execution,
+        $data,
+        $auxBool = true
+    )
+    {
+        // 同步 编辑 记录
+        $this->addTaskLogAux(
+            $taskId,
+            1,
+            -1,
+            -1,
+            '用户编辑任务',
+            TaskStatus::EXECUTEVERSION
+        );
+
+        if ($auxBool) {
+            Task::async('work', 'insertQueue', [$taskId, $execution]);
+        }
+
+        if ($result = $this->redisHashDao->addHashDataAux($taskId, $data)) {
+            $this->taskWorkDao->updateBytaskId($taskId, $data);
+            return $result;
+        }
+
+        throw new ApiException('redis 存储异常', -1);
+    }
+
+    /**
+     * 异步 处理 redis 中的数据 （不处理也无所谓，数据会顶替）
+     * @param $taskId
+     * @throws ApiException
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function clearRedisData($taskId): void
+    {
+        if (!$this->taskWorkDao->findByTaskId($taskId, TaskStatus::UNEXECUTED))
+            throw new ApiException("任务已注销 或者 不存在", -1);
+        $this->redisHashDao->delByKeyAux($taskId);
+        $this->redisSsetDao->delByValueAux($taskId);
+        $this->taskWorkLogic->updateByTaskId($taskId, TaskStatus::EXECUTEDCANCEL);
     }
 }

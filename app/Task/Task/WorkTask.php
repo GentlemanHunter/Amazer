@@ -3,6 +3,7 @@
 
 namespace App\Task\Task;
 
+use App\Exception\TaskStatus;
 use App\Helper\GuzzleRetry;
 use App\Helper\MemoryTable;
 use App\Model\Logic\RedisLogic;
@@ -110,5 +111,48 @@ class WorkTask
             Timer::clear((int)$timerId['timerId']);
         }
         $this->redisLogic->delTaskData($taskId);
+    }
+
+    /**
+     * 编辑任务
+     * @TaskMapping(name="editQueue")
+     */
+    public function editQueueData(
+        $taskId
+        , $names
+        , $describe
+        , $execution
+        , $retry
+        , $bodys
+        , $uid
+    ): void
+    {
+        /** @var MemoryTable $memoryTable */
+        $memoryTable = bean('App\Helper\MemoryTable');
+        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId);
+
+        if ($timerId) {
+            // 取消定时器
+            $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
+            Timer::clear((int)$timerId['timerId']);
+            if ((time() - $execution) < env('TIMEOUT', 60))
+                $this->insertQueueData($taskId, $execution);// 时间小于 当前 时间 20秒 进行插队
+        }
+
+        /** @var RedisLogic $redisLogic */
+        $redisLogic = bean('App\Model\Logic\RedisLogic');
+        $redisLogic->clearRedisData($taskId);
+
+        $data = [
+            'names' => $names,
+            'describe' => $describe,
+            'execution' => $execution,
+            'retry' => $retry,
+            'bodys' => $bodys,
+            'uid' => $uid,
+            'status' => TaskStatus::UNEXECUTED
+        ];
+
+        $this->redisLogic->editTask($taskId, $execution, $data, false);
     }
 }

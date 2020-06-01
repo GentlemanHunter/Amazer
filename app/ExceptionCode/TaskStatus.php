@@ -10,7 +10,8 @@ class TaskStatus
     const UNEXECUTED = 1000,
           EXECUTEDCANCEL = 1001,
           EXECUTEDFAIL = 1002,
-          EXECUTEDSUCCESS = 1003;
+          EXECUTEDSUCCESS = 1003,
+          EXECUTEVERSION = 1004;
 
 
 
@@ -18,6 +19,7 @@ class TaskStatus
         self::UNEXECUTED => '待执行!(:>',
         self::EXECUTEDCANCEL => '执行取消!(:<',
         self::EXECUTEDFAIL => '执行失败(:<',
-        self::EXECUTEDSUCCESS => '执行成功!(:'
+        self::EXECUTEDSUCCESS => '执行成功!(:',
+        self::EXECUTEVERSION => "编辑的版本-:)."
     ];
 }

@@ -15,6 +15,7 @@ use App\Helper\MemoryTable;
 use App\Model\Dao\RedisHashDao;
 use App\Model\Logic\TaskWorkLogic;
 use Exception;
+use Swoft\Http\Message\Response;
 use Swoft\Log\Helper\CLog;
 use Swoft\Task\Task;
 use Swoft\Timer;
@@ -125,5 +126,49 @@ class TimerController
         } catch (\Throwable $throwable) {
             return apiError($throwable->getCode(), $throwable->getMessage());
         }
+    }
+
+    /**
+     * @RequestMapping(route="/edit/task",method={RequestMethod::POST})
+     * @Validate(validator="TaskWorkValidator",fields={"taskId","names","describe","execution","retry","bodys"})
+     * @param Request $request
+     * @param Response $response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     */
+    public function editTask(Request $request,Response $response)
+    {
+        try {
+            $taskId = $request->parsedBody('taskId');
+            $names = $request->parsedBody('names');
+            $describe = $request->parsedBody('describe');
+            $execution = strtotime($request->parsedBody('execution'));
+            $retry = $request->parsedBody('retry');
+            $bodys = $request->parsedBody('bodys');
+            if (!isJSON($bodys)) {
+                throw new ApiException("body 不是 JSON", -1);
+            }
+            $bodys = json_decode($bodys, true);
+            keyExists($bodys, 'url');
+            keyExists($bodys, 'method');
+            if (time() >= $execution || ($execution - time()) < 5) {
+                throw new ApiException("不允许 设定 超过时间", -1);
+            }
+
+            Task::co('work','editQueue',[
+                $taskId
+                ,$names
+                ,$describe
+                ,$execution
+                ,$retry
+                ,$bodys
+                ,1
+            ]);
+
+            return apiSuccess(['taskId' => $taskId]);
+        } catch (\Throwable $throwable){
+            return apiError($throwable->getCode(),$throwable->getMessage());
+        }
+
+
     }
 }
