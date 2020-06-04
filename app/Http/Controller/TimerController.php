@@ -168,7 +168,5 @@ class TimerController
         } catch (\Throwable $throwable){
             return apiError($throwable->getCode(),$throwable->getMessage());
         }
-
-
     }
 }
