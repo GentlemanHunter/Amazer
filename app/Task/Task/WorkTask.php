@@ -60,7 +60,7 @@ class WorkTask
         unset($data['method']);
 
         /** TODO: 待完善 */
-        $timerId = Timer::after($runTime, function ($url, $method, $data, $retry, $taskId) {
+        $timerId = Timer::after($runTime * 1000, function ($url, $method, $data, $retry, $taskId) {
             /** @var GuzzleRetry $handRetry */
             $handRetry = bean('App\Helper\GuzzleRetry');
             $handRetry->setRetry($retry)->setBodys($data)->setTaskId($taskId)->setStartTime(time());
@@ -104,11 +104,11 @@ class WorkTask
     {
         /** @var MemoryTable $memoryTable */
         $memoryTable = bean('App\Helper\MemoryTable');
-        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId);
+        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId, 'timerId');
         if ($timerId) {
             // 取消定时器
             $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
-            Timer::clear((int)$timerId['timerId']);
+            Timer::clear((int)$timerId);
         }
         $this->redisLogic->delTaskData($taskId);
     }
@@ -129,12 +129,12 @@ class WorkTask
     {
         /** @var MemoryTable $memoryTable */
         $memoryTable = bean('App\Helper\MemoryTable');
-        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId);
+        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId, 'timerId');
 
         if ($timerId) {
             // 取消定时器
             $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
-            Timer::clear((int)$timerId['timerId']);
+            Timer::clear((int)$timerId);
             if ((time() - $execution) < env('TIMEOUT', 60))
                 $this->insertQueueData($taskId, $execution);// 时间小于 当前 时间 20秒 进行插队
         }

@@ -34,13 +34,14 @@ class CronTask
     public function secondTaskConsumption()
     {
         $start = time();
-        $end = time() + 20;
+        $end = time() + 5;
         $data = Redis::zRangeByScore('zset_data', (string)$start, (string)$end);
-        if (!empty($data)){
+        if (!empty($data)) {
             foreach ($data as $item) {
                 $score = Redis::zScore('zset_data', $item);
                 $msec = $score - time();
                 $value = redisHashArray(Redis::hGet('hash_data', $item));
+                CLog::info("msec:" . $msec);
                 \Swoft\Task\Task::async('work', 'consumption',
                     [$msec, $item, $value['retry'], $value['bodys']]
                 );

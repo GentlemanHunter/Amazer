@@ -56,11 +56,13 @@ class RedisController
     {
         $key = 'key1';
 
-        $data = [
+        /*$data = [
             'add'    => 11.1,
             'score2' => 11.1,
             'score3' => 11.21
-        ];
+        ];*/
+
+        $data['md'] = time();
         $this->redis->zAdd($key, $data);
 
         $res = Redis::zRangeByScore($key, '11.1', '11.21', ['withscores' => true]);

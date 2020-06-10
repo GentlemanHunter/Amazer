@@ -85,9 +85,11 @@ class RedisLogic
             'updated_at' => time()
         ];
 
-        if (($execution - time()) < env('TIMEOUT',60)){
+        /*if (($execution - time()) < env('TIMEOUT',60)){
             Task::async('work', 'insertQueue', [$taskId, $execution]);
-        }
+        }*/
+
+        Task::async('work', 'insertQueue', [$taskId, $execution]);
 
         if ($result = $this->redisHashDao->addHashDataAux($taskId, $data)) {
             $data['task_id'] = $taskId;
