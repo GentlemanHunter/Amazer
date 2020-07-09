@@ -101,6 +101,7 @@ class TaskWorkLogic
      */
     public function createTaskLogData(array $data)
     {
+        CLog::info(json_encode($data));
         return $this->taskWorkLogDao->createLogData($data);
     }
 

@@ -3,6 +3,7 @@
 
 namespace App\Task\Task;
 
+use App\Exception\ApiException;
 use App\Exception\TaskStatus;
 use App\Helper\GuzzleRetry;
 use App\Helper\MemoryTable;
@@ -59,7 +60,7 @@ class WorkTask
         unset($data['url']);
         unset($data['method']);
 
-        /** TODO: 待完善 */
+        /** TODO: 需要加入 通知元素 */
         $timerId = Timer::after($runTime * 1000, function ($url, $method, $data, $retry, $taskId) {
             /** @var GuzzleRetry $handRetry */
             $handRetry = bean('App\Helper\GuzzleRetry');
@@ -74,12 +75,12 @@ class WorkTask
             $client = new Client(['handler' => $handlerState]);
             $reponse = $client->request($method, $url, $data);
 
-//            CLog::info("response:".json_encode($reponse));
+            CLog::info("response:" . serialize($reponse->getBody()->getContents()));
 
             /** @var MemoryTable $memoryTable */
             $memoryTable = bean('App\Helper\MemoryTable');
             $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
-            Redis::hDel('hash_data', $taskId);
+            Redis::hDel('hash_data', (string)$taskId);
         }, $url, $method, $data, $retry, $taskId);
 
         /** @var MemoryTable $memoryTable */
@@ -139,9 +140,13 @@ class WorkTask
                 $this->insertQueueData($taskId, $execution);// 时间小于 当前 时间 20秒 进行插队
         }
 
-        /** @var RedisLogic $redisLogic */
-        $redisLogic = bean('App\Model\Logic\RedisLogic');
-        $redisLogic->clearRedisData($taskId);
+        try {
+            /** @var RedisLogic $redisLogic */
+            $redisLogic = bean('App\Model\Logic\RedisLogic');
+            $redisLogic->clearRedisData($taskId);
+        } catch (ApiException $apiException){
+            //
+        }
 
         $data = [
             'names' => $names,

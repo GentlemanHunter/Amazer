@@ -11,6 +11,7 @@ use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Swoft\Log\Helper\CLog;
 
 /**
  * Class GuzzleRetry
@@ -45,24 +46,24 @@ class GuzzleRetry
         ) {
             // Limit the number of retries to 5
             if ($retries >= self::$retry) {
-                $this->log($response, "超过最大重试次数", TaskStatus::EXECUTEDFAIL);
+                GuzzleRetry::log($response, "超过最大重试次数", TaskStatus::EXECUTEDFAIL);
                 return false;
             }
 
             // Retry connection exceptions
             if ($exception instanceof ConnectException) {
-                $this->log($response, "连接异常", TaskStatus::EXECUTEDFAIL);
+                GuzzleRetry::log($response, "连接异常", TaskStatus::EXECUTEDFAIL);
                 return true;
             }
 
             if ($response) {
                 // Retry on server errors
                 if ($response->getStatusCode() >= 500) {
-                    $this->log($response, "客户端错误", TaskStatus::EXECUTEDFAIL);
+                    GuzzleRetry::log($response, "客户端错误", TaskStatus::EXECUTEDFAIL);
                     return true;
                 }
             }
-            $this->log($response, "执行成功", TaskStatus::EXECUTEDSUCCESS);
+            GuzzleRetry::log($response, "执行成功", TaskStatus::EXECUTEDSUCCESS);
             return false;
         };
     }
@@ -87,21 +88,25 @@ class GuzzleRetry
         self::$retry = $retry;
         return $this;
     }
+
     public function setTaskId($task)
     {
         self::$taskid = $task;
         return $this;
     }
+
     public function setStartTime($startTime)
     {
         self::$startTime = $startTime;
         return $this;
     }
+
     public function setOvertime($overtime)
     {
         self::$overtime = $overtime;
         return $this;
     }
+
     public function setBodys($bodys)
     {
         self::$bodys = $bodys;
@@ -120,9 +125,9 @@ class GuzzleRetry
      * @param $status
      * @throws \App\Exception\ApiException
      */
-    private function log($response, $message, $status): void
+    private function log(Response $response, $message, $status): void
     {
-        $result = "{$message}" . json_encode($response->getBody());
+        $result = $response->getBody()->getContents();
         $osTime = time();
         $endTime = $osTime - self::$startTime;
         $this->redisLogic->addTaskWorkLog(
