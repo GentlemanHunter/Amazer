@@ -25,7 +25,7 @@ class TaskWorkValidator
      * @IsString()
      * @Required()
      * @NotEmpty(message="任务名称不能为空")
-     * @Length(min=2,max=20,message="任务名称长度限制为 2-20")
+     * @Length(min=2,max=20,message="任务名称长度限制为 2-15")
      * @var string
      */
     protected $names = '';
