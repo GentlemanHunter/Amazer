@@ -62,25 +62,33 @@ class WorkTask
 
         /** TODO: 需要加入 通知元素 */
         $timerId = Timer::after($runTime * 1000, function ($url, $method, $data, $retry, $taskId) {
-            /** @var GuzzleRetry $handRetry */
-            $handRetry = bean('App\Helper\GuzzleRetry');
-            $handRetry->setRetry($retry)->setBodys($data)->setTaskId($taskId)->setStartTime(time());
+            try {
+                /** @var GuzzleRetry $handRetry */
+                $handRetry = bean('App\Helper\GuzzleRetry');
+                $handRetry->setRetry($retry)->setBodys($data)->setTaskId($taskId)->setStartTime(time());
 
-            if (isset($data['timeout'])) {
-                $handRetry->setOvertime($data['timeout']);
+                if (isset($data['timeout'])) {
+                    $handRetry->setOvertime($data['timeout']);
+                }
+
+                $handlerState = HandlerStack::create(new CurlHandler());
+                $handlerState->push(Middleware::retry($handRetry->retryDecider(), $handRetry->retryDelay()));
+                $client = new Client(['handler' => $handlerState]);
+                $reponse = $client->request($method, $url, $data);
+
+                CLog::info("response:" . serialize($reponse->getBody()->getContents()));
+
+                /** @var MemoryTable $memoryTable */
+                $memoryTable = bean('App\Helper\MemoryTable');
+                $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
+                Redis::hDel('hash_data', (string)$taskId);
+            } catch (\Exception $exception){
+                Redis::hSet('timer:error',$taskId,json_encode([
+                    'url' => $url,
+                    'method' => $method,
+                    'data' => $data
+                ]));
             }
-
-            $handlerState = HandlerStack::create(new CurlHandler());
-            $handlerState->push(Middleware::retry($handRetry->retryDecider(), $handRetry->retryDelay()));
-            $client = new Client(['handler' => $handlerState]);
-            $reponse = $client->request($method, $url, $data);
-
-            CLog::info("response:" . serialize($reponse->getBody()->getContents()));
-
-            /** @var MemoryTable $memoryTable */
-            $memoryTable = bean('App\Helper\MemoryTable');
-            $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
-            Redis::hDel('hash_data', (string)$taskId);
         }, $url, $method, $data, $retry, $taskId);
 
         /** @var MemoryTable $memoryTable */
