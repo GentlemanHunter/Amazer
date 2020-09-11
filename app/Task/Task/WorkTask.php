@@ -86,7 +86,10 @@ class WorkTask
                 Redis::hSet('timer:error',$taskId,json_encode([
                     'url' => $url,
                     'method' => $method,
-                    'data' => $data
+                    'data' => $data,
+                    'message' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                    'line' => $exception->getTraceAsString()
                 ]));
             }
         }, $url, $method, $data, $retry, $taskId);
