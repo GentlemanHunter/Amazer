@@ -3,11 +3,14 @@
 
 namespace App\Model\Logic;
 
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use App\Model\Dao\TaskWorkDao;
 use App\Model\Dao\TaskWorkLogDao;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Db\Eloquent\Builder;
+use Swoft\Db\Eloquent\Model;
+use Swoft\Db\Exception\DbException;
 use Swoft\Log\Helper\CLog;
 
 /**
@@ -75,7 +78,7 @@ class TaskWorkLogic
      * @param $taskId
      * @param int $status
      * @return int
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function updateByTaskId($taskId, $status = TaskStatus::UNEXECUTED)
     {
@@ -86,8 +89,8 @@ class TaskWorkLogic
      * 获取一个task
      * @param $taskId
      * @param int $status
-     * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
-     * @throws \Swoft\Db\Exception\DbException
+     * @return object|Builder|Model|null
+     * @throws DbException
      */
     public function findByTaskId($taskId, $status = TaskStatus::EXECUTEDSUCCESS)
     {
@@ -150,12 +153,12 @@ class TaskWorkLogic
      * @param $page
      * @param $pageSize
      * @return array
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function getTaskWorkPagingByUid($uid, $page, $pageSize)
     {
-        $count = $this->taskWorkDao->getCount(['uid', '=', (string)$uid]) ?? 0;
-        $data = $this->taskWorkDao->getPaging(['uid', '=', (string)$uid], $page, $pageSize) ?? [];
+        $count = $this->taskWorkDao->getCount(['uid' => (string)$uid]) ?? 0;
+        $data = $this->taskWorkDao->getPaging(['uid' => (string)$uid], $page, $pageSize) ?? [];
 
         if ($data) {
             $data = $data->toArray();
@@ -172,11 +175,32 @@ class TaskWorkLogic
     /**
      * 返回 task 主体
      * @param $taskId
-     * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
-     * @throws \Swoft\Db\Exception\DbException
+     * @return object|Builder|Model|null
+     * @throws DbException
      */
     public function findByTaskIdInfo($taskId)
     {
         return $this->taskWorkDao->findByTaskId($taskId);
+    }
+
+    /**
+     * 返回 一分钟内的 任务列表
+     * @return array
+     * @throws DbException
+     */
+    public function getTaskWorkByExecution()
+    {
+        $currentTime = time();
+        $futureTime = $currentTime + (60 * 6);// 6 分钟预热 大于 预热执行任务 时间
+        $data = $this->taskWorkDao->getPaging([
+            ['execution', '>=', $currentTime],
+            ['execution', '<=', $futureTime]
+        ], 1, 999, ['task_id','execution']) ?: [];
+
+        if ($data) {
+            $data = $data->toArray();
+        }
+
+        return $data;
     }
 }

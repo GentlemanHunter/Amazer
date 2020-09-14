@@ -13,14 +13,7 @@ use App\Exception\ApiException;
 use App\ExceptionCode\ApiCode;
 use App\Helper\JwtHelper;
 
-function user_func(): string
-{
-    return 'hello';
-}
-
 if (!function_exists('apiError')) {
-
-
     /**
      * @param $code
      * @param string $msg
@@ -188,7 +181,7 @@ if (!function_exists('UID')) {
     }
 }
 
-if (!function_exists('redisHashArray')){
+if (!function_exists('redisHashArray')) {
     /**
      * 反序列化 redis 数据
      * @param $value
@@ -197,21 +190,44 @@ if (!function_exists('redisHashArray')){
     function redisHashArray($value)
     {
         $lists = array();
-        array_push($lists,unserialize($value));
+        array_push($lists, unserialize($value));
         return $lists[0];
     }
 }
 
-if (!function_exists('getUserInfo')){
+if (!function_exists('getUserInfo')) {
     /**
      * 获取用户的 姓名
      * @param $uid
      * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Collection|\Swoft\Db\Eloquent\Model|null
      * @throws \Swoft\Db\Exception\DbException
      */
-    function getUserInfo($uid){
+    function getUserInfo($uid)
+    {
         /** @var \App\Model\Dao\UserDao $userDao */
         $userDao = bean('App\Model\Dao\UserDao');
         return $userDao->findUserInfoById($uid);
+    }
+}
+
+if (!function_exists('isTimestamp')) {
+    /**
+     * @param mixed $timestamp
+     * @return int
+     * @throws ApiException
+     */
+    function isTimestamp($timestamp)
+    {
+        if (is_string($timestamp)) {
+            if ($timestamps = strtotime($timestamp)) {
+                return $timestamps;
+            }
+        }
+
+        if ((strtotime(date("Y-m-d H:i:s", (int)$timestamp)) === (int)$timestamp)) {
+            return $timestamp;
+        }
+
+        throw new ApiException('参数不是时间规格', -1);
     }
 }

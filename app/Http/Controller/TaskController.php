@@ -10,7 +10,7 @@
 
 namespace App\Http\Controller;
 
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
 use App\Model\Logic\TaskWorkLogic;

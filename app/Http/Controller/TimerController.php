@@ -10,7 +10,7 @@
 
 namespace App\Http\Controller;
 
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use App\Helper\MemoryTable;
 use App\Model\Dao\RedisHashDao;
 use App\Model\Logic\TaskWorkLogic;
@@ -39,7 +39,7 @@ use Swoft\Http\Server\Annotation\Mapping\RequestMethod;
  *
  * @since 2.0
  *
- * @Controller(prefix="timer")
+ * @Controller()
  */
 class TimerController
 {
@@ -50,17 +50,18 @@ class TimerController
     private $redisLogic;
 
     /**
-     * @RequestMapping(route="/add/task",method={RequestMethod::POST})
+     * 新增 任务
+     * @RequestMapping(route="/task",method={RequestMethod::POST})
      * @Validate(validator="TaskWorkValidator",fields={"names","describe","execution","retry","bodys"})
      * @param Request $request
-     * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     public function createTask(Request $request)
     {
         try {
             $names = $request->parsedBody('names');
             $describe = $request->parsedBody('describe');
-            $execution = strtotime($request->parsedBody('execution'));
+            $execution = isTimestamp($request->parsedBody('execution'));
             $retry = $request->parsedBody('retry');
             $bodys = $request->parsedBody('bodys');
             if (!isJSON($bodys)) {
@@ -80,6 +81,7 @@ class TimerController
                 $bodys,
                 1
             );
+
             return apiSuccess(['taskId' => $id]);
         } catch (\Throwable $throwable) {
             return apiError($throwable->getCode(), $throwable->getMessage());
@@ -87,12 +89,13 @@ class TimerController
     }
 
     /**
-     * @RequestMapping(route="/del/task",method={RequestMethod::POST,RequestMethod::GET})
+     * 删除任务
+     * @RequestMapping(route="/task",method={RequestMethod::DELETE})
      * @Validate(validator="TaskWorkValidator",fields={"taskId"})
      * @param Request $request
-     * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
-    public function delTaskWork(Request $request)
+    public function cancelTaskWork(Request $request)
     {
         try {
             $taskId = $request->parsedBody('taskId');
@@ -129,19 +132,19 @@ class TimerController
     }
 
     /**
-     * @RequestMapping(route="/edit/task",method={RequestMethod::POST})
+     * 修改 任务
+     * @RequestMapping(route="/task",method={RequestMethod::PUT})
      * @Validate(validator="TaskWorkValidator",fields={"taskId","names","describe","execution","retry","bodys"})
      * @param Request $request
-     * @param Response $response
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
-    public function editTask(Request $request,Response $response)
+    public function editTask(Request $request)
     {
         try {
             $taskId = $request->parsedBody('taskId');
             $names = $request->parsedBody('names');
             $describe = $request->parsedBody('describe');
-            $execution = strtotime($request->parsedBody('execution'));
+            $execution = isTimestamp($request->parsedBody('execution'));
             $retry = $request->parsedBody('retry');
             $bodys = $request->parsedBody('bodys');
             if (!isJSON($bodys)) {

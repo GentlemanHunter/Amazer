@@ -3,7 +3,7 @@
 
 namespace App\Task\Crontab;
 
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use App\Helper\GuzzleRetry;
 use App\Model\Entity\TaskWork;
 use App\Model\Logic\TaskWorkLogic;
@@ -28,6 +28,12 @@ use Swoole\Coroutine;
 class CronTask
 {
     /**
+     * @Inject()
+     * @var TaskWorkLogic
+     */
+    private $taskWork;
+
+    /**
      * 秒级定时器
      * @Cron("* * * * * *")
      */
@@ -47,6 +53,20 @@ class CronTask
                 );
 //                CLog::info("scoure:" . $score . "  value:" . json_encode($value));
                 Redis::zRem('zset_data', $item);
+            }
+        }
+    }
+
+    /**
+     * 秒级定时器
+     * @Cron("0 * * * * *")
+     */
+    public function minuteTaskProduction()
+    {
+        $data = $this->taskWork->getTaskWorkByExecution();
+        if (!empty($data)) {
+            foreach ($data as $item){
+                Task::async('work','insertQueue',[$item['taskId'],$item['execution']]);
             }
         }
     }

@@ -39,10 +39,10 @@ class TaskWorkValidator
 
     /**
      * @IsString()
-     * @Required()
      * @NotEmpty(message="执行时间不能为空")
      * @AfterDate(message="执行时间必须是时间格式")
-     * @var string
+     * @Required()
+     * @var string|int
      */
     protected $execution = '';
 

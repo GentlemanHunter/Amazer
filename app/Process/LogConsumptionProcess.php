@@ -10,7 +10,6 @@ use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Log\Helper\CLog;
 use Swoft\Process\Process;
 use Swoft\Process\UserProcess;
-use Swoft\Redis\Redis;
 use Swoole\Coroutine;
 
 /**

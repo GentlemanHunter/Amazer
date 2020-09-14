@@ -10,6 +10,7 @@
 
 namespace App\Http\Controller;
 
+use App\Common\Wechat;
 use Swoft\Http\Message\ContentType;
 use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
@@ -121,5 +122,24 @@ class ViewController
     public function task()
     {
         return view('task/list');
+    }
+
+    /**
+     * @RequestMapping(route="/test",method={"GET"})
+     */
+    public function test()
+    {
+        /** @var Wechat $wechat */
+        $wechat = bean('App\Common\Wechat');
+        $message = sprintf(
+            Wechat::$message[Wechat::ERRORLOG],
+            'test-test',
+            date('Y/m/d H:i:s',time()),
+            'http://baidu.com',
+            '{"url": "http://host.docker.internal/test/request.php?id=2", "method": "POST", "form_params": {"id": 1}}'
+        );
+        $wechat->sendMarkdownMessage($message);
+
+        return apiSuccess();
     }
 }

@@ -3,16 +3,15 @@
 
 namespace App\Model\Logic;
 
+use Swoft\Task\Task;
+use App\Model\Dao\TaskWorkDao;
 use App\Exception\ApiException;
-use App\Exception\TaskStatus;
 use App\Model\Dao\RedisHashDao;
 use App\Model\Dao\RedisListDao;
 use App\Model\Dao\RedisSsetDao;
-use App\Model\Dao\TaskWorkDao;
+use App\ExceptionCode\TaskStatus;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
-use Swoft\Log\Helper\CLog;
-use Swoft\Task\Task;
 
 /**
  * Class RedisLogic
@@ -85,11 +84,11 @@ class RedisLogic
             'updated_at' => time()
         ];
 
-        /*if (($execution - time()) < env('TIMEOUT',60)){
+        if (($execution - time()) < env('TIMEOUT',120)){
             Task::async('work', 'insertQueue', [$taskId, $execution]);
-        }*/
+        }
 
-        Task::async('work', 'insertQueue', [$taskId, $execution]);
+//        Task::async('work', 'insertQueue', [$taskId, $execution]);
 
         if ($result = $this->redisHashDao->addHashDataAux($taskId, $data)) {
             $data['task_id'] = $taskId;

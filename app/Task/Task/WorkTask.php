@@ -3,8 +3,9 @@
 
 namespace App\Task\Task;
 
+use App\Common\Wechat;
 use App\Exception\ApiException;
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use App\Helper\GuzzleRetry;
 use App\Helper\MemoryTable;
 use App\Model\Logic\RedisLogic;
@@ -82,8 +83,8 @@ class WorkTask
                 $memoryTable = bean('App\Helper\MemoryTable');
                 $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
                 Redis::hDel('hash_data', (string)$taskId);
-            } catch (\Exception $exception){
-                Redis::hSet('timer:error',$taskId,json_encode([
+            } catch (\Exception $exception) {
+                Redis::hSet('timer:error', $taskId, serialize([
                     'url' => $url,
                     'method' => $method,
                     'data' => $data,
@@ -91,6 +92,16 @@ class WorkTask
                     'code' => $exception->getCode(),
                     'line' => $exception->getTraceAsString()
                 ]));
+                $wechat = bean('App\Common\Wechat');
+                $wechat->sendMarkdownMessage(
+                    sprintf(
+                        Wechat::$message[Wechat::ERRORLOG],
+                        $taskId,
+                        date('Y/m/d H:i:s', time()),
+                        $url,
+                        $data
+                    )
+                );
             }
         }, $url, $method, $data, $retry, $taskId);
 
@@ -155,7 +166,7 @@ class WorkTask
             /** @var RedisLogic $redisLogic */
             $redisLogic = bean('App\Model\Logic\RedisLogic');
             $redisLogic->clearRedisData($taskId);
-        } catch (ApiException $apiException){
+        } catch (ApiException $apiException) {
             //
         }
 
