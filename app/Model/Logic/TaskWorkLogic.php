@@ -6,6 +6,7 @@ namespace App\Model\Logic;
 use App\ExceptionCode\TaskStatus;
 use App\Model\Dao\TaskWorkDao;
 use App\Model\Dao\TaskWorkLogDao;
+use App\Model\Entity\TaskWork;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Db\Eloquent\Builder;
@@ -191,11 +192,12 @@ class TaskWorkLogic
     public function getTaskWorkByExecution()
     {
         $currentTime = time();
-        $futureTime = $currentTime + (60 * 6);// 6 分钟预热 大于 预热执行任务 时间
+        $futureTime = $currentTime + 60;// 6 分钟预热 大于 预热执行任务 时间
         $data = $this->taskWorkDao->getPaging([
             ['execution', '>=', $currentTime],
-            ['execution', '<=', $futureTime]
-        ], 1, 999, ['task_id','execution']) ?: [];
+            ['execution', '<=', $futureTime],
+            ['status', '=', TaskStatus::UNEXECUTED]
+        ], 1, 999, ['task_id', 'execution']) ?: [];
 
         if ($data) {
             $data = $data->toArray();
