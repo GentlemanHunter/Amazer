@@ -153,13 +153,20 @@ class TaskWorkLogic
      * @param $uid
      * @param $page
      * @param $pageSize
+     * @param null|string $taskId
      * @return array
      * @throws DbException
      */
-    public function getTaskWorkPagingByUid($uid, $page, $pageSize)
+    public function getTaskWorkPagingByUid($uid, $page, $pageSize, $taskId = null)
     {
-        $count = $this->taskWorkDao->getCount(['uid' => (string)$uid]) ?? 0;
-        $data = $this->taskWorkDao->getPaging(['uid' => (string)$uid], $page, $pageSize) ?? [];
+        $where = ['uid' => (string)$uid];
+
+        if (!is_null($taskId)) {
+            $where[] = ['task_id', 'like', '%' . $taskId . '%'];
+        }
+
+        $count = $this->taskWorkDao->getCount($where) ?? 0;
+        $data = $this->taskWorkDao->getPaging($where, $page, $pageSize) ?? [];
 
         if ($data) {
             $data = $data->toArray();

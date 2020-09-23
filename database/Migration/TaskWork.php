@@ -4,23 +4,25 @@
 namespace Database\Migration;
 
 
+use Swoft\Db\Exception\DbException;
 use Swoft\Db\Schema\Blueprint;
 use Swoft\Devtool\Annotation\Mapping\Migration;
 use Swoft\Devtool\Migration\Migration as BaseMigration;
 
 /**
- * Class KtpTaskWork
+ * Class TaskWork
  *
  * @since 2.0
  *
  * @Migration(time=20200527111323)
  */
-class KtpTaskWork extends BaseMigration
+class TaskWork extends BaseMigration
 {
     const TABLE = 'task_work';
 
     /**
      * @return void
+     * @throws DbException
      */
     public function up(): void
     {
@@ -50,6 +52,7 @@ class KtpTaskWork extends BaseMigration
 
     /**
      * @return void
+     * @throws DbException
      */
     public function down(): void
     {

@@ -4,22 +4,25 @@
 namespace Database\Migration;
 
 
+use Swoft\Db\Exception\DbException;
 use Swoft\Db\Schema\Blueprint;
 use Swoft\Devtool\Annotation\Mapping\Migration;
 use Swoft\Devtool\Migration\Migration as BaseMigration;
 
 /**
- * Class KtpUser
+ * Class User
  *
  * @since 2.0
  *
  * @Migration(time=20200526143913)
  */
-class KtpUser extends BaseMigration
+class User extends BaseMigration
 {
     const TABLE = 'user';
+
     /**
      * @return void
+     * @throws DbException
      */
     public function up(): void
     {
@@ -45,6 +48,7 @@ class KtpUser extends BaseMigration
 
     /**
      * @return void
+     * @throws DbException
      */
     public function down(): void
     {

@@ -11,6 +11,7 @@
 namespace App\Http\Controller;
 
 use App\ExceptionCode\TaskStatus;
+use Swoft\Db\Exception\DbException;
 use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
 use App\Model\Logic\TaskWorkLogic;
@@ -42,13 +43,14 @@ class TaskController
      * @param Request $request
      * @param Response $response
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function getList(Request $request, Response $response)
     {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
+        $taskId = $request->get('taskid', null);
 
-        return apiSuccess($this->taskWorkLogic->getTaskWorkPagingByUid(UID(),(int)$page,(int)$limit));
+        return apiSuccess($this->taskWorkLogic->getTaskWorkPagingByUid(UID(), (int)$page, (int)$limit, (string)$taskId));
     }
 }

@@ -12,12 +12,19 @@
 use App\Exception\ApiException;
 use App\ExceptionCode\ApiCode;
 use App\Helper\JwtHelper;
+use App\Model\Dao\UserDao;
+use Swoft\Db\Eloquent\Builder;
+use Swoft\Db\Eloquent\Collection;
+use Swoft\Db\Eloquent\Model;
+use Swoft\Db\Exception\DbException;
+use Swoft\Http\Message\Request;
+use Swoft\Http\Message\Response;
 
 if (!function_exists('apiError')) {
     /**
      * @param $code
      * @param string $msg
-     * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     function apiError($code = -1, $msg = 'Error')
     {
@@ -37,7 +44,7 @@ if (!function_exists('apiSuccess')) {
      * @param $data
      * @param int $code
      * @param string $msg
-     * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     function apiSuccess($data = [], $code = 0, $msg = 'Success')
     {
@@ -57,7 +64,7 @@ if (!function_exists('throwApiException')) {
      * @param string $msg
      * @param string $file
      * @param string $trace
-     * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     function throwApiException($code, $msg = 'Error', $file = '', $trace = '')
     {
@@ -78,8 +85,8 @@ if (!function_exists('throwApiException')) {
 if (!function_exists('checkAuth')) {
     /**
      * @return bool|int
-     * @throws \App\Exception\ApiException
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws ApiException
+     * @throws DbException
      */
     function checkAuth()
     {
@@ -143,7 +150,7 @@ if (!function_exists('isJSON')) {
     {
         return is_string($string) &&
         is_array(json_decode($string, true)) &&
-        (json_last_error() == JSON_ERROR_NONE) ? true : false;
+        (json_last_error() == JSON_ERROR_NONE);
     }
 }
 
@@ -169,10 +176,10 @@ if (!function_exists('keyExists')) {
 if (!function_exists('UID')) {
     /**
      * 获取用户 uid
-     * @param \Swoft\Http\Message\Request|null $request
+     * @param Request|null $request
      * @return mixed
      */
-    function UID(\Swoft\Http\Message\Request $request = null)
+    function UID(Request $request = null)
     {
         if ($request === null) {
             $request = context()->getRequest();
@@ -199,12 +206,12 @@ if (!function_exists('getUserInfo')) {
     /**
      * 获取用户的 姓名
      * @param $uid
-     * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Collection|\Swoft\Db\Eloquent\Model|null
-     * @throws \Swoft\Db\Exception\DbException
+     * @return object|Builder|Collection|Model|null
+     * @throws DbException
      */
     function getUserInfo($uid)
     {
-        /** @var \App\Model\Dao\UserDao $userDao */
+        /** @var UserDao $userDao */
         $userDao = bean('App\Model\Dao\UserDao');
         return $userDao->findUserInfoById($uid);
     }
