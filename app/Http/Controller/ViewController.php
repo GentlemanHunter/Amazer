@@ -114,6 +114,7 @@ class ViewController
     }
 
     /**
+     * 获取 任务 列表
      * @RequestMapping(route="task",method={"GET"})
      * @Middleware(ViewsMiddleware::class)
      * @return Response
@@ -125,21 +126,13 @@ class ViewController
     }
 
     /**
-     * @RequestMapping(route="/test",method={"GET"})
+     * 新增任务视图
+     * @RequestMapping(route="task/insert",method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
+     * @throws Throwable
      */
-    public function test()
+    public function addTask()
     {
-        /** @var Wechat $wechat */
-        $wechat = bean('App\Common\Wechat');
-        $message = sprintf(
-            Wechat::$message[Wechat::ERRORLOG],
-            'test-test',
-            date('Y/m/d H:i:s',time()),
-            'http://baidu.com',
-            '{"url": "http://host.docker.internal/test/request.php?id=2", "method": "POST", "form_params": {"id": 1}}'
-        );
-        $wechat->sendMarkdownMessage($message);
-
-        return apiSuccess();
+        return view('task/insert');
     }
 }

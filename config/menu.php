@@ -19,12 +19,19 @@ return [
         'title' => '任务管理',
         'child' => [
             [
-                'title' => '任务列表',
+                'title' => '新建任务',
                 'id' => 'createGroup',
+                'url' => '/views/task/insert',
+                'width' => '1670px',
+                'height' => '750px',
+            ],
+            [
+                'title' => '任务列表',
+                'id' => 'listGroup',
                 'url' => '/views/task',
                 'width' => '1670px',
                 'height' => '750px',
-            ]
+            ],
         ]
     ],
     /*[
