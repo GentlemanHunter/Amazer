@@ -10,6 +10,7 @@
 
 namespace App\Http\Controller;
 
+use App\Common\Wechat;
 use Swoft\Http\Message\ContentType;
 use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
@@ -113,6 +114,7 @@ class ViewController
     }
 
     /**
+     * 获取 任务 列表
      * @RequestMapping(route="task",method={"GET"})
      * @Middleware(ViewsMiddleware::class)
      * @return Response
@@ -121,5 +123,16 @@ class ViewController
     public function task()
     {
         return view('task/list');
+    }
+
+    /**
+     * 新增任务视图
+     * @RequestMapping(route="task/insert",method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
+     * @throws Throwable
+     */
+    public function addTask()
+    {
+        return view('task/insert');
     }
 }

@@ -2,8 +2,8 @@ version: '3.4'
 services:
   swoft:
     image: swoft/swoft
-#    for local develop
-#    command: php -S 127.0.0.1:13300
+    #    for local develop
+    #    command: php -S 127.0.0.1:13300
     container_name: swoft-srv
     environment:
       - APP_ENV=dev
@@ -17,9 +17,9 @@ services:
       - "18307:18307"
       - "18308:18308"
     volumes:
-       - ./:/var/www/swoft
-#       - ./:/var/www/swoft:delegated
-#      - ./:/var/www/swoft:cached
+      - ./:/var/www/swoft
+      #       - ./:/var/www/swoft:delegated
+      #      - ./:/var/www/swoft:cached
       # - ./runtime/ng-conf:/etc/nginx
       # - ./runtime/logs:/var/log
 
@@ -44,23 +44,3 @@ services:
     sysctls:
       net.core.somaxconn: 65535
     restart: always
-
-#  mongo:
-#    container_name: mongo-srv
-#    image: mongo
-#    ports:
-#      - "27017:27017"
-#    environment:
-#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-#      ME_CONFIG_MONGODB_ADMINPASSWORD: ktp_2020_root
-#    restart: always
-#  # mongodb web 视图
-#  mongo-express:
-#    container_name: mongo-express-srv
-#    image: mongo-express
-#    restart: always
-#    ports:
-#      - 18081:8081
-#    environment:
-#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-#      ME_CONFIG_MONGODB_ADMINPASSWORD: ktp_2020_root

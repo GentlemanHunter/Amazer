@@ -3,14 +3,16 @@
 namespace App\Helper;
 
 
+use App\Exception\ApiException;
 use GuzzleHttp\Psr7\Request;
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use GuzzleHttp\Psr7\Response;
 use App\Model\Logic\RedisLogic;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use Swoft\Log\Helper\CLog;
 
 /**
  * Class GuzzleRetry
@@ -45,24 +47,24 @@ class GuzzleRetry
         ) {
             // Limit the number of retries to 5
             if ($retries >= self::$retry) {
-                GuzzleRetry::log($response, "超过最大重试次数", TaskStatus::EXECUTEDFAIL);
+                GuzzleRetry::log("超过最大重试次数", TaskStatus::EXECUTEDFAIL, $response);
                 return false;
             }
 
             // Retry connection exceptions
             if ($exception instanceof ConnectException) {
-                GuzzleRetry::log($response, "连接异常", TaskStatus::EXECUTEDFAIL);
+                GuzzleRetry::log("连接异常", TaskStatus::EXECUTEDFAIL, $response);
                 return true;
             }
 
             if ($response) {
                 // Retry on server errors
                 if ($response->getStatusCode() >= 500) {
-                    GuzzleRetry::log($response, "客户端错误", TaskStatus::EXECUTEDFAIL);
+                    GuzzleRetry::log("客户端错误", TaskStatus::EXECUTEDFAIL, $response);
                     return true;
                 }
             }
-            GuzzleRetry::log($response, "执行成功", TaskStatus::EXECUTEDSUCCESS);
+            GuzzleRetry::log("执行成功", TaskStatus::EXECUTEDSUCCESS, $response);
             return false;
         };
     }
@@ -119,14 +121,14 @@ class GuzzleRetry
 
     /**
      * 记录日志
-     * @param $response
      * @param $message
      * @param $status
-     * @throws \App\Exception\ApiException
+     * @param Response|null $response
+     * @throws ApiException
      */
-    private function log(Response $response, $message, $status): void
+    private function log($message, $status, Response $response = null): void
     {
-        $result = "{$message}" . json_encode($response->getBody()->getContents());
+        if (!is_null($response)) $message = $response->getBody()->getContents();
         $osTime = time();
         $endTime = $osTime - self::$startTime;
         $this->redisLogic->addTaskWorkLog(
@@ -137,7 +139,7 @@ class GuzzleRetry
             self::$startTime,
             $osTime,
             $endTime,
-            $result,
+            $message,
             $status
         );
     }

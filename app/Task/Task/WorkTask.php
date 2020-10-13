@@ -3,7 +3,9 @@
 
 namespace App\Task\Task;
 
-use App\Exception\TaskStatus;
+use App\Common\Wechat;
+use App\Exception\ApiException;
+use App\ExceptionCode\TaskStatus;
 use App\Helper\GuzzleRetry;
 use App\Helper\MemoryTable;
 use App\Model\Logic\RedisLogic;
@@ -59,27 +61,48 @@ class WorkTask
         unset($data['url']);
         unset($data['method']);
 
-        /** TODO: 待完善 */
-        $timerId = Timer::after($runTime, function ($url, $method, $data, $retry, $taskId) {
-            /** @var GuzzleRetry $handRetry */
-            $handRetry = bean('App\Helper\GuzzleRetry');
-            $handRetry->setRetry($retry)->setBodys($data)->setTaskId($taskId)->setStartTime(time());
+        /** TODO: 需要加入 通知元素 */
+        $timerId = Timer::after($runTime * 1000, function ($url, $method, $data, $retry, $taskId) {
+            try {
+                /** @var GuzzleRetry $handRetry */
+                $handRetry = bean('App\Helper\GuzzleRetry');
+                $handRetry->setRetry($retry)->setBodys($data)->setTaskId($taskId)->setStartTime(time());
 
-            if (isset($data['timeout'])) {
-                $handRetry->setOvertime($data['timeout']);
+                if (isset($data['timeout'])) {
+                    $handRetry->setOvertime($data['timeout']);
+                }
+
+                $handlerState = HandlerStack::create(new CurlHandler());
+                $handlerState->push(Middleware::retry($handRetry->retryDecider(), $handRetry->retryDelay()));
+                $client = new Client(['handler' => $handlerState]);
+                $reponse = $client->request($method, $url, $data);
+
+                CLog::info("response:" . serialize($reponse->getBody()->getContents()));
+
+                /** @var MemoryTable $memoryTable */
+                $memoryTable = bean('App\Helper\MemoryTable');
+                $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
+                Redis::hDel('hash_data', (string)$taskId);
+            } catch (\Exception $exception) {
+                Redis::hSet('timer:error', $taskId, serialize([
+                    'url' => $url,
+                    'method' => $method,
+                    'data' => $data,
+                    'message' => $exception->getMessage(),
+                    'code' => $exception->getCode(),
+                    'line' => $exception->getTraceAsString()
+                ]));
+                $wechat = bean('App\Common\Wechat');
+                $wechat->sendMarkdownMessage(
+                    sprintf(
+                        Wechat::$message[Wechat::ERRORLOG],
+                        $taskId,
+                        date('Y/m/d H:i:s', time()),
+                        $url,
+                        $data
+                    )
+                );
             }
-
-            $handlerState = HandlerStack::create(new CurlHandler());
-            $handlerState->push(Middleware::retry($handRetry->retryDecider(), $handRetry->retryDelay()));
-            $client = new Client(['handler' => $handlerState]);
-            $reponse = $client->request($method, $url, $data);
-
-//            CLog::info("response:".json_encode($reponse));
-
-            /** @var MemoryTable $memoryTable */
-            $memoryTable = bean('App\Helper\MemoryTable');
-            $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
-            Redis::hDel('hash_data', $taskId);
         }, $url, $method, $data, $retry, $taskId);
 
         /** @var MemoryTable $memoryTable */
@@ -104,11 +127,11 @@ class WorkTask
     {
         /** @var MemoryTable $memoryTable */
         $memoryTable = bean('App\Helper\MemoryTable');
-        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId);
+        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId, 'timerId');
         if ($timerId) {
             // 取消定时器
             $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
-            Timer::clear((int)$timerId['timerId']);
+            Timer::clear((int)$timerId);
         }
         $this->redisLogic->delTaskData($taskId);
     }
@@ -129,19 +152,23 @@ class WorkTask
     {
         /** @var MemoryTable $memoryTable */
         $memoryTable = bean('App\Helper\MemoryTable');
-        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId);
+        $timerId = $memoryTable->get(MemoryTable::TASK_TO_ID, (string)$taskId, 'timerId');
 
         if ($timerId) {
             // 取消定时器
             $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
-            Timer::clear((int)$timerId['timerId']);
+            Timer::clear((int)$timerId);
             if ((time() - $execution) < env('TIMEOUT', 60))
                 $this->insertQueueData($taskId, $execution);// 时间小于 当前 时间 20秒 进行插队
         }
 
-        /** @var RedisLogic $redisLogic */
-        $redisLogic = bean('App\Model\Logic\RedisLogic');
-        $redisLogic->clearRedisData($taskId);
+        try {
+            /** @var RedisLogic $redisLogic */
+            $redisLogic = bean('App\Model\Logic\RedisLogic');
+            $redisLogic->clearRedisData($taskId);
+        } catch (ApiException $apiException) {
+            //
+        }
 
         $data = [
             'names' => $names,

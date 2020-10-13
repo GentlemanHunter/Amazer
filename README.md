@@ -28,4 +28,3 @@ Project name: ***Amazer***
 > 详情请看 wiki 
 
 [https://github.com/noOvertimeGroup/Amazer/wiki](https://github.com/noOvertimeGroup/Amazer/wiki)
-

@@ -3,11 +3,16 @@
 
 namespace App\Model\Logic;
 
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use App\Model\Dao\TaskWorkDao;
 use App\Model\Dao\TaskWorkLogDao;
+use App\Model\Entity\TaskWork;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Db\Eloquent\Builder;
+use Swoft\Db\Eloquent\Model;
+use Swoft\Db\Exception\DbException;
+use Swoft\Log\Helper\CLog;
 
 /**
  * Class TaskWorkLogic
@@ -74,7 +79,7 @@ class TaskWorkLogic
      * @param $taskId
      * @param int $status
      * @return int
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function updateByTaskId($taskId, $status = TaskStatus::UNEXECUTED)
     {
@@ -85,8 +90,8 @@ class TaskWorkLogic
      * 获取一个task
      * @param $taskId
      * @param int $status
-     * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
-     * @throws \Swoft\Db\Exception\DbException
+     * @return object|Builder|Model|null
+     * @throws DbException
      */
     public function findByTaskId($taskId, $status = TaskStatus::EXECUTEDSUCCESS)
     {
@@ -100,6 +105,7 @@ class TaskWorkLogic
      */
     public function createTaskLogData(array $data)
     {
+        CLog::info(json_encode($data));
         return $this->taskWorkLogDao->createLogData($data);
     }
 
@@ -144,21 +150,19 @@ class TaskWorkLogic
 
     /**
      * 根据 用户 获取 task 分页 列表
-     * @param int $uid
-     * @param int $page
-     * @param int $pageSize
-     * @param string $task
+     * @param $uid
+     * @param $page
+     * @param $pageSize
+     * @param null|string $taskId
      * @return array
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
-    public function getTaskWorkPagingByUid($uid, $page, $pageSize, $task = '')
+    public function getTaskWorkPagingByUid($uid, $page, $pageSize, $taskId = null)
     {
-        $where = [
-            ['uid', '=', (string)$uid]
-        ];
+        $where = ['uid' => (string)$uid];
 
-        if (!empty($task) || strlen($task) > 0) {
-            $where[] = ['task', 'like', '%' . $task . '%'];
+        if (!is_null($taskId)) {
+            $where[] = ['task_id', 'like', '%' . $taskId . '%'];
         }
 
         $count = $this->taskWorkDao->getCount($where) ?? 0;
@@ -177,15 +181,35 @@ class TaskWorkLogic
     }
 
     /**
-     * Notes: 返回 task 主体
-     * @param string $taskId
-     * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
-     * @throws \Swoft\Db\Exception\DbException
-     * @date: 2020/6/25 7:51 下午
-     * @author: higanbana
+     * 返回 task 主体
+     * @param $taskId
+     * @return object|Builder|Model|null
+     * @throws DbException
      */
-    public function findByTaskIdInfo(string $taskId)
+    public function findByTaskIdInfo($taskId)
     {
         return $this->taskWorkDao->findByTaskId($taskId);
+    }
+
+    /**
+     * 返回 一分钟内的 任务列表
+     * @return array
+     * @throws DbException
+     */
+    public function getTaskWorkByExecution()
+    {
+        $currentTime = time();
+        $futureTime = $currentTime + 60;// 6 分钟预热 大于 预热执行任务 时间
+        $data = $this->taskWorkDao->getPaging([
+            ['execution', '>=', $currentTime],
+            ['execution', '<=', $futureTime],
+            ['status', '=', TaskStatus::UNEXECUTED]
+        ], 1, 999, ['task_id', 'execution']) ?: [];
+
+        if ($data) {
+            $data = $data->toArray();
+        }
+
+        return $data;
     }
 }

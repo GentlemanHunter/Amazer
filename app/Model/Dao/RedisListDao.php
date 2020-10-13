@@ -4,6 +4,7 @@
 namespace App\Model\Dao;
 
 use Swoft\Bean\Annotation\Mapping\Bean;
+use Swoft\Log\Helper\CLog;
 use Swoft\Redis\Redis;
 
 /**

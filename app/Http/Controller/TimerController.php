@@ -10,36 +10,36 @@
 
 namespace App\Http\Controller;
 
-use App\Exception\TaskStatus;
-use App\Helper\MemoryTable;
-use App\Model\Dao\RedisHashDao;
-use App\Model\Logic\TaskWorkLogic;
 use Exception;
-use Swoft\Http\Message\Response;
-use Swoft\Log\Helper\CLog;
-use Swoft\Task\Task;
 use Swoft\Timer;
+use Swoft\Task\Task;
 use Swoft\Redis\Redis;
 use Swoft\Log\Helper\Log;
 use App\Model\Entity\User;
+use Swoft\Log\Helper\CLog;
+use App\Helper\MemoryTable;
 use Swoft\Http\Message\Request;
+use App\Model\Dao\RedisHashDao;
 use App\Exception\ApiException;
 use App\Model\Logic\RedisLogic;
+use Swoft\Http\Message\Response;
+use App\ExceptionCode\TaskStatus;
+use App\Model\Logic\TaskWorkLogic;
 use Swoft\Stdlib\Helper\JsonHelper;
+use App\Http\Middleware\AuthMiddleware;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Validator\Annotation\Mapping\Validate;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\Middleware;
-use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
-use Swoft\Validator\Annotation\Mapping\Validate;
-use App\Http\Middleware\AuthMiddleware;
 use Swoft\Http\Server\Annotation\Mapping\RequestMethod;
+use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
 
 /**
  * Class TimerController
  *
  * @since 2.0
  *
- * @Controller(prefix="timer")
+ * @Controller()
  */
 class TimerController
 {
@@ -50,17 +50,18 @@ class TimerController
     private $redisLogic;
 
     /**
-     * @RequestMapping(route="/add/task",method={RequestMethod::POST})
+     * 新增 任务
+     * @RequestMapping(route="/task",method={RequestMethod::POST})
      * @Validate(validator="TaskWorkValidator",fields={"names","describe","execution","retry","bodys"})
      * @param Request $request
-     * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     public function createTask(Request $request)
     {
         try {
             $names = $request->parsedBody('names');
             $describe = $request->parsedBody('describe');
-            $execution = $request->parsedBody('execution');
+            $execution = isTimestamp($request->parsedBody('execution'));
             $retry = $request->parsedBody('retry');
             $bodys = $request->parsedBody('bodys');
             if (!isJSON($bodys)) {
@@ -80,6 +81,7 @@ class TimerController
                 $bodys,
                 1
             );
+
             return apiSuccess(['taskId' => $id]);
         } catch (\Throwable $throwable) {
             return apiError($throwable->getCode(), $throwable->getMessage());
@@ -87,12 +89,13 @@ class TimerController
     }
 
     /**
-     * @RequestMapping(route="/del/task",method={RequestMethod::POST,RequestMethod::GET})
+     * 删除任务
+     * @RequestMapping(route="/task",method={RequestMethod::DELETE})
      * @Validate(validator="TaskWorkValidator",fields={"taskId"})
      * @param Request $request
-     * @return \Swoft\Http\Message\Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
-    public function delTaskWork(Request $request)
+    public function cancelTaskWork(Request $request)
     {
         try {
             $taskId = $request->parsedBody('taskId');
@@ -129,19 +132,19 @@ class TimerController
     }
 
     /**
-     * @RequestMapping(route="/edit/task",method={RequestMethod::POST})
+     * 修改 任务
+     * @RequestMapping(route="/task",method={RequestMethod::PUT})
      * @Validate(validator="TaskWorkValidator",fields={"taskId","names","describe","execution","retry","bodys"})
      * @param Request $request
-     * @param Response $response
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
-    public function editTask(Request $request,Response $response)
+    public function editTask(Request $request)
     {
         try {
             $taskId = $request->parsedBody('taskId');
             $names = $request->parsedBody('names');
             $describe = $request->parsedBody('describe');
-            $execution = $request->parsedBody('execution');
+            $execution = isTimestamp($request->parsedBody('execution'));
             $retry = $request->parsedBody('retry');
             $bodys = $request->parsedBody('bodys');
             if (!isJSON($bodys)) {

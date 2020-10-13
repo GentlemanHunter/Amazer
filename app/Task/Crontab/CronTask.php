@@ -3,7 +3,7 @@
 
 namespace App\Task\Crontab;
 
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use App\Helper\GuzzleRetry;
 use App\Model\Entity\TaskWork;
 use App\Model\Logic\TaskWorkLogic;
@@ -28,24 +28,45 @@ use Swoole\Coroutine;
 class CronTask
 {
     /**
+     * @Inject()
+     * @var TaskWorkLogic
+     */
+    private $taskWork;
+
+    /**
      * 秒级定时器
      * @Cron("* * * * * *")
      */
     public function secondTaskConsumption()
     {
         $start = time();
-        $end = time() + 20;
+        $end = time() + 5;
         $data = Redis::zRangeByScore('zset_data', (string)$start, (string)$end);
-        if (!empty($data)){
+        if (!empty($data)) {
             foreach ($data as $item) {
                 $score = Redis::zScore('zset_data', $item);
                 $msec = $score - time();
                 $value = redisHashArray(Redis::hGet('hash_data', $item));
+                CLog::info("msec:" . $msec);
                 \Swoft\Task\Task::async('work', 'consumption',
                     [$msec, $item, $value['retry'], $value['bodys']]
                 );
 //                CLog::info("scoure:" . $score . "  value:" . json_encode($value));
                 Redis::zRem('zset_data', $item);
+            }
+        }
+    }
+
+    /**
+     * 秒级定时器
+     * @Cron("0 * * * * *")
+     */
+    public function minuteTaskProduction()
+    {
+        $data = $this->taskWork->getTaskWorkByExecution();
+        if (!empty($data)) {
+            foreach ($data as $item){
+                Task::async('work','insertQueue',[$item['taskId'],$item['execution']]);
             }
         }
     }

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Exception;
+namespace App\ExceptionCode;
 
 
 class TaskStatus

@@ -3,7 +3,7 @@
 
 namespace App\Model\Dao;
 
-use App\Exception\TaskStatus;
+use App\ExceptionCode\TaskStatus;
 use App\Model\Entity\TaskWork;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
@@ -73,8 +73,9 @@ class TaskWorkDao
      */
     public function getPaging(array $where, int $page, int $pageSize, array $field = ['*'])
     {
-        return $this->taskWorkEntity::where([$where])
+        return $this->taskWorkEntity::where($where)
             ->forPage($page, $pageSize)
+            ->orderByDesc('created_at')
             ->orderBy('execution', 'desc')
             ->get($field);
     }
@@ -87,6 +88,6 @@ class TaskWorkDao
      */
     public function getCount(array $where, $field = '*')
     {
-        return $this->taskWorkEntity::where([$where])->count($field);
+        return $this->taskWorkEntity::where($where)->count($field);
     }
 }
