@@ -10,10 +10,18 @@
 
 namespace App\Http\Controller;
 
+use App\Exception\TaskStatus;
+use Swoft\Http\Message\Request;
+use Swoft\Http\Message\Response;
+use App\Model\Logic\TaskWorkLogic;
+use App\Http\Middleware\AuthMiddleware;
+use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
+use Swoft\Http\Server\Annotation\Mapping\Middleware;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
-use Swoft\Task\Exception\TaskException;
+use Swoft\Log\Helper\CLog;
 use Swoft\Task\Task;
+use Swoft\Validator\Annotation\Mapping\Validate;
 
 /**
  * Class TaskController
@@ -25,97 +33,52 @@ use Swoft\Task\Task;
 class TaskController
 {
     /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
+     * @Inject()
+     * @var TaskWorkLogic
      */
-    public function getListByCo(): array
+    private $taskWorkLogic;
+
+    /**
+     * @RequestMapping(route="list",method={"GET"})
+     * @Middleware(AuthMiddleware::class)
+     * @param Request $request
+     * @param Response $response
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @throws \Swoft\Db\Exception\DbException
+     */
+    public function getList(Request $request, Response $response)
     {
-        return Task::co('testTask', 'list', [12]);
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 10);
+        $uid = $request->get('uid', UID());
+        $task = $request->get('taskId');
+
+        return apiSuccess($this->taskWorkLogic->getTaskWorkPagingByUid($uid, (int)$page, (int)$limit, (string)$task));
     }
 
     /**
-     * @RequestMapping(route="deleteByCo")
-     *
-     * @return array
-     * @throws TaskException
+     * Notes: 获取 单个 task 详细信息
+     * @RequestMapping(route="info",method={"GET"})
+     * @Validate(validator="TaskWorkValidator",fields={"taskId"})
+     * @Middleware(Authmiddleware::class)
+     * @param Request $request
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @throws \Swoft\Db\Exception\DbException
      */
-    public function deleteByCo(): array
+    public function getTaskInfo(Request $request)
     {
-        $data = Task::co('testTask', 'delete', [12]);
-        if (is_bool($data)) {
-            return ['bool'];
+        $task = $request->get('taskId');
+
+        /** @var array $taskData */
+        $taskData = $this->taskWorkLogic->findByTaskIdInfo($task);
+
+        if ($taskData) {
+            $taskData = $taskData->toArray();
+            $username = getUserInfo($taskData['uid'])->getUsername() ?? '此用户异常';
+            $taskData['username'] = $username;
+            $taskData['status'] = TaskStatus::$errorMessages[$taskData['status']];
         }
 
-        return ['notBool'];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function getListByAsync(): array
-    {
-        $data = Task::async('testTask', 'list', [12]);
-
-        return [$data];
-    }
-
-    /**
-     * @RequestMapping(route="deleteByAsync")
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function deleteByAsync(): array
-    {
-        $data = Task::async('testTask', 'delete', [12]);
-
-        return [$data];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function returnNull(): array
-    {
-        $result = Task::co('testTask', 'returnNull', ['name']);
-        return [$result];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function returnVoid(): array
-    {
-        $result = Task::co('testTask', 'returnVoid', ['name']);
-        return [$result];
-    }
-
-    /**
-     * @RequestMapping()
-     *
-     * @return array
-     * @throws TaskException
-     */
-    public function syncTask(): array
-    {
-        $result  = Task::co('sync', 'test', ['name']);
-        $result2 = Task::co('sync', 'testBool');
-        $result3 = Task::co('sync', 'testNull');
-
-        $data[] = $result;
-        $data[] = $result2;
-        $data[] = $result3;
-        return $data;
+        return apiSuccess($taskData);
     }
 }

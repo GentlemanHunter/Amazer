@@ -29,21 +29,21 @@ return [
         'logFile' => '@runtime/logs/error-%d{Y-m-d}.log',
     ],
     'logger'             => [
-        'flushRequest' => false,
-        'enable'       => false,
-        'json'         => true,
+        'flushRequest' => true,
+        'enable'       => true,
+        'json'         => false,
     ],
     'httpServer'         => [
         'class'    => HttpServer::class,
         'port'     => env('HTTP_PORT',18306),
         'listener' => [
-             'rpc' => bean('rpcServer'),
-             'tcp' => bean('tcpServer'),
+//             'rpc' => bean('rpcServer'),
+//             'tcp' => bean('tcpServer'),
         ],
         'process'  => [
 //            'monitor' => bean(\App\Process\MonitorProcess::class),
-//            'dispatch' => bean(\App\Process\DispatchProcess::class),
-//            'crontab' => bean(\Swoft\Crontab\Process\CrontabProcess::class)
+            'logconsump' => bean(\App\Process\LogConsumptionProcess::class),
+            'crontab' => bean(\Swoft\Crontab\Process\CrontabProcess::class)
         ],
         'on'       => [
 //            SwooleEvent::TASK   => bean(SyncTaskListener::class),  // Enable sync task
@@ -56,8 +56,8 @@ return [
             'task_enable_coroutine' => true,
             'worker_num'            => 6,
             // static handle
-            // 'enable_static_handler'    => true,
-            // 'document_root'            => dirname(__DIR__) . '/public',
+             'enable_static_handler'    => true,
+             'document_root'            => dirname(__DIR__) . '/public',
         ]
     ],
     'httpDispatcher'     => [
@@ -72,6 +72,10 @@ return [
         'afterMiddlewares' => [
             \Swoft\Http\Server\Middleware\ValidatorMiddleware::class
         ]
+    ],
+    'sessionManager' => [
+        'class' => \Swoft\Http\Session\SessionManager::class,
+        'name' => 'Wharf_SESSION_ID'
     ],
     'db'                 => [
         'class'    => Database::class,
@@ -95,16 +99,6 @@ return [
     'db2.pool'           => [
         'class'    => Pool::class,
         'database' => bean('db2'),
-    ],
-    'db3'                => [
-        'class'    => Database::class,
-        'dsn'      => 'mysql:dbname=test2;host=127.0.0.1',
-        'username' => 'root',
-        'password' => 'swoft123456'
-    ],
-    'db3.pool'           => [
-        'class'    => Pool::class,
-        'database' => bean('db3')
     ],
     'migrationManager'   => [
         'migrationPath' => '@database/Migration',
@@ -152,11 +146,11 @@ return [
             SwooleEvent::TASK    => bean(TaskListener::class),
             SwooleEvent::FINISH  => bean(FinishListener::class)
         ],
-        'debug'    => 1,
+        'debug'    => env('SWOFT_DEBUG',0),
         // 'debug'   => env('SWOFT_DEBUG', 0),
         /* @see WebSocketServer::$setting */
         'setting'  => [
-            'task_worker_num'       => 6,
+            'task_worker_num'       => 12,
             'task_enable_coroutine' => true,
             'worker_num'            => 6,
             'log_file'              => alias('@runtime/swoole.log'),

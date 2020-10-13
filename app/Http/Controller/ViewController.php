@@ -11,10 +11,13 @@
 namespace App\Http\Controller;
 
 use Swoft\Http\Message\ContentType;
+use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
+use Swoft\Http\Server\Annotation\Mapping\Middleware;
 use Swoft\View\Annotation\Mapping\View;
+use App\Http\Middleware\ViewsMiddleware;
 use Throwable;
 
 /**
@@ -22,7 +25,7 @@ use Throwable;
  *
  * @since 2.0
  *
- * @Controller(prefix="view")
+ * @Controller(prefix="/views")
  */
 class ViewController
 {
@@ -53,5 +56,70 @@ class ViewController
         return [
             'msg' => 'hello'
         ];
+    }
+
+    /**
+     * @RequestMapping(route="login", method={"GET"})
+     * @return Response
+     * @throws Throwable
+     */
+    public function login()
+    {
+        return view('home/login');
+    }
+
+    /**
+     * @RequestMapping(route="register", method={"GET"})
+     * @return Response
+     * @throws Throwable
+     */
+    public function register()
+    {
+        return view('home/register');
+    }
+
+    /**
+     * 获取用户菜单
+     * @RequestMapping(route="home", method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
+     */
+    public function home(Request $request, Response $response)
+    {
+        $menus = config('menu');
+        $userInfo = $request->userInfo;
+        return view('home/home', [
+            'menus' => $menus,
+            'userInfo' => $userInfo
+        ]);
+    }
+
+    /**
+     * @RequestMapping(route="userInfo",method={"GET"})
+     */
+    public function userInfo(Request $request, Response $response)
+    {
+        return view('user/info');
+    }
+
+    /**
+     * @RequestMapping(route="machine",method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
+     * @return Response
+     * @throws Throwable
+     */
+    public function machine()
+    {
+        return view('machine/list');
+    }
+
+    /**
+     * @RequestMapping(route="task",method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
+     * @return Response
+     * @throws Throwable
+     */
+    public function task()
+    {
+        return view('task/list');
     }
 }

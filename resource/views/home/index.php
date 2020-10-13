@@ -5,7 +5,7 @@
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Swoft Framework 2.0 - PHP microservices coroutine framework</title>
+  <title>Wharf-S</title>
   <style type="text/css">
     *,
     *::before,
@@ -253,24 +253,27 @@
 <div class="container">
   <nav class="top-nav ">
     <ul class="clearfix">
-      <li><a target="_blank"  href="https://github.com/swoft-cloud/swoft">Github</a></li>
-      <li><a target="_blank"  href="https://swoft.org/docs">Document</a></li>
-      <li><a target="_blank"  href="https://swoft.org/docs">Swoft.org</a></li>
-      <li><a target="_blank"  href="https://gitter.im/swoft-cloud/community">Gitter.im</a></li>
+      <li><a href="/views/login">登录</a></li>
+      <li><a href="/views/register">注册</a></li>
+      <li><a href="/views/home">工作面板</a></li>
+      <li><a href="">Gitter.im</a></li>
     </ul>
   </nav>
   <div class="main">
-    <h1 class="swoft-title">Swoft <span class="framework">Framework</span>
-      <small>2.x</small>
-    </h1>
+    <h5 class="swoft-title">Wharf <span class="framework">S</span>
+      <small>1.0</small>
+    </h5>
+<!--    <h5 class="swoft-title">Swoft <span class="framework">Framework</span>-->
+<!--      <small>2.x</small>-->
+<!--    </h5>-->
   </div>
 </div>
 <nav class="foot-nav">
   <ul class="clearfix">
-    <li><a target="_blank"  href="https://github.com/swoft-cloud/swoft">Github</a></li>
-    <li><a target="_blank"  href="https://swoft.org/docs">Document</a></li>
-    <li><a target="_blank"  href="https://swoft.org/docs">Swoft.org</a></li>
-    <li><a target="_blank"  href="https://gitter.im/swoft-cloud/community">Gitter.im</a></li>
+    <li><a href="/views/login">登录</a></li>
+    <li><a href="/views/register">注册</a></li>
+    <li><a href="/views/home">工作面板</a></li>
+    <li><a href="">Gitter.im</a></li>
   </ul>
 </nav>
 </body>

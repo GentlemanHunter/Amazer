@@ -10,7 +10,6 @@
 
 namespace App\Http\Controller;
 
-use App\Model\Data\GoodsData;
 use Swoft;
 use Swoft\Http\Message\ContentType;
 use Swoft\Http\Message\Response;
@@ -18,8 +17,6 @@ use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
 use Swoft\View\Renderer;
 use Throwable;
-use function bean;
-use function context;
 
 /**
  * Class HomeController
@@ -35,14 +32,13 @@ class HomeController
     {
         /** @var Renderer $renderer */
         $renderer = Swoft::getBean('view');
-        $content  = $renderer->render('home/index');
+        $content = $renderer->render('home/index');
 
         return context()->getResponse()->withContentType(ContentType::HTML)->withContent($content);
     }
 
     /**
      * @RequestMapping("/hi")
-     *
      * @return Response
      */
     public function hi(): Response
@@ -50,16 +46,6 @@ class HomeController
         return context()->getResponse()->withContent('hi');
     }
 
-    /**
-     * @RequestMapping("/hello[/{name}]")
-     * @param string $name
-     *
-     * @return Response
-     */
-    public function hello(string $name): Response
-    {
-        return context()->getResponse()->withContent('Hello' . ($name === '' ? '' : ", {$name}"));
-    }
 
     /**
      * @RequestMapping("/wstest", method={"GET"})
@@ -70,16 +56,5 @@ class HomeController
     public function wsTest(): Response
     {
         return view('home/ws-test');
-    }
-
-    /**
-     * @RequestMapping("/dataConfig", method={"GET"})
-     *
-     * @return array
-     * @throws Throwable
-     */
-    public function dataConfig(): array
-    {
-        return bean(GoodsData::class)->getConfig();
     }
 }

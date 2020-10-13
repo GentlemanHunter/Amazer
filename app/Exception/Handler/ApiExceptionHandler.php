@@ -14,6 +14,8 @@ use App\Exception\ApiException;
 use Swoft\Error\Annotation\Mapping\ExceptionHandler;
 use Swoft\Http\Message\Response;
 use Swoft\Http\Server\Exception\Handler\AbstractHttpErrorHandler;
+use Swoft\Log\Helper\CLog;
+use Swoft\Log\Helper\Log;
 use Throwable;
 
 /**
@@ -33,13 +35,25 @@ class ApiExceptionHandler extends AbstractHttpErrorHandler
      */
     public function handle(Throwable $except, Response $response): Response
     {
-        $data = [
-            'code'  => $except->getCode(),
-            'error' => sprintf('(%s) %s', get_class($except), $except->getMessage()),
-            'file'  => sprintf('At %s line %d', $except->getFile(), $except->getLine()),
-            'trace' => $except->getTraceAsString(),
-        ];
+        // Log error message
+        Log::error($except->getMessage());
+        CLog::error('%s. (At %s line %d)', $except->getMessage(), $except->getFile(), $except->getLine());
 
-        return $response->withData($data);
+        // 这里code默认为-1 因为layIm的api成功返回的code为0
+        $code = ($except->getCode() == 0) ? -1 : $except->getCode();
+        $message = $except->getMessage();
+
+
+
+        // Debug is true
+        if (APP_DEBUG) {
+            $message = sprintf('(%s) %s', get_class($except), $except->getMessage());
+        }
+        return throwApiException(
+            $code,
+            $message,
+            sprintf('At %s line %d', $except->getFile(), $except->getLine()),
+            $except->getTraceAsString()
+        );
     }
 }

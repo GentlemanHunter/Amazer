@@ -39,19 +39,19 @@ class HttpExceptionHandler extends AbstractHttpErrorHandler
         Log::error($e->getMessage());
         CLog::error('%s. (At %s line %d)', $e->getMessage(), $e->getFile(), $e->getLine());
 
+        $code = ($e->getCode() == 0) ? -1 : $e->getCode();
+        $message = $e->getMessage();
+
         // Debug is false
         if (!APP_DEBUG) {
-            return $response->withStatus(500)->withContent($e->getMessage());
+            $message = sprintf('(%s) %s', get_class($e), $e->getMessage());
         }
 
-        $data = [
-            'code'  => $e->getCode(),
-            'error' => sprintf('(%s) %s', get_class($e), $e->getMessage()),
-            'file'  => sprintf('At %s line %d', $e->getFile(), $e->getLine()),
-            'trace' => $e->getTraceAsString(),
-        ];
-
-        // Debug is true
-        return $response->withData($data);
+        return throwApiException(
+            $code,
+            $message,
+            sprintf('At %s line %d', $e->getFile(), $e->getLine()),
+            $e->getTraceAsString()
+        );
     }
 }
