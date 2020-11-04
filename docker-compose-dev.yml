@@ -28,7 +28,7 @@ services:
     container_name: mysql-srv
     command: --default-authentication-plugin=mysql_native_password #这行代码解决无法访问的问题
     environment:
-      MYSQL_ROOT_PASSWORD: ktp123123
+      MYSQL_ROOT_PASSWORD: amazer123
     ports:
       - "13306:3306"
     volumes:

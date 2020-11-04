@@ -38,7 +38,7 @@ class User extends BaseMigration
             $table->integer('update_at')->comment("更新时间");
             $table->integer('delete_at')->nullable()->comment('删除时间 为NULL未删除');
 
-            $table->index('account');
+            $table->unique('account');
             $table->comment('系统用户表');
             $table->charset = 'utf8mb4';
 

@@ -4,7 +4,8 @@ Project name: ***Amazer***
 
 运行方式：
 
-请在根目录 迁移 .env.example => .env
+请在根目录 迁移 .env.example => .env  
+请在根目录 迁移 docker-compose-dev.yml => docker-compose.yml  
 
 推荐 docker 运行 直接使用 ***docker-composer up -d***
 
