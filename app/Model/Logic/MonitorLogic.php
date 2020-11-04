@@ -11,7 +11,6 @@
 namespace App\Model\Logic;
 
 use App\Model\Entity\TaskWork;
-use App\Model\Entity\Test;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Db\Exception\DbException;
 use Swoft\Log\Helper\CLog;

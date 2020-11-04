@@ -56,6 +56,7 @@ class TaskWorkLogic
     )
     {
         $taskId = getGuid();
+
         $data = [
             'taskId' => $taskId,
             'names' => $names,
@@ -192,13 +193,13 @@ class TaskWorkLogic
     }
 
     /**
-     * 返回 一分钟内的 任务列表
+     * 返回 [10-60]s 内的任务列表
      * @return array
      * @throws DbException
      */
     public function getTaskWorkByExecution()
     {
-        $currentTime = time();
+        $currentTime = time() + 10;
         $futureTime = $currentTime + 60;// 6 分钟预热 大于 预热执行任务 时间
         $data = $this->taskWorkDao->getPaging([
             ['execution', '>=', $currentTime],

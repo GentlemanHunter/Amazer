@@ -41,7 +41,7 @@ class LogConsumptionProcess extends UserProcess
                 CLog::info(json_encode($log));
                 $this->taskWorkLogic->updateByTaskId($log['task_id'],$log['status']);
             }
-            Coroutine::sleep(10);
+            Coroutine::sleep(1);
         }
     }
 }

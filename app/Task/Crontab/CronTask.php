@@ -7,6 +7,7 @@ use App\ExceptionCode\TaskStatus;
 use App\Helper\GuzzleRetry;
 use App\Model\Entity\TaskWork;
 use App\Model\Logic\TaskWorkLogic;
+use App\Task\Task\WorkTask;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
@@ -66,6 +67,7 @@ class CronTask
         $data = $this->taskWork->getTaskWorkByExecution();
         if (!empty($data)) {
             foreach ($data as $item){
+                /** @var WorkTask insertQueueData() */
                 Task::async('work','insertQueue',[$item['taskId'],$item['execution']]);
             }
         }
