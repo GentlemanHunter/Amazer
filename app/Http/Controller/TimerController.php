@@ -172,4 +172,22 @@ class TimerController
             return apiError($throwable->getCode(),$throwable->getMessage());
         }
     }
+
+    /**
+     * Notes: 测试返回结果的影响
+     * @RequestMapping(route="/setTime")
+     * @param Request $request
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @author: MagicConch17
+     */
+    public function setTime(Request $request)
+    {
+        $time = time();
+        $request = json_encode($request->getBody());
+
+        return apiSuccess([
+            'request' => $request,
+            'time' => $time
+        ]);
+    }
 }

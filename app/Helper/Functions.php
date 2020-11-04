@@ -226,8 +226,8 @@ if (!function_exists('isTimestamp')) {
     function isTimestamp($timestamp)
     {
         if (is_string($timestamp)) {
-            if ($timestamps = strtotime($timestamp)) {
-                return $timestamps;
+            if ($timestamp == strtotime($timestamp)) {
+                return $timestamp;
             }
         }
 

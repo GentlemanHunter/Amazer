@@ -15,10 +15,12 @@ use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Db\Exception\DbException;
 use Swoft\Log\Helper\CLog;
 use Swoft\Redis\Redis;
 use Swoft\Task\Annotation\Mapping\Task;
 use Swoft\Task\Annotation\Mapping\TaskMapping;
+use Swoft\Task\Exception\TaskException;
 use Swoft\Timer;
 
 /**
@@ -53,6 +55,10 @@ class WorkTask
      *      timeout => '请求超时的秒数。使用 0 无限期的等待(默认行为)',// float
      *      version => '请求要使用到的协议版本',// string, float
      * ]
+     * @param int $runTime
+     * @param $taskId
+     * @param $retry
+     * @param array $data
      */
     public function consumptionTimer(int $runTime, $taskId, $retry, array $data): void
     {
@@ -113,6 +119,8 @@ class WorkTask
     /**
      * 插入 task
      * @TaskMapping(name="insertQueue")
+     * @param $taskId
+     * @param $runTime
      */
     public function insertQueueData($taskId, $runTime): void
     {
@@ -122,6 +130,9 @@ class WorkTask
     /**
      * 取消任务
      * @TaskMapping(name="delQueue")
+     * @param $taskId
+     * @throws ApiException
+     * @throws DbException
      */
     public function delQueueData($taskId): void
     {
@@ -139,6 +150,16 @@ class WorkTask
     /**
      * 编辑任务
      * @TaskMapping(name="editQueue")
+     * @param $taskId
+     * @param $names
+     * @param $describe
+     * @param $execution
+     * @param $retry
+     * @param $bodys
+     * @param $uid
+     * @throws ApiException
+     * @throws DbException
+     * @throws TaskException
      */
     public function editQueueData(
         $taskId

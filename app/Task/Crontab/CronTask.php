@@ -67,7 +67,7 @@ class CronTask
         $data = $this->taskWork->getTaskWorkByExecution();
         if (!empty($data)) {
             foreach ($data as $item){
-                /** @var WorkTask insertQueueData() */
+                /** @method WorkTask insertQueueData() */
                 Task::async('work','insertQueue',[$item['taskId'],$item['execution']]);
             }
         }

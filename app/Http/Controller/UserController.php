@@ -8,6 +8,7 @@ use App\Helper\JwtHelper;
 use App\Helper\AuthHelper;
 use App\Model\Entity\User;
 use App\Model\Logic\UserLogic;
+use Swoft\Http\Message\Concern\CookiesTrait;
 use Swoft\Http\Message\Request;
 use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Http\Message\Response;
@@ -40,6 +41,8 @@ class UserController
     /**
      * @RequestMapping(route="register",method={RequestMethod::POST})
      * @Validate(validator="UserValidator",fields={"account","password"})
+     * @param Request $request
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     public function register(Request $request)
     {
@@ -61,6 +64,9 @@ class UserController
      * 用户登录
      * @RequestMapping(route="login",method={RequestMethod::POST})
      * @Validate(validator="UserValidator",fields={"account","password"})
+     * @param Request $request
+     * @param Response $response
+     * @return CookiesTrait|Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     public function login(Request $request, Response $response)
     {
@@ -86,6 +92,9 @@ class UserController
      * 用户退出
      * @RequestMapping(route="signout",method={RequestMethod::GET})
      * @Middleware(ViewsMiddleware::class)
+     * @param Request $request
+     * @param Response $response
+     * @return CookiesTrait|Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     public function signout(Request $request, Response $response)
     {
@@ -96,8 +105,11 @@ class UserController
     }
 
     /**
+     * Notes: 获取用户信息
      * @RequestMapping(route="info",method={RequestMethod::GET})
      * @Middleware(AuthMiddleware::class)
+     * @param Request $request
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     public function userInfo(Request $request)
     {
@@ -109,9 +121,12 @@ class UserController
     }
 
     /**
+     * Notes: 修改用户信息
      * @RequestMapping(route="update",method={RequestMethod::POST})
      * @Middleware(AuthMiddleware::class)
      * @Validate(validator="UserValidator",fields={"username"})
+     * @param Request $request
+     * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
     public function changeUserInfo(Request $request)
     {

@@ -64,6 +64,7 @@ class GuzzleRetry
                     return true;
                 }
             }
+
             GuzzleRetry::log("执行成功", TaskStatus::EXECUTEDSUCCESS, $response);
             return false;
         };

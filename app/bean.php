@@ -80,8 +80,8 @@ return [
     'db'                 => [
         'class'    => Database::class,
         'dsn'      => env('DB_DSN'),
-        'username' => env('DB_USERNAME'),
-        'password' => env('DB_PASSWORD'),
+        'username' => env('DB_USERNAME','root'),
+        'password' => env('DB_PASSWORD','123456'),
         'prefix'   => env('DB_PREFIX'),
         'charset'  => 'utf8mb4',
     ],
