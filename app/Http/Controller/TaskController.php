@@ -60,7 +60,7 @@ class TaskController
      * Notes: 获取任务日志列表 (分页)
      * @RequestMapping(route="list/{taskId}",method={"GET"})
      * @Middleware(AuthMiddleware::class)
-     * @Validate(validator="TaskWorkValidator",fields={"taskId"}})
+     * @Validate(validator="TaskWorkValidator",fields={"taskId"})
      * @param Request $request
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      * @throws DbException
