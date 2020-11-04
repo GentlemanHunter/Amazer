@@ -7,6 +7,10 @@ use App\ExceptionCode\TaskStatus;
 use App\Model\Entity\TaskWork;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Db\Eloquent\Builder;
+use Swoft\Db\Eloquent\Collection;
+use Swoft\Db\Eloquent\Model;
+use Swoft\Db\Exception\DbException;
 use Swoft\Log\Helper\CLog;
 
 /**
@@ -26,8 +30,8 @@ class TaskWorkDao
      * 根据 task 任务id 返回 task 信息
      * @param string $taskId
      * @param int $status
-     * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
-     * @throws \Swoft\Db\Exception\DbException
+     * @return object|Builder|Model|null
+     * @throws DbException
      */
     public function findByTaskId(string $taskId, int $status = 0)
     {
@@ -55,7 +59,7 @@ class TaskWorkDao
      * @param string $taskId
      * @param array $data
      * @return bool|int
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function updateBytaskId(string $taskId, array $data)
     {
@@ -68,8 +72,8 @@ class TaskWorkDao
      * @param int $page
      * @param int $pageSize
      * @param array|string[] $field
-     * @return \Swoft\Db\Eloquent\Collection
-     * @throws \Swoft\Db\Exception\DbException
+     * @return Collection
+     * @throws DbException
      */
     public function getPaging(array $where, int $page, int $pageSize, array $field = ['*'])
     {

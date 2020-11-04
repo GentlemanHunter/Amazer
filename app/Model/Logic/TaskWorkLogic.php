@@ -7,6 +7,7 @@ use App\ExceptionCode\TaskStatus;
 use App\Model\Dao\TaskWorkDao;
 use App\Model\Dao\TaskWorkLogDao;
 use App\Model\Entity\TaskWork;
+use App\Model\Entity\TaskWorkLog;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Db\Eloquent\Builder;
@@ -22,12 +23,14 @@ use Swoft\Log\Helper\CLog;
 class TaskWorkLogic
 {
     /**
+     * 任务主表
      * @Inject()
      * @var TaskWorkDao
      */
     private $taskWorkDao;
 
     /**
+     * 任务日志表
      * @Inject()
      * @var TaskWorkLogDao
      */
@@ -193,7 +196,7 @@ class TaskWorkLogic
     }
 
     /**
-     * 返回 [10-60]s 内的任务列表
+     * 返回 [10 - 60]s 内的任务列表
      * @return array
      * @throws DbException
      */
@@ -212,5 +215,35 @@ class TaskWorkLogic
         }
 
         return $data;
+    }
+
+    /**
+     * Notes: 根据任务Id 返回日志
+     * @param $taskId
+     * @param $page
+     * @param $pageSize
+     * @param null $status
+     * @return array
+     * @throws DbException
+     * @author: MagicConch17
+     */
+    public function getTaskWorkLogPagingByTaskId($taskId, $page, $pageSize, $status = null)
+    {
+        $where = [
+            'task_id' => $taskId
+        ];
+
+        if (!is_null($status)) {
+            $where['status'] = $status;
+        }
+
+        $count = $this->taskWorkLogDao->getCount($where, 'id') ?? 0;
+        $list = $this->taskWorkLogDao->getPaging($where, $page, $pageSize) ?? [];
+
+        foreach ($list as &$item) {
+            $item['statusMessage'] = TaskStatus::$errorMessages[$item['status']];
+        }
+
+        return ['total' => $count, 'data' => $list];
     }
 }

@@ -83,6 +83,10 @@ class ViewController
      * 获取用户菜单
      * @RequestMapping(route="home", method={"GET"})
      * @Middleware(ViewsMiddleware::class)
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     * @throws Throwable
      */
     public function home(Request $request, Response $response)
     {
@@ -96,6 +100,10 @@ class ViewController
 
     /**
      * @RequestMapping(route="userInfo",method={"GET"})
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     * @throws Throwable
      */
     public function userInfo(Request $request, Response $response)
     {

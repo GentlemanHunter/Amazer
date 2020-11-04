@@ -7,14 +7,92 @@
     /*.layui-table-view .layui-table[lay-size=lg] .layui-table-cell{height: auto !important;}*/
   </style>
   <?= $this->include('layouts/common/header', ['title' => '任务管理']) ?>
+  <link rel="stylesheet" href="/lib/jsoneditor/normalize.css">
 </head>
 <body>
 <table class="layui-hide" id="table" lay-filter="table"></table>
 </body>
 
+
 <script type="text/html" id="operation">
   <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
   <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">取消</a>
+</script>
+
+<script type="text/html" id="panel">
+  <form class="layui-form layui-form-pane" action="" lay-filter="panel-form">
+    <div class="layui-form-item">
+      <label class="layui-form-label">任务ID:</label>
+      <div class="layui-input-block">
+        <input type="text" name="taskId" autocomplete="off" placeholder="请输入任务ID" class="layui-input">
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">任务名称:</label>
+        <div class="layui-input-block">
+          <input type="text" name="names" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-inline">
+        <label class="layui-form-label">任务状态:</label>
+        <div class="layui-input-inline">
+          <input type="text" name="status" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">执行时间:</label>
+        <div class="layui-input-block">
+          <input type="text" name="execution" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-inline">
+        <label class="layui-form-label">重试次数:</label>
+        <div class="layui-input-inline">
+          <input type="text" name="retry" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+      <label class="layui-form-label">任务描述:</label>
+      <div class="layui-input-block">
+        <textarea placeholder="请输入内容" class="layui-textarea" name="describe"></textarea>
+      </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+      <label class="layui-form-label">任务配置:(说明文档)</label>
+      <div class="layui-input-block" style="width: auto">
+        <div id="jsoneditor" style="width: 50%;height: 400px;float: left"></div>
+        <div id="jsondesc" style="width: 50%;height: 400px; float: left">
+          <h3 style="text-align: center">全部请求数据参数</h3>
+
+          <pre class="layui-code" lay-skin="notepad" lay-encode="true">
+url =&gt; &#39;https://localhost/test/redis&#39;,// string
+method =&gt; &#39;请求方式&#39;,// string
+connect_timeout =&gt; &#39;表示等待服务器响应超时的最大值&#39;, // float 0
+verify =&gt; &#39;请求时验证SSL证书行为&#39;, // boole
+cookies =&gt; &#39;cookie 数据’, // string
+body =&gt; &#39;body 选项用来控制一个请求(比如：PUT, POST, PATCH)的主体部分。&#39;,
+headers =&gt; &#39;要添加到请求的报文头的关联数组，每个键名是header的名称，每个键值是一个字符串或包含代表头字段字符串的数组。&#39;, // array
+form_params =&gt; &#39;用来发送一个 application/x-www-form-urlencoded POST请求.&#39;,// array
+timeout =&gt; &#39;请求超时的秒数。使用 0 无限期的等待(默认行为)&#39;,// float
+version =&gt; &#39;请求要使用到的协议版本&#39;,// string, float
+          </pre>
+
+          <p>上述 大部分 参数 都是为了 更加满足使用 </p>
+
+          <blockquote><p>注意： <b>timeout</b> 默认 为 1 既 等待 1秒 如果 1秒无法 执行完毕您的程序 必须 设定 禁止为空</p></blockquote>
+        </div>
+      </div>
+    </div>
+
+  </form>
 </script>
 
 <script type="module">
@@ -22,9 +100,13 @@
   import {task_delete} from '/service/js/api.js';
   import {postRequest} from '/service/js/request.js';
 
-  layui.use(['table', 'code', 'util'], function () {
+  layui.use(['table', 'code', 'util', 'form', 'jquery'], function () {
+    let $ = layui.$;
     var table = layui.table;
     var util = layui.util;
+    var form = layui.form;
+    var jQuery = layui.jquery;
+
     table.render({
       elem: '#table'
       , url: '/task/list'
@@ -111,8 +193,42 @@
         });
       } else if (obj.event === 'detail') {
         layer.msg('TASKID：' + data.taskId + ' 的查看操作');
+        layer.open({
+          type: 1
+          , title: "任务:" + data.taskId //不显示标题栏
+          , closeBtn: false
+          , area: '1000px'
+          , shade: 0.8
+          , id: 'LAY_layuipro' //设定一个id，防止重复弹出
+          , btn: ['查看日志', '关闭页面']
+          , btnAlign: 'c'
+          , moveType: 1 //拖拽模式，0或者1
+          , content: $('#panel').html()
+          , success: function (layero) {
+            console.log(data);
+            form.val("panel-form", data);
+            var editor = new JsonEditor($('#jsoneditor'), data.bodys, {});
+            editor.load(data.bodys);
+            try {
+              editor.get();
+            } catch (ex) {
+              //   Trigger an Error when JSON invalid
+              alert(ex);
+            }
+            console.log(editor);
+
+            /*var btn = layero.find('.layui-layer-btn');
+            btn.find('.layui-layer-btn0').attr({
+              href: 'http://www.layui.com/'
+              ,target: '_blank'
+            });*/
+
+          }
+        });
       }
     });
   });
 </script>
+<script src="/lib/jquery/jquery-1.11.0.min.js"></script>
+<script type="application/javascript" src="/lib/jsoneditor/jquery.json-editor.min.js"></script>
 </html>
