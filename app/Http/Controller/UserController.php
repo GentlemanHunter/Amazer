@@ -94,7 +94,7 @@ class UserController
      * @Middleware(ViewsMiddleware::class)
      * @param Request $request
      * @param Response $response
-     * @return CookiesTrait|Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return CookiesTrait|Response
      */
     public function signout(Request $request, Response $response)
     {

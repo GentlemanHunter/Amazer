@@ -116,7 +116,7 @@ class ViewController
      * @return Response
      * @throws Throwable
      */
-    public function machine()
+    public function machine(): Response
     {
         return view('machine/list');
     }
@@ -128,19 +128,30 @@ class ViewController
      * @return Response
      * @throws Throwable
      */
-    public function task()
+    public function task(): Response
     {
         return view('task/list');
     }
 
     /**
      * 新增任务视图
-     * @RequestMapping(route="task/insert",method={"GET"})
+     * @RequestMapping(route="task/add",method={"GET"})
      * @Middleware(ViewsMiddleware::class)
      * @throws Throwable
      */
-    public function addTask()
+    public function addTask(): Response
     {
         return view('task/insert');
+    }
+
+    /**
+     * Notes: edit task view
+     * @RequestMapping(route="task/edit",method={"GET"})
+     * @Middleware(ViewsMiddleware::class)
+     * @throws Throwable
+     */
+    public function editTask(): Response
+    {
+        return view('task/edit');
     }
 }

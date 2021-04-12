@@ -84,7 +84,7 @@ class RedisLogic
             'updated_at' => time()
         ];
 
-        if (($execution - time()) < env('TIMEOUT',120)){
+        if (($execution - time()) < env('TIMEOUT', 120)) {
             Task::async('work', 'insertQueue', [$taskId, $execution]);
         }
 

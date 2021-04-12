@@ -27,14 +27,14 @@ class TaskWorkLogic
      * @Inject()
      * @var TaskWorkDao
      */
-    private $taskWorkDao;
+    public $taskWorkDao;
 
     /**
      * 任务日志表
      * @Inject()
      * @var TaskWorkLogDao
      */
-    private $taskWorkLogDao;
+    public $taskWorkLogDao;
 
     /**
      * 创建一个 task
@@ -42,7 +42,6 @@ class TaskWorkLogic
      * @param $describe
      * @param $execution
      * @param $retry
-     * @param $overtime
      * @param $bodys
      * @param $uid
      * @param int $status
@@ -56,7 +55,7 @@ class TaskWorkLogic
         $bodys,
         $uid,
         $status = TaskStatus::UNEXECUTED
-    )
+    ): string
     {
         $taskId = getGuid();
 
@@ -85,7 +84,7 @@ class TaskWorkLogic
      * @return int
      * @throws DbException
      */
-    public function updateByTaskId($taskId, $status = TaskStatus::UNEXECUTED)
+    public function updateByTaskId($taskId, $status = TaskStatus::UNEXECUTED): int
     {
         return $this->taskWorkDao->updateBytaskId($taskId, ['status' => $status]);
     }
@@ -107,7 +106,7 @@ class TaskWorkLogic
      * @param array $data
      * @return string
      */
-    public function createTaskLogData(array $data)
+    public function createTaskLogData(array $data): string
     {
         CLog::info(json_encode($data));
         return $this->taskWorkLogDao->createLogData($data);
@@ -136,7 +135,7 @@ class TaskWorkLogic
         $implement = 0,
         $result = '',
         $status = TaskStatus::UNEXECUTED
-    )
+    ): string
     {
         $data = [
             'task_id' => $taskId,
@@ -161,12 +160,12 @@ class TaskWorkLogic
      * @return array
      * @throws DbException
      */
-    public function getTaskWorkPagingByUid($uid, $page, $pageSize, $taskId = null)
+    public function getTaskWorkPagingByUid($uid, $page, $pageSize, $taskId = null): array
     {
         $where = ['uid' => (string)$uid];
 
         if (!is_null($taskId)) {
-            $where[] = ['task_id', 'like', '%' . $taskId . '%'];
+            $where[] = ['task_id', $taskId];
         }
 
         $count = $this->taskWorkDao->getCount($where) ?? 0;
@@ -200,7 +199,7 @@ class TaskWorkLogic
      * @return array
      * @throws DbException
      */
-    public function getTaskWorkByExecution()
+    public function getTaskWorkByExecution(): array
     {
         $currentTime = time() + 10;
         $futureTime = $currentTime + 60;// 6 分钟预热 大于 预热执行任务 时间
@@ -227,7 +226,7 @@ class TaskWorkLogic
      * @throws DbException
      * @author: MagicConch17
      */
-    public function getTaskWorkLogPagingByTaskId($taskId, $page, $pageSize, $status = null)
+    public function getTaskWorkLogPagingByTaskId($taskId, $page, $pageSize, $status = null): array
     {
         $where = [
             'task_id' => $taskId

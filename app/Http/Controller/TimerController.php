@@ -47,7 +47,7 @@ class TimerController
      * @Inject()
      * @var RedisLogic
      */
-    private $redisLogic;
+    public $redisLogic;
 
     /**
      * 新增 任务

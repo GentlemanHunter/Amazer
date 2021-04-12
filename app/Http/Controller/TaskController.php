@@ -36,7 +36,7 @@ class TaskController
      * @Inject()
      * @var TaskWorkLogic
      */
-    private $taskWorkLogic;
+    public $taskWorkLogic;
 
     /**
      * Notes: 获取任务列表 (分页)
@@ -51,7 +51,7 @@ class TaskController
     {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
-        $taskId = $request->get('taskId', null);
+        $taskId = $request->get('taskId');
 
         return apiSuccess($this->taskWorkLogic->getTaskWorkPagingByUid(UID(), (int)$page, (int)$limit, (string)$taskId));
     }
