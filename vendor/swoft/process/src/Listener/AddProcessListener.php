@@ -1,8 +1,14 @@
 <?php declare(strict_types=1);
-
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Process\Listener;
-
 
 use Swoft;
 use Swoft\Event\Annotation\Mapping\Listener;
@@ -68,17 +74,19 @@ class AddProcessListener implements EventHandlerInterface
             $function = function (SwooleProcess $swProcess) use ($callback, $server, $name) {
                 $process = Process::new($swProcess);
 
-                // Before
-                Swoft::trigger(ProcessEvent::BEFORE_USER_PROCESS, null, $server, $process, $name);
+                try {
+                    // Before
+                    Swoft::trigger(ProcessEvent::BEFORE_USER_PROCESS, null, $server, $process, $name);
 
-                try {// Run
+                    // Run
+                    // TODO use $userProcess->run($process);
                     PhpHelper::call($callback, $process);
+
+                    // After
+                    Swoft::trigger(ProcessEvent::AFTER_USER_PROCESS);
                 } catch (Throwable $e) {
                     Error::log('User process fail(%s %s %d)!', $e->getFile(), $e->getMessage(), $e->getLine());
                 }
-
-                // After
-                Swoft::trigger(ProcessEvent::AFTER_USER_PROCESS);
             };
 
             $process = new SwooleProcess($function, $stdinOut, $pipeType, $coroutine);

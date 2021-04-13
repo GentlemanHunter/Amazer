@@ -1,9 +1,10 @@
 # Text-Template (Single Class, IF, FOR, FILTERS)
 
 [![Downloads this Month](https://img.shields.io/packagist/dm/text/template.svg)](https://packagist.org/packages/text/template)
+[![Latest Stable Version](https://poser.pugx.org/text/template/v/stable)](https://github.com/dermatthes/text-template/releases)
+[![Actions Status](https://github.com/dermatthes/text-template/workflows/tests/badge.svg)](https://github.com/dermatthes/text-template/actions)
 [<img src="https://travis-ci.org/dermatthes/text-template.svg">](https://travis-ci.org/dermatthes/text-template)
 [![Coverage Status](https://coveralls.io/repos/github/dermatthes/text-template/badge.svg?branch=master)](https://coveralls.io/github/dermatthes/text-template?branch=master)
-[![Latest Stable Version](https://poser.pugx.org/text/template/v/stable)](https://github.com/dermatthes/text-template/releases)
 [![Supports PHP 5.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-5_4plus.png)](http://php.net/)
 [![Supports PHP 7.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_0plus.png)](http://php.net/)
 [![Homepage](https://img.shields.io/badge/info-website-blue.svg)](http://text-template.pub.leuffen.de)
@@ -69,6 +70,10 @@ I prefer and recommend using [composer](http://getcomposer.com):
 composer require text/template
 ```
 
+## Flexible tag-start/end
+
+This documentation refers to the default-tags: Having one bracket `{` as start and one `}` as
+end delimiter. Of course, they are flexible: If you want to change these, see: `TextTempate::setOpenCloseTagChars()`
 
 ## Value injection
 
@@ -157,8 +162,8 @@ Goodbye World
 You can register user-defined functions.
 
 ```php
-$template->addFunctampion("sayHello", 
-    function ($paramArr, $command, $context, $cmdParam) {
+$template->addFunction("sayHello", 
+    function ($paramArr, $command, $context, $cmdParam, $self) {
         return "Hello " . $paramArr["msg"];
     }
 );
@@ -196,7 +201,6 @@ Multiline
 Comment #}
 ``` 
 
-
 ### Adding Filters
 
 You can add custom filters or overwrite own filters. The default filter is `html` (htmlspecialchars).
@@ -232,6 +236,7 @@ Use this filter inside your template
 | fixedLength:<length>:<pad_char: | Pad / shrink the output to <length> characters |
 | inflect:tag | Convert to underline tag |
 | sanitize:hostname | Convert to hostname |
+| count           | Return count of array |
 
 ### Replacing the default-Filter
 
@@ -276,10 +281,13 @@ Some Content
 To use sections you must just set the callback:
 
 ```php
-$textTemplate->addSection("sectionxy", function ($content, $params, $command, $context, $cmdParam) {
+$textTemplate->addSection("sectionxy", function ($content, $params, $command, $context, $cmdParam, $self) {
     return "Content to replace section content with";
 });
 ```
+
+
+
 
 
 ### Stripping empty lines
@@ -292,6 +300,14 @@ line1
 
 line2
 {/strip_empty_lines}
+```
+
+### Counting a array
+
+```
+{trim > countElem}{= var | count}{/trim}
+{if countElem == "0" }
+{/if}
 ```
 
 

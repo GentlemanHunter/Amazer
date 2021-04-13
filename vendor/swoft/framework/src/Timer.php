@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft;
 
@@ -27,7 +35,6 @@ class Timer
     {
         $items = self::getLogItems();
         return SwooleTimer::tick($msec, function (int $timerId, ...$params) use ($callback, $items) {
-
             try {
                 // Before
                 Swoft::trigger(SwoftEvent::TIMER_TICK_BEFORE, null, $timerId, $params);
@@ -57,7 +64,6 @@ class Timer
     {
         $items = self::getLogItems();
         return SwooleTimer::after($msec, function () use ($callback, $items, $params) {
-
             try {
                 // Before
                 Swoft::trigger(SwoftEvent::TIMER_AFTER_BEFORE);

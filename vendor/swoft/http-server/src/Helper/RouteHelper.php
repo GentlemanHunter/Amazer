@@ -1,9 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: Inhere
- * Date: 2018/4/19 0019
- * Time: 23:56
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
  */
 
 namespace Swoft\Http\Server\Helper;
@@ -15,13 +17,16 @@ use function strpos;
 
 /**
  * Class RouteHelper
+ *
  * @package Swoft\Http\Server\Helper
  */
 class RouteHelper
 {
     /**
      * check route path is static route
+     *
      * @param string $route
+     *
      * @return bool
      */
     public static function isStaticRoute(string $route): bool
@@ -31,8 +36,10 @@ class RouteHelper
 
     /**
      * Format URI path
+     *
      * @param string $path
      * @param bool   $ignoreLastSlash
+     *
      * @return string
      */
     public static function formatPath(string $path, bool $ignoreLastSlash = true): string

@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace SwoftTest\Http\Server\Unit;
 
@@ -13,7 +21,7 @@ use SwoftTest\Http\Server\Testing\MockRequest;
  * @since 2.0
  *
  */
-class RouteTest extends TestCase
+class RouteTest extends HttpServerTestCase
 {
     /**
      * @throws SwoftException
@@ -28,6 +36,9 @@ class RouteTest extends TestCase
 
         $response = $this->mockServer->request(MockRequest::GET, '/testRoute/null');
         $response->assertEqualContent('{}');
+
+        $response = $this->mockServer->request(MockRequest::GET, '/testRoute');
+        $response->assertEqualJson(['data' => 'testRoute']);
     }
 
     /**

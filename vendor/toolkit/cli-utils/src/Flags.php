@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: inhere
- * Date: 2019-01-08
- * Time: 00:25
+ * This file is part of toolkit/cli-utils.
+ *
+ * @link     https://github.com/php-toolkit/cli-utils
+ * @author   https://github.com/inhere
+ * @license  MIT
  */
 
 namespace Toolkit\Cli;
@@ -33,6 +34,7 @@ class Flags
 {
     // These words will be as a Boolean value
     private const TRUE_WORDS  = '|on|yes|true|';
+
     private const FALSE_WORDS = '|off|no|false|';
 
     /**
@@ -161,7 +163,7 @@ class Flags
                     $value = $nxt;
                     next($params);
 
-                    // short-opt: bool opts. like -e -abc
+                // short-opt: bool opts. like -e -abc
                 } elseif (!$isLong && $value === true) {
                     foreach (str_split($option) as $char) {
                         $sOpts[$char] = true;
@@ -193,7 +195,12 @@ class Flags
             // value specified inline (<arg>=<value>)
             if (strpos($p, '=') !== false) {
                 [$name, $value] = explode('=', $p, 2);
-                $args[$name] = self::filterBool($value);
+
+                if (self::isValidArgName($name)) {
+                    $args[$name] = self::filterBool($value);
+                } else {
+                    $args[] = $p;
+                }
             } else {
                 $args[] = $p;
             }
@@ -263,7 +270,6 @@ class Flags
      */
     public static function parseString(string $string): void
     {
-
     }
 
     /**
@@ -293,6 +299,8 @@ class Flags
     }
 
     /**
+     * check next is option value
+     *
      * @param mixed $val
      *
      * @return bool
@@ -309,8 +317,32 @@ class Flags
             return true;
         }
 
-        // it isn't option or named argument
-        return $val[0] !== '-' && false === strpos($val, '=');
+        // is not option name.
+        if ($val[0] !== '-') {
+            // ensure is option value.
+            if (false === strpos($val, '=')) {
+                return true;
+            }
+
+            // is string value, but contains '='
+            [$name,] = explode('=', $val, 2);
+
+            // named argument OR invlaid: 'some = string'
+            return false === self::isValidArgName($name);
+        }
+
+        // is option name.
+        return false;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function isValidArgName(string $name): bool
+    {
+        return preg_match('#^\w+$#', $name) === 1;
     }
 
     /**

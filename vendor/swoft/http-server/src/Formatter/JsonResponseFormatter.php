@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Http\Server\Formatter;
 
@@ -28,9 +36,7 @@ class JsonResponseFormatter implements ResponseFormatterInterface
      */
     public function format(Response $response): Response
     {
-        $response = $response
-            ->withoutHeader(ContentType::KEY)
-            ->withAddedHeader(ContentType::KEY, ContentType::JSON);
+        $response = $response->withoutHeader(ContentType::KEY)->withAddedHeader(ContentType::KEY, ContentType::JSON);
 
         $data = $response->getData();
 

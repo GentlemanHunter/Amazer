@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Rpc\Server;
 
@@ -10,6 +18,8 @@ use Swoft\Rpc\Exception\RpcException;
 use Swoft\Rpc\Packet;
 use Swoft\Rpc\Server\Contract\RequestInterface;
 use Swoole\Server;
+use function microtime;
+use function bean;
 
 /**
  * Class Request
@@ -108,7 +118,7 @@ class Request implements RequestInterface
         $instance = self::__instance();
 
         /* @var Packet $packet */
-        $packet   = \bean('rpcServerPacket');
+        $packet   = bean('rpcServerPacket');
         $protocol = $packet->decode($data);
 
         $instance->version     = $protocol->getVersion();
@@ -134,9 +144,8 @@ class Request implements RequestInterface
         $rc       = BeanFactory::getReflection($this->interface);
         $rxParams = $rc['methods'][$this->method]['params'];
 
-        $index     = 0;
         $paramsMap = [];
-        foreach ($rxParams as $methodParams) {
+        foreach ($rxParams as $index => $methodParams) {
             if (!isset($this->params[$index])) {
                 break;
             }

@@ -1,8 +1,14 @@
 <?php declare(strict_types=1);
-
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Validator\Rule;
-
 
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Validator\Annotation\Mapping\IsBool;
@@ -42,9 +48,10 @@ class IsBoolRule implements RuleInterface
             throw new ValidatorException($message);
         }
 
-        $value = $data[$propertyName];
-        if ($value == 'true' || $value == 'false' || is_bool($value)) {
-            $data[$propertyName] = (bool)$value;
+        $value = filter_var($data[$propertyName], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        if (is_bool($value)) {
+            $data[$propertyName] = $value;
             return $data;
         }
 

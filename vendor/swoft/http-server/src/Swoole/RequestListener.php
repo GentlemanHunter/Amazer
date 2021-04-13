@@ -1,10 +1,17 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Http\Server\Swoole;
 
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
-use Swoft\Exception\SwoftException;
 use Swoft\Http\Message\Request as ServerRequest;
 use Swoft\Http\Message\Response as ServerResponse;
 use Swoft\Http\Server\HttpDispatcher;
@@ -31,8 +38,6 @@ class RequestListener implements RequestInterface
     /**
      * @param Request  $request
      * @param Response $response
-     *
-     * @throws SwoftException
      */
     public function onRequest(Request $request, Response $response): void
     {

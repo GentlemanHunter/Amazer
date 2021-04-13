@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Http\Server;
 
@@ -7,13 +15,13 @@ use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Concern\AbstractDispatcher;
 use Swoft\Context\Context;
-use Swoft\Exception\SwoftException;
 use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
 use Swoft\Http\Server\Formatter\AcceptResponseFormatter;
 use Swoft\Http\Server\Middleware\DefaultMiddleware;
 use Swoft\Http\Server\Middleware\UserMiddleware;
 use Swoft\Http\Server\Router\Router;
+use Swoft\Log\Error;
 use Swoft\Log\Logger;
 use Swoft\Server\SwooleEvent;
 use Swoft\SwoftEvent;
@@ -53,8 +61,6 @@ class HttpDispatcher extends AbstractDispatcher
      * Dispatch http request
      *
      * @param mixed ...$params
-     *
-     * @throws SwoftException
      */
     public function dispatch(...$params): void
     {
@@ -66,9 +72,10 @@ class HttpDispatcher extends AbstractDispatcher
 
         /* @var RequestHandler $requestHandler */
         $requestHandler = Swoft::getBean(RequestHandler::class);
-        $requestHandler->initialize($this->requestMiddlewares, $this->defaultMiddleware);
 
         try {
+            $requestHandler->initialize($this->requestMiddlewares, $this->defaultMiddleware);
+
             // Before request
             $this->beforeRequest($request, $response);
 
@@ -86,14 +93,18 @@ class HttpDispatcher extends AbstractDispatcher
             $response = $errDispatcher->run($e, $response);
         }
 
-        // Format response content type
-        $response = $this->acceptFormatter->format($response);
+        try {
+            // Format response content type
+            $response = $this->acceptFormatter->format($response);
 
-        // Trigger after request
-        Swoft::trigger(HttpServerEvent::AFTER_REQUEST, null, $response);
+            // Trigger after request
+            Swoft::trigger(HttpServerEvent::AFTER_REQUEST, null, $response);
 
-        // After request
-        $this->afterRequest($response);
+            // After request
+            $this->afterRequest($response);
+        } catch (Throwable $e) {
+            Error::log('response error=%s(%d) at %s:%d', $e->getMessage(), $e->getCode(), $e->getFile(), $e->getLine());
+        }
     }
 
     /**
@@ -149,7 +160,6 @@ class HttpDispatcher extends AbstractDispatcher
      */
     private function matchRouter(Request $request): Request
     {
-        /** @var Request $request $method */
         $method  = $request->getMethod();
         $uriPath = $request->getUriPath();
 

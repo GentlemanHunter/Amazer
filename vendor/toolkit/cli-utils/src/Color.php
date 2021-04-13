@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: inhere
- * Date: 2018/5/4
- * Time: 上午9:12
+ * This file is part of toolkit/cli-utils.
+ *
+ * @link     https://github.com/php-toolkit/cli-utils
+ * @author   https://github.com/inhere
+ * @license  MIT
  */
 
 namespace Toolkit\Cli;
@@ -13,12 +14,11 @@ use function array_keys;
 use function implode;
 use function is_array;
 use function is_string;
-use function preg_match_all;
 use function preg_replace;
 use function sprintf;
-use function str_replace;
 use function strip_tags;
 use function strpos;
+use const PHP_EOL;
 
 /**
  * Class Color
@@ -47,75 +47,132 @@ use function strpos;
  */
 class Color
 {
-    public const RESET  = 0;
+    public const RESET = 0;
+
     public const NORMAL = 0;
 
+    /** Foreground base value */
+    public const FG_BASE = 30;
+
+    /** Background base value */
+    public const BG_BASE = 40;
+
+    /** Extra Foreground base value */
+    public const FG_EXTRA = 90;
+
+    /** Extra Background base value */
+    public const BG_EXTRA = 100;
+
     // Foreground color
-    public const FG_BLACK   = 30;
-    public const FG_RED     = 31;
-    public const FG_GREEN   = 32;
-    public const FG_BROWN   = 33; // like yellow
-    public const FG_BLUE    = 34;
-    public const FG_CYAN    = 36;
-    public const FG_WHITE   = 37;
+    public const FG_BLACK = 30;
+
+    public const FG_RED = 31;
+
+    public const FG_GREEN = 32;
+
+    public const FG_BROWN = 33; // like yellow
+
+    public const FG_BLUE = 34;
+
+    public const FG_CYAN = 36;
+
+    public const FG_WHITE = 37;
+
     public const FG_DEFAULT = 39;
 
     // extra Foreground color
-    public const FG_DARK_GRAY     = 90;
-    public const FG_LIGHT_RED     = 91;
-    public const FG_LIGHT_GREEN   = 92;
-    public const FG_LIGHT_YELLOW  = 93;
-    public const FG_LIGHT_BLUE    = 94;
+    public const FG_DARK_GRAY = 90;
+
+    public const FG_LIGHT_RED = 91;
+
+    public const FG_LIGHT_GREEN = 92;
+
+    public const FG_LIGHT_YELLOW = 93;
+
+    public const FG_LIGHT_BLUE = 94;
+
     public const FG_LIGHT_MAGENTA = 95;
-    public const FG_LIGHT_CYAN    = 96;
-    public const FG_LIGHT_WHITE   = 97;
+
+    public const FG_LIGHT_CYAN = 96;
+
+    public const FG_LIGHT_WHITE = 97;
 
     // Background color
-    public const BG_BLACK   = 40;
-    public const BG_RED     = 41;
-    public const BG_GREEN   = 42;
-    public const BG_BROWN   = 43; // like yellow
-    public const BG_BLUE    = 44;
-    public const BG_CYAN    = 46;
-    public const BG_WHITE   = 47;
+    public const BG_BLACK = 40;
+
+    public const BG_RED = 41;
+
+    public const BG_GREEN = 42;
+
+    public const BG_BROWN = 43; // like yellow
+
+    public const BG_BLUE = 44;
+
+    public const BG_CYAN = 46;
+
+    public const BG_WHITE = 47;
+
     public const BG_DEFAULT = 49;
 
     // extra Background color
-    public const BG_DARK_GRAY     = 100;
-    public const BG_LIGHT_RED     = 101;
-    public const BG_LIGHT_GREEN   = 102;
-    public const BG_LIGHT_YELLOW  = 103;
-    public const BG_LIGHT_BLUE    = 104;
+    public const BG_DARK_GRAY = 100;
+
+    public const BG_LIGHT_RED = 101;
+
+    public const BG_LIGHT_GREEN = 102;
+
+    public const BG_LIGHT_YELLOW = 103;
+
+    public const BG_LIGHT_BLUE = 104;
+
     public const BG_LIGHT_MAGENTA = 105;
-    public const BG_LIGHT_CYAN    = 106;
-    public const BG_WHITE_W       = 107;
+
+    public const BG_LIGHT_CYAN = 106;
+
+    public const BG_WHITE_W = 107;
 
     // color option
-    public const BOLD       = 1;      // 加粗
-    public const FUZZY      = 2;      // 模糊(不是所有的终端仿真器都支持)
-    public const ITALIC     = 3;      // 斜体(不是所有的终端仿真器都支持)
-    public const UNDERSCORE = 4;  // 下划线
-    public const BLINK      = 5;      // 闪烁
-    public const REVERSE    = 7;    // 颠倒的 交换背景色与前景色
-    public const CONCEALED  = 8;      // 隐匿的
+    public const BOLD = 1;      // 加粗
+
+    public const FUZZY = 2;      // 模糊(不是所有的终端仿真器都支持)
+
+    public const ITALIC = 3;      // 斜体(不是所有的终端仿真器都支持)
+
+    public const UNDERSCORE = 4;      // 下划线
+
+    public const BLINK = 5;      // 闪烁
+
+    public const REVERSE = 7;      // 颠倒的 交换背景色与前景色
+
+    public const CONCEALED = 8;      // 隐匿的
 
     /**
-     * some styles
+     * There are some internal styles
      * custom style: fg;bg;opt
      *
      * @var array
      */
     public const STYLES = [
         // basic
+        'normal'      => '39',// no color
         'red'         => '0;31',
+        'red1'        => '1;31',
         'blue'        => '0;34',
         'cyan'        => '0;36',
+        'cyan1'       => '1;36',
         'black'       => '0;30',
         'green'       => '0;32',
+        'green1'      => '1;32',
         'brown'       => '0;33',
+        'brown1'      => '1;33',
         'white'       => '1;37',
-        'normal'      => '39',// no color
+        'ylw0'        => '0;33',
+        'ylw'         => '1;33',
+        'yellow0'     => '0;33',
         'yellow'      => '1;33',
+        'mga0'        => '0;35',
+        'magenta0'    => '0;35',
+        'mga'         => '1;35',
         'magenta'     => '1;35',
 
         // alert
@@ -163,10 +220,15 @@ class Color
         'white_ex'       => '97',
 
         // option
-        'bold'           => '1',
-        'italic'         => '3',
+        'b'              => '0;1',
+        'bold'           => '0;1',
+        'fuzzy'          => '2',
+        'i'              => '0;3',
+        'italic'         => '0;3',
         'underscore'     => '4',
+        'blink'          => '5',
         'reverse'        => '7',
+        'concealed'      => '8',
     ];
 
     // Regex to match color tags
@@ -174,6 +236,20 @@ class Color
 
     // CLI color template
     public const COLOR_TPL = "\033[%sm%s\033[0m";
+
+    /**
+     * Flag to remove color codes from the output
+     *
+     * @var bool
+     */
+    private static $noColor = false;
+
+    /**
+     * Force render color code
+     *
+     * @var bool
+     */
+    private static $forceColor = false;
 
     /**
      * @param string $method
@@ -217,14 +293,25 @@ class Color
     /**
      * Print colored message to STDOUT
      *
-     * @param string|array $messages
-     * @param string       $style
+     * @param string|array      $messages
+     * @param string|array|null $style
      */
-    public static function println($messages, string $style = 'info'): void
+    public static function println($messages, $style = 'info'): void
     {
-        $string = is_array($messages) ? implode("\n", $messages) : (string)$messages;
+        $str = is_array($messages) ? implode("\n", $messages) : (string)$messages;
 
-        echo self::render($string . "\n", $style);
+        echo self::render($str, $style) . PHP_EOL;
+    }
+
+    /**
+     * @param string $text
+     * @param string $tag
+     *
+     * @return string
+     */
+    public static function addTag(string $text, string $tag = 'info'): string
+    {
+        return ColorTag::add($text, $tag);
     }
 
     /*******************************************************************************
@@ -234,8 +321,8 @@ class Color
     /**
      * Render text, apply color code
      *
-     * @param string       $text
-     * @param string|array $style
+     * @param string            $text
+     * @param string|array|null $style
      * - string: 'green', 'blue'
      * - array: [Color::FG_GREEN, Color::BG_WHITE, Color::UNDERSCORE]
      *
@@ -247,13 +334,16 @@ class Color
             return $text;
         }
 
-        if (!Cli::isSupportColor()) {
+        // shouldn't render color, clear color code.
+        if (!self::isShouldRenderColor()) {
             return self::clearColor($text);
         }
 
+        $color = '';
+
         // use defined style: 'green'
         if (is_string($style)) {
-            $color = self::STYLES[$style] ?? '0';
+            $color = self::STYLES[$style] ?? '';
 
             // custom style: [self::FG_GREEN, self::BG_WHITE, self::UNDERSCORE]
         } elseif (is_array($style)) {
@@ -262,7 +352,9 @@ class Color
             // user color tag: <info>message</info>
         } elseif (strpos($text, '</') > 0) {
             return self::parseTag($text);
-        } else {
+        }
+
+        if (!$color) {
             return $text;
         }
 
@@ -279,30 +371,38 @@ class Color
      */
     public static function parseTag(string $text)
     {
-        if (!$text || false === strpos($text, '</')) {
-            return $text;
+        return ColorTag::parse($text);
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isShouldRenderColor(): bool
+    {
+        // force render color code
+        if (self::$forceColor) {
+            return true;
         }
 
-        // if don't support output color text, clear color tag.
-        if (!Cli::isSupportColor()) {
-            return static::clearColor($text);
+        // disable color
+        if (self::$noColor) {
+            return false;
         }
 
-        if (!preg_match_all(ColorTag::MATCH_TAG, $text, $matches)) {
-            return $text;
-        }
+        // current env is support render color?
+        return Cli::isSupportColor();
+    }
 
-        foreach ((array)$matches[0] as $i => $m) {
-            if ($style = self::STYLES[$matches[1][$i]] ?? null) {
-                $tag   = $matches[1][$i];
-                $match = $matches[2][$i];
-
-                $repl = sprintf("\033[%sm%s\033[0m", $style, $match);
-                $text = str_replace("<$tag>$match</$tag>", $repl, $text);
-            }
-        }
-
-        return $text;
+    /**
+     * Create a color style code from a parameter string.
+     *
+     * @param string $string e.g 'fg=white;bg=black;options=bold,underscore;extra=1'
+     *
+     * @return string
+     */
+    public static function stringToCode(string $string): string
+    {
+        return ColorCode::fromString($string)->toString();
     }
 
     /**
@@ -334,8 +434,48 @@ class Color
      */
     public static function getStyles(): array
     {
-        return array_filter(array_keys(self::STYLES), function ($style) {
+        return array_filter(array_keys(self::STYLES), static function ($style) {
             return !strpos($style, '_');
         });
+    }
+
+    /**
+     * reset color config
+     */
+    public static function resetConfig(): void
+    {
+        self::$noColor = self::$forceColor = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isNoColor(): bool
+    {
+        return self::$noColor;
+    }
+
+    /**
+     * @param bool $noColor
+     */
+    public static function setNoColor(bool $noColor): void
+    {
+        self::$noColor = $noColor;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isForceColor(): bool
+    {
+        return self::$forceColor;
+    }
+
+    /**
+     * @param bool $forceColor
+     */
+    public static function setForceColor(bool $forceColor): void
+    {
+        self::$forceColor = $forceColor;
     }
 }

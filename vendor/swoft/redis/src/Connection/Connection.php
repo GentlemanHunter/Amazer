@@ -16,6 +16,7 @@ use Swoft\Redis\RedisEvent;
 use Swoft\Stdlib\Helper\PhpHelper;
 use Throwable;
 use function count;
+use function method_exists;
 use function sprintf;
 
 /**
@@ -104,14 +105,16 @@ use function sprintf;
  * @method int zCount(string $key, int $start, int $end)
  * @method float zIncrBy(string $key, float $value, string $member)
  * @method int zLexCount(string $key, int $min, int $max)
+ * @method array zPopMin(string $key, int $count)
+ * @method array zPopMax(string $key, int $count)
  * @method array zRange(string $key, int $start, int $end, bool $withscores = null)
  * @method array zRangeByLex(string $key, int $min, int $max, int $offset = null, int $limit = null)
- * @method array zRangeByScore(string $key, int $start, int $end, array $options = [])
+ * @method array zRangeByScore(string $key, string $start, string $end, array $options = [])
  * @method int zRank(string $key, string $member)
  * @method array zRemRangeByLex(string $key, int $min, int $max)
  * @method array zRevRange(string $key, int $start, int $end, bool $withscore = null)
  * @method array zRevRangeByLex(string $key, int $min, int $max, int $offset = null, int $limit = null)
- * @method array zRevRangeByScore(string $key, int $start, int $end, array $options = [])
+ * @method array zRevRangeByScore(string $key, string $start, string $end, array $options = [])
  * @method int zRevRank(string $key, string $member)
  * @method float zScore(string $key, mixed $member)
  * @method array zScan(string $key, int &$iterator, string $pattern = null, int $count = 0)
@@ -137,144 +140,22 @@ use function sprintf;
  * @method void subscribe(array $channels, string|array $callback)
  * @method array geoRadius(string $key, float $longitude, float $latitude, float $radius, string $radiusUnit, array $options)
  * @method bool expireAt(string $key, int $timestamp)
+ * @method integer xAck(string $stream_key, string $group, array $id_list)
+ * @method string xAdd(string $stream_key, string $id, array $message, int $max_len, bool $approximate)
+ * @method string xClaim(string $stream_key, string $group, string $consumer, string $min_idle_time, array $id_list, array $options)
+ * @method string xDel(string $stream_key, array $id_list)
+ * @method mixed xGroup(...$args)
+ * @method mixed xInfo(...$args)
+ * @method integer xLen(string $stream_key)
+ * @method array xPending(string $stream_key, string $group, string $start, string $end, int $count, string $consumer)
+ * @method array xRange(string $stream_key, string $start, string $end, int $count)
+ * @method array xRevRange(string $stream_key, string $end, string $start, int $count)
+ * @method array xRead(array|string $stream_keys, int $count, int $block)
+ * @method array xReadGroup(string $group, string $consumer, array|string $stream_keys, int $count, int $block)
+ * @method integer xTrim(string $stream_key, int $max_len, bool $approximate)
  */
 abstract class Connection extends AbstractConnection implements ConnectionInterface
 {
-    /**
-     * Supported methods
-     *
-     * @var array
-     */
-    protected $supportedMethods = [
-        'append',
-        'bitcount',
-        'blpop',
-        'brpop',
-        'brpoplpush',
-        'decr',
-        'decrby',
-        'eval',
-        'evalsha',
-        'exists',
-        'geoadd',
-        'geodist',
-        'geohash',
-        'geopos',
-        'georadius',
-        'get',
-        'getbit',
-        'getoption',
-        'getrange',
-        'getset',
-        'hdel',
-        'hexists',
-        'hget',
-        'hgetall',
-        'hincrby',
-        'hincrbyfloat',
-        'hkeys',
-        'hlen',
-        'hmget',
-        'hmset',
-        'hset',
-        'hsetnx',
-        'hvals',
-        'hscan',
-        'incr',
-        'incrby',
-        'incrbyfloat',
-        'info',
-        'lget',
-        'linsert',
-        'lpop',
-        'lpush',
-        'lpushx',
-        'lset',
-        'mset',
-        'msetnx',
-        'persist',
-        'pexpire',
-        'pexpireat',
-        'psetex',
-        'pttl',
-        'rpop',
-        'rpush',
-        'rpushx',
-        'rawcommand',
-        'renamenx',
-        'restore',
-        'rpoplpush',
-        'sadd',
-        'saddarray',
-        'sdiff',
-        'sdiffstore',
-        'sinter',
-        'sinterstore',
-        'smembers',
-        'smove',
-        'spop',
-        'srandmember',
-        'sunion',
-        'sunionstore',
-        'scan',
-        'script',
-        'set',
-        'setbit',
-        'setrange',
-        'setex',
-        'setnx',
-        'sort',
-        'sscan',
-        'strlen',
-        'ttl',
-        'type',
-        'unwatch',
-        'watch',
-        'zadd',
-        'zcard',
-        'zcount',
-        'zincrby',
-        'zlexcount',
-        'zrange',
-        'zrangebylex',
-        'zrangebyscore',
-        'zrank',
-        'zremrangebylex',
-        'zrevrange',
-        'zrevrangebylex',
-        'zrevrangebyscore',
-        'zrevrank',
-        'zscore',
-        'zscan',
-        'del',
-        'expire',
-        'keys',
-        'llen',
-        'lindex',
-        'lrange',
-        'lrem',
-        'ltrim',
-        'mget',
-        'rename',
-        'scard',
-        'sismember',
-        'srem',
-        'zrem',
-        'zremrangebyrank',
-        'zremrangebyscore',
-        'zinterstore',
-        'zunionstore',
-        'hmset',
-        'psubscribe',
-        'multi',
-        'publish',
-        'pubsub',
-        'punsubscribe',
-        'subscribe',
-        'unsubscribe',
-        'expireat'
-    ];
-
     /**
      * @var Redis|RedisCluster
      */
@@ -289,7 +170,7 @@ abstract class Connection extends AbstractConnection implements ConnectionInterf
      * @param Pool    $pool
      * @param RedisDb $redisDb
      */
-    public function initialize(Pool $pool, RedisDb $redisDb)
+    public function initialize(Pool $pool, RedisDb $redisDb): void
     {
         $this->pool     = $pool;
         $this->redisDb  = $redisDb;
@@ -364,11 +245,10 @@ abstract class Connection extends AbstractConnection implements ConnectionInterf
     public function command(string $method, array $parameters = [], bool $reconnect = false)
     {
         try {
-            $lowerMethod = strtolower($method);
-            if (!in_array($lowerMethod, $this->supportedMethods, true)) {
-                throw new RedisException(
-                    sprintf('Method(%s) is not supported!', $method)
-                );
+            // if (!in_array($lowerMethod, $this->supportedMethods, true)) {
+            // Up: use method_exists check command is valid.
+            if (false === method_exists($this->client, $method)) {
+                throw new RedisException(sprintf('Redis method(%s) is not supported!', $method));
             }
 
             // Before event
@@ -388,9 +268,7 @@ abstract class Connection extends AbstractConnection implements ConnectionInterf
                 return $this->command($method, $parameters, true);
             }
 
-            throw new RedisException(
-                sprintf('Redis command reconnect error(%s)', $e->getMessage())
-            );
+            throw new RedisException('Redis command reconnect error=' . $e->getMessage(), $e->getCode(), $e);
         }
 
         return $result;

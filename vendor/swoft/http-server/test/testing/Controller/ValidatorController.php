@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace SwoftTest\Http\Server\Testing\Controller;
 
@@ -6,9 +14,9 @@ use Swoft\Http\Message\Request;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
 use Swoft\Validator\Annotation\Mapping\Validate;
+use Swoft\Validator\Annotation\Mapping\ValidateType;
 use SwoftTest\Http\Server\Testing\Validator\DefaultValidator;
 use SwoftTest\Http\Server\Testing\Validator\UserBaseValidate;
-use Swoft\Validator\Annotation\Mapping\ValidateType;
 
 /**
  * Class ValidatorController

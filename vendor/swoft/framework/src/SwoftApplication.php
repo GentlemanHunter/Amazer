@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft;
 
@@ -164,7 +172,7 @@ class SwoftApplication implements SwoftInterface, ApplicationInterface
         // $this->disableProcessor(ConsoleProcessor::class, EnvProcessor::class);
     }
 
-    private function findBasePath()
+    private function findBasePath(): void
     {
         if ($this->basePath) {
             return;

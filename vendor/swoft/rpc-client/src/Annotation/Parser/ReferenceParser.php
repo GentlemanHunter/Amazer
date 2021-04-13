@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Rpc\Client\Annotation\Parser;
 
@@ -25,7 +33,7 @@ class ReferenceParser extends Parser
 {
     /**
      * @param int       $type
-     * @param Reference $annotationObject
+     * @param Reference $refObject
      *
      * @return array
      * @throws RpcClientException
@@ -33,7 +41,7 @@ class ReferenceParser extends Parser
      * @throws ReflectionException
      * @throws ProxyException
      */
-    public function parse(int $type, $annotationObject): array
+    public function parse(int $type, $refObject): array
     {
         // Parse php document
         $phpReader       = new PhpDocReader();
@@ -41,17 +49,21 @@ class ReferenceParser extends Parser
         $propClassType   = $phpReader->getPropertyClass($reflectProperty);
 
         if (empty($propClassType)) {
-            throw new RpcClientException(sprintf('`@Reference`(%s->%s) must to define `@var xxx`', $this->className,
-                    $this->propertyName));
+            throw new RpcClientException(sprintf(
+                '`@Reference`(%s->%s) must to define `@var xxx`',
+                $this->className,
+                $this->propertyName
+            ));
         }
 
-        $className = Proxy::newClassName($propClassType);
+        $refVersion = $refObject->getVersion();
+        $className  = Proxy::newClassName($propClassType, $refVersion);
 
         $this->definitions[$className] = [
             'class' => $className,
         ];
 
-        ReferenceRegister::register($className, $annotationObject->getPool(), $annotationObject->getVersion());
+        ReferenceRegister::register($className, $refObject->getPool(), $refVersion);
         return [$className, true];
     }
 }

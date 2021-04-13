@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: inhere
- * Date: 2017-08-15
- * Time: 10:51
+ * This file is part of toolkit/cli-utils.
+ *
+ * @link     https://github.com/php-toolkit/cli-utils
+ * @author   https://github.com/inhere
+ * @license  MIT
  */
 
 namespace Toolkit\Cli;
@@ -14,6 +15,7 @@ use Throwable;
 use function array_merge;
 use function array_shift;
 use function array_values;
+use function basename;
 use function class_exists;
 use function function_exists;
 use function getcwd;
@@ -54,19 +56,20 @@ class App
      * @var array
      */
     private $metas = [
-        'name' => 'My application',
-        'desc' => 'My command line application',
+        'name'    => 'My application',
+        'desc'    => 'My command line application',
+        'version' => '0.2.1'
     ];
 
     /**
      * @var array Parsed from `arg0 name=val var2=val2`
      */
-    private $args = [];
+    private $args;
 
     /**
      * @var array Parsed from `--name=val --var2=val2 -d`
      */
-    private $opts = [];
+    private $opts;
 
     /**
      * @var string
@@ -97,7 +100,7 @@ class App
      * Class constructor.
      *
      * @param array $config
-     * @param array $argv
+     * @param array|null $argv
      */
     public function __construct(array $config = [], array $argv = null)
     {
@@ -105,10 +108,10 @@ class App
         self::$i = $this;
 
         // get current dir
-        $this->pwd = getcwd();
+        $this->pwd = (string)getcwd();
 
         // parse cli argv
-        $argv = $argv ?? (array)$_SERVER['argv'];
+        $argv = $argv ?? $_SERVER['argv'];
         if ($config) {
             $this->setMetas($config);
         }
@@ -117,9 +120,10 @@ class App
         $this->script = array_shift($argv);
 
         // parse flags
-        [$this->args, $this->opts] = Flags::parseArgv(array_values($argv), [
-            'mergeOpts' => true
-        ]);
+        [
+            $this->args,
+            $this->opts
+        ] = Flags::parseArgv(array_values($argv), ['mergeOpts' => true]);
     }
 
     /**
@@ -144,7 +148,6 @@ class App
         }
 
         $newArgs = [];
-
         foreach ($this->args as $key => $value) {
             if ($key === 0) {
                 $this->command = trim($value);
@@ -165,19 +168,31 @@ class App
      */
     public function dispatch(bool $exit = true): void
     {
+        $status = $this->doHandle();
+
+        if ($exit) {
+            $this->stop($status);
+        }
+    }
+
+    /**
+     * @return int
+     */
+    protected function doHandle(): int
+    {
         if (!$command = $this->command) {
             $this->displayHelp();
-            return;
+            return 0;
         }
 
         if (!isset($this->commands[$command])) {
             $this->displayHelp("The command '{$command}' is not exists!");
-            return;
+            return 0;
         }
 
         if (isset($this->opts['h']) || isset($this->opts['help'])) {
             $this->displayCommandHelp($command);
-            return;
+            return 0;
         }
 
         try {
@@ -186,9 +201,7 @@ class App
             $status = $this->handleException($e);
         }
 
-        if ($exit) {
-            $this->stop($status);
-        }
+        return $status;
     }
 
     /**
@@ -356,14 +369,18 @@ class App
     public function displayHelp(string $err = ''): void
     {
         if ($err) {
-            echo Color::render("<red>ERROR</red>: $err\n\n");
+            Color::println("<red>ERROR</red>: $err\n");
         }
 
         // help
         $desc  = ucfirst($this->metas['desc']);
+        if ($ver = $this->metas['version']) {
+            $desc .= "(<red>v$ver</red>)";
+        }
+
         $usage = "<cyan>{$this->script} COMMAND -h</cyan>";
 
-        $help = "$desc\n<comment>Usage:</comment> $usage\n<comment>Commands:</comment>\n";
+        $help = "$desc\n\n<comment>Usage:</comment> $usage\n<comment>Commands:</comment>\n";
         $data = $this->messages;
         ksort($data);
 
@@ -375,8 +392,7 @@ class App
 
         $help .= "\nFor command usage please run: <cyan>{$this->script} COMMAND -h</cyan>";
 
-        echo Color::render($help) . PHP_EOL;
-        exit(0);
+        Color::println($help);
     }
 
     /**
@@ -419,7 +435,7 @@ class App
             ]);
         }
 
-        echo Color::render($help);
+        Color::println($help);
     }
 
     /**
@@ -541,6 +557,14 @@ class App
     public function getScript(): string
     {
         return $this->script;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScriptName(): string
+    {
+        return basename($this->script);
     }
 
     /**

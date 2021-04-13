@@ -1,11 +1,18 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Http\Server\Contract;
 
 use Swoft\Error\Contract\ErrorHandlerInterface;
 use Swoft\Http\Message\Response;
 use Throwable;
-
 
 /**
  * Class HttpErrorHandlerInterface
@@ -16,7 +23,7 @@ interface HttpErrorHandlerInterface extends ErrorHandlerInterface
 {
     /**
      * @param Throwable $e
-     * @param Response   $response
+     * @param Response  $response
      *
      * @return Response
      */

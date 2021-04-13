@@ -1,14 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: inhere
- * Date: 2019-01-08
- * Time: 00:01
+ * This file is part of toolkit/cli-utils.
+ *
+ * @link     https://github.com/php-toolkit/cli-utils
+ * @author   https://github.com/inhere
+ * @license  MIT
  */
 
 namespace Toolkit\CliTest;
 
 use PHPUnit\Framework\TestCase;
+use Toolkit\Cli\Color;
 use Toolkit\Cli\ColorTag;
 
 /**
@@ -71,5 +73,15 @@ class ColorTagTest extends TestCase
         $this->assertFalse(ColorTag::exists('text'));
         $this->assertFalse(ColorTag::exists('<tag>text'));
         $this->assertFalse(ColorTag::exists('<tag>text<tag>'));
+    }
+
+    public function testParse(): void
+    {
+        Color::setForceColor(true);
+
+        $text = ColorTag::parse('<info>INFO</info>');
+        $this->assertSame("\033[0;32mINFO\033[0m", $text);
+
+        Color::resetConfig();
     }
 }

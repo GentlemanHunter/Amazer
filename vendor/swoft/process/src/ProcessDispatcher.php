@@ -1,5 +1,12 @@
 <?php declare(strict_types=1);
-
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Process;
 
@@ -39,8 +46,12 @@ class ProcessDispatcher
             $process = $this->getProcess($workerId);
             PhpHelper::call([$process, self::METHOD], $pool, $workerId);
         } catch (Throwable $e) {
-            Error::log(sprintf('Run process for process pool fail(%s %s %d)!', $e->getMessage(), $e->getFile(),
-                $e->getLine()));
+            Error::log(sprintf(
+                'Run process for process pool fail(%s %s %d)!',
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            ));
         }
     }
 
@@ -53,8 +64,8 @@ class ProcessDispatcher
     private function getProcess(int $workerId): ProcessInterface
     {
         $processName = ProcessRegister::getProcess($workerId);
-        $process     = BeanFactory::getBean($processName);
 
+        $process = BeanFactory::getBean($processName);
         if (!$process instanceof ProcessInterface) {
             throw new ProcessException('Process must be instanceof ProcessInterface');
         }

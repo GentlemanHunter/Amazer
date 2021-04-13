@@ -78,19 +78,21 @@ class HandshakeListener implements HandshakeInterface
         $psr7Req  = Psr7Request::new($request);
         $psr7Res  = Psr7Response::new($response);
         $wsServer = Swoft::getBean(WsServerBean::SERVER);
+        /** @var Swoft\WebSocket\Server\ConnectionManager $manager */
         $manager  = Swoft::getBean(WsServerBean::MANAGER);
 
         // Initialize connection session and context
         $ctx  = WsHandshakeContext::new($psr7Req, $psr7Res);
         $conn = Connection::new($wsServer, $psr7Req, $psr7Res);
 
-        // Storage connection and bind cid => sid(fd)
-        // old: Session::set($sid, $conn);
-        $manager->set($sid, $conn);
         // Storage context
         Context::set($ctx);
 
         try {
+            // Storage connection and bind cid => sid(fd)
+            // old: Session::set($sid, $conn);
+            $manager->set($sid, $conn);
+
             Swoft::trigger(WsServerEvent::HANDSHAKE_BEFORE, $fd, $request, $response);
 
             /** @var Psr7Response $psr7Res */
@@ -188,7 +190,7 @@ class HandshakeListener implements HandshakeInterface
             Swoft::trigger(WsServerEvent::OPEN_AFTER, $fd, $server, $request);
         } catch (Throwable $e) {
             Swoft::trigger(WsServerEvent::OPEN_ERROR, $e, $request);
-            \vdump($e);
+
             /** @var WsErrorDispatcher $errDispatcher */
             $errDispatcher = BeanFactory::getSingleton(WsErrorDispatcher::class);
             $errDispatcher->openError($e, $request);

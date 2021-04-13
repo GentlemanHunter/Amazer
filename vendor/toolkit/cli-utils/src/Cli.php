@@ -1,27 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: inhere
- * Date: 2017/5/1
- * Time: 下午5:33
+ * This file is part of toolkit/cli-utils.
+ *
+ * @link     https://github.com/php-toolkit/cli-utils
+ * @author   https://github.com/inhere
+ * @license  MIT
  */
 
 namespace Toolkit\Cli;
 
+use Toolkit\Cli\Traits\ReadMessageTrait;
+use Toolkit\Cli\Traits\WriteMessageTrait;
 use function date;
 use function defined;
-use function fflush;
-use function fgets;
 use function function_exists;
-use function fwrite;
 use function getenv;
 use function implode;
-use function is_array;
-use function is_int;
 use function is_numeric;
 use function json_encode;
 use function preg_replace;
-use function sprintf;
 use function strpos;
 use function strtoupper;
 use function trim;
@@ -32,8 +29,6 @@ use const PHP_EOL;
 use const PHP_WINDOWS_VERSION_BUILD;
 use const PHP_WINDOWS_VERSION_MAJOR;
 use const PHP_WINDOWS_VERSION_MINOR;
-use const STDERR;
-use const STDIN;
 use const STDOUT;
 
 /**
@@ -43,6 +38,8 @@ use const STDOUT;
  */
 class Cli
 {
+    use ReadMessageTrait, WriteMessageTrait;
+
     public const LOG_LEVEL2TAG = [
         'info'    => 'info',
         'warn'    => 'warning',
@@ -53,92 +50,20 @@ class Cli
     ];
 
     /*******************************************************************************
-     * read/write message
-     ******************************************************************************/
-
-    /**
-     * @param string $message
-     * @param bool   $nl
-     *
-     * @return string
-     */
-    public static function read(string $message = '', bool $nl = false): string
-    {
-        if ($message) {
-            self::write($message, $nl);
-        }
-
-        return trim(fgets(STDIN));
-    }
-
-    /**
-     * @param string $format
-     * @param mixed  ...$args
-     */
-    public static function writef(string $format, ...$args): void
-    {
-        self::write(sprintf($format, ...$args));
-    }
-
-    /**
-     * Write message to console
-     *
-     * @param string|array $messages
-     * @param bool         $nl
-     * @param bool|int     $quit
-     */
-    public static function write($messages, bool $nl = true, $quit = false): void
-    {
-        if (is_array($messages)) {
-            $messages = implode($nl ? PHP_EOL : '', $messages);
-        }
-
-        self::stdout(Color::parseTag($messages), $nl, $quit);
-    }
-
-    /**
-     * Logs data to stdout
-     *
-     * @param string   $message
-     * @param bool     $nl
-     * @param bool|int $quit
-     */
-    public static function stdout(string $message, bool $nl = true, $quit = false): void
-    {
-        fwrite(STDOUT, $message . ($nl ? PHP_EOL : ''));
-        fflush(STDOUT);
-
-        if (($isTrue = true === $quit) || is_int($quit)) {
-            $code = $isTrue ? 0 : $quit;
-            exit($code);
-        }
-    }
-
-    /**
-     * Logs data to stderr
-     *
-     * @param string   $message
-     * @param bool     $nl
-     * @param bool|int $quit
-     */
-    public static function stderr(string $message, $nl = true, $quit = -1): void
-    {
-        fwrite(STDERR, self::color('[ERROR] ', 'red') . $message . ($nl ? PHP_EOL : ''));
-        fflush(STDOUT);
-
-        if (($isTrue = true === $quit) || is_int($quit)) {
-            $code = $isTrue ? 0 : $quit;
-            exit($code);
-        }
-    }
-
-    /*******************************************************************************
      * color render
      ******************************************************************************/
 
     /**
-     * @param                  $text
-     * @param string|int|array $style
+     * @return Style
+     */
+    public static function style(): Style
+    {
+        return Style::instance();
+    }
+
+    /**
+     * @param string           $text
+     * @param string|int|array|null $style
      *
      * @return string
      */
@@ -161,7 +86,7 @@ class Cli
      *  'coId' => 12,
      *  ]
      */
-    public static function log(string $msg, array $data = [], string $type = 'info', array $opts = []): void
+    public static function clog(string $msg, array $data = [], string $type = 'info', array $opts = []): void
     {
         if (isset(self::LOG_LEVEL2TAG[$type])) {
             $type = ColorTag::add(strtoupper($type), self::LOG_LEVEL2TAG[$type]);

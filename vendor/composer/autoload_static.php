@@ -12,8 +12,9 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         '9ae26d4cc56bd1c2226b67ffc59eacc2' => __DIR__ . '/..' . '/swoft/bean/src/Helper/Functions.php',
         'cc37a1befbed2103104b095911899e94' => __DIR__ . '/..' . '/swoft/console/src/Helper/Functions.php',
         '40725293a2ac2c3dc06eda78738e3ff6' => __DIR__ . '/..' . '/swoft/framework/src/Helper/Functions.php',
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
@@ -39,8 +40,9 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Php72\\' => 23,
-            'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
             'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Contracts\\Service\\' => 26,
@@ -55,6 +57,7 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
             'Swoft\\Tcp\\Server\\' => 17,
             'Swoft\\Tcp\\' => 10,
             'Swoft\\Task\\' => 11,
+            'Swoft\\Swlib\\' => 12,
             'Swoft\\Stdlib\\' => 13,
             'Swoft\\Server\\' => 13,
             'Swoft\\Serialize\\' => 16,
@@ -150,13 +153,17 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         array (
             0 => __DIR__ . '/..' . '/toolkit/cli-utils/src',
         ),
+        'Symfony\\Polyfill\\Php80\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
+        ),
         'Symfony\\Polyfill\\Php72\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
         array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
         ),
         'Symfony\\Polyfill\\Intl\\Idn\\' => 
         array (
@@ -213,6 +220,10 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         'Swoft\\Task\\' => 
         array (
             0 => __DIR__ . '/..' . '/swoft/task/src',
+        ),
+        'Swoft\\Swlib\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/swoft/swlib/src',
         ),
         'Swoft\\Stdlib\\' => 
         array (
@@ -442,6 +453,8 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
     );
 
     public static $classMap = array (
+        'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'PHPUnit\\Exception' => __DIR__ . '/..' . '/phpunit/phpunit/src/Exception.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert.php',
         'PHPUnit\\Framework\\AssertionFailedError' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/AssertionFailedError.php',
@@ -981,6 +994,7 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         'SebastianBergmann\\Timer\\RuntimeException' => __DIR__ . '/..' . '/phpunit/php-timer/src/RuntimeException.php',
         'SebastianBergmann\\Timer\\Timer' => __DIR__ . '/..' . '/phpunit/php-timer/src/Timer.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Swoft' => __DIR__ . '/..' . '/swoft/framework/src/Swoft.php',
         'Text_Template' => __DIR__ . '/..' . '/phpunit/php-text-template/src/Template.php',
         'TheSeer\\Tokenizer\\Exception' => __DIR__ . '/..' . '/theseer/tokenizer/src/Exception.php',
@@ -991,6 +1005,8 @@ class ComposerStaticInit96fae43fea809bc9f5fffa92881b49e4
         'TheSeer\\Tokenizer\\TokenCollectionException' => __DIR__ . '/..' . '/theseer/tokenizer/src/TokenCollectionException.php',
         'TheSeer\\Tokenizer\\Tokenizer' => __DIR__ . '/..' . '/theseer/tokenizer/src/Tokenizer.php',
         'TheSeer\\Tokenizer\\XMLSerializer' => __DIR__ . '/..' . '/theseer/tokenizer/src/XMLSerializer.php',
+        'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+        'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

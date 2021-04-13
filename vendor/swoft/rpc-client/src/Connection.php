@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Rpc\Client;
 
@@ -41,7 +49,7 @@ class Connection extends AbstractConnection implements ConnectionInterface
 
     /**
      * @param \Swoft\Rpc\Client\Client $client
-     * @param Pool                     $pool
+     * @param Pool $pool
      *
      * @return Connection
      */
@@ -50,7 +58,7 @@ class Connection extends AbstractConnection implements ConnectionInterface
         $instance = self::__instance();
 
         $instance->client = $client;
-        $instance->pool   = $pool;
+        $instance->pool = $pool;
 
         $instance->lastTime = time();
 
@@ -131,6 +139,22 @@ class Connection extends AbstractConnection implements ConnectionInterface
     {
         // fix: The timeout setting uses the configuration when the client connects. timeout, read_timeout
         return $this->connection->recv();
+    }
+
+    /**
+     * @return int
+     */
+    public function getErrCode(): int
+    {
+        return (int)$this->connection->errCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrMsg(): string
+    {
+        return (string)$this->connection->errMsg;
     }
 
     /**

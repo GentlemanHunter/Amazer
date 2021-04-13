@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-
 namespace Swoft\Db\Connection;
 
 use RuntimeException;
@@ -8,6 +7,8 @@ use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Co;
 use Swoft\Concern\ArrayPropertyTrait;
 use Swoft\Connection\Pool\Contract\ConnectionInterface as BaseConnection;
+use function sprintf;
+use function str_replace;
 
 /**
  * Class ConnectionManager
@@ -69,7 +70,8 @@ class ConnectionManager
     public function setOrdinaryConnection(BaseConnection $connection, string $poolName): void
     {
         $poolName = $this->formatName($poolName);
-        $key      = sprintf('%d.connection.%d.%s.%d', Co::tid(), Co::id(), $poolName, $connection->getId());
+
+        $key = sprintf('%d.connection.%d.%s.%d', Co::tid(), Co::id(), $poolName, $connection->getId());
         $this->set($key, $connection);
     }
 
@@ -77,10 +79,11 @@ class ConnectionManager
      * @param int    $id
      * @param string $poolName
      */
-    public function releaseOrdinaryConnection(int $id, string $poolName)
+    public function releaseOrdinaryConnection(int $id, string $poolName): void
     {
         $poolName = $this->formatName($poolName);
-        $key      = sprintf('%d.connection.%d.%s.%d', Co::tid(), Co::id(), $poolName, $id);
+
+        $key = sprintf('%d.connection.%d.%s.%d', Co::tid(), Co::id(), $poolName, $id);
         $this->unset($key);
     }
 
@@ -118,14 +121,14 @@ class ConnectionManager
     public function decTransactionTransactons(string $poolName): void
     {
         $poolName = $this->formatName($poolName);
-        $key      = sprintf('%d.transaction.%d.%s.transactions', Co::tid(), Co::id(), $poolName);
+        $connKey  = sprintf('%d.transaction.%d.%s.transactions', Co::tid(), Co::id(), $poolName);
 
-        $transactions = $this->get($key, 0);
+        $transactions = $this->get($connKey, 0);
         if ($transactions <= 0) {
             return;
         }
 
-        $this->set($key, $transactions - 1);
+        $this->set($connKey, $transactions - 1);
     }
 
     /**
@@ -135,8 +138,8 @@ class ConnectionManager
     public function setTransactionTransactons(int $transactions, string $poolName): void
     {
         $poolName = $this->formatName($poolName);
-        $key      = sprintf('%d.transaction.%d.%s.transactions', Co::tid(), Co::id(), $poolName);
-        $this->set($key, $transactions);
+        $connKey  = sprintf('%d.transaction.%d.%s.transactions', Co::tid(), Co::id(), $poolName);
+        $this->set($connKey, $transactions);
     }
 
     /**
@@ -147,8 +150,9 @@ class ConnectionManager
     public function getTransactionTransactons(string $poolName): int
     {
         $poolName = $this->formatName($poolName);
-        $key      = sprintf('%d.transaction.%d.%s.transactions', Co::tid(), Co::id(), $poolName);
-        return $this->get($key, 0);
+        $connKey  = sprintf('%d.transaction.%d.%s.transactions', Co::tid(), Co::id(), $poolName);
+
+        return (int)$this->get($connKey, 0);
     }
 
     /**
@@ -158,8 +162,8 @@ class ConnectionManager
     public function setTransactionConnection(BaseConnection $connection, string $poolName): void
     {
         $poolName = $this->formatName($poolName);
-        $key      = sprintf('%d.transaction.%d.%s.connection', Co::tid(), Co::id(), $poolName);
-        $this->set($key, $connection);
+        $connKey  = sprintf('%d.transaction.%d.%s.connection', Co::tid(), Co::id(), $poolName);
+        $this->set($connKey, $connection);
     }
 
     /**
@@ -170,6 +174,7 @@ class ConnectionManager
     public function getTransactionConnection(string $poolName): Connection
     {
         $poolName = $this->formatName($poolName);
+
         $key      = sprintf('%d.transaction.%d.%s.connection', Co::tid(), Co::id(), $poolName);
         $con      = $this->get($key, null);
         if (!$con instanceof Connection) {
@@ -187,8 +192,8 @@ class ConnectionManager
     public function releaseTransaction(string $poolName): void
     {
         $poolName = $this->formatName($poolName);
-        $key      = sprintf('%d.transaction.%d.%s', Co::tid(), Co::id(), $poolName);
-        $this->unset($key);
+        $connKey  = sprintf('%d.transaction.%d.%s', Co::tid(), Co::id(), $poolName);
+        $this->unset($connKey);
     }
 
     /**

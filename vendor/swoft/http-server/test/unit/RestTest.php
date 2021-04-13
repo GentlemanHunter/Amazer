@@ -1,8 +1,14 @@
 <?php declare(strict_types=1);
-
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace SwoftTest\Http\Server\Unit;
-
 
 use Swoft\Http\Message\ContentType;
 use Swoft\Stdlib\Helper\JsonHelper;
@@ -13,12 +19,9 @@ use SwoftTest\Http\Server\Testing\MockRequest;
  *
  * @since 2.0
  */
-class RestTest extends TestCase
+class RestTest extends HttpServerTestCase
 {
-    /**
-     * @throws \Swoft\Exception\SwoftException
-     */
-    public function testList()
+    public function testList(): void
     {
         $headers = [
             ContentType::KEY => ContentType::JSON
@@ -28,9 +31,7 @@ class RestTest extends TestCase
         $response->assertEqualJson(['list']);
     }
 
-    /**
-     */
-    public function testCreate()
+    public function testCreate(): void
     {
         $headers = [
             ContentType::KEY => ContentType::JSON
@@ -48,7 +49,7 @@ class RestTest extends TestCase
         $response->assertEqualJson($data);
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $headers = [
             ContentType::KEY => ContentType::JSON
@@ -67,7 +68,7 @@ class RestTest extends TestCase
         $response->assertEqualJson(['getUser', 0]);
     }
 
-    public function testGetBookFromUser()
+    public function testGetBookFromUser(): void
     {
         $headers = [
             ContentType::KEY => ContentType::JSON
@@ -83,7 +84,7 @@ class RestTest extends TestCase
         $response->assertEqualJson($data);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $headers = [
             ContentType::KEY => ContentType::JSON
@@ -98,7 +99,7 @@ class RestTest extends TestCase
         $response->assertEqualJson($data);
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $headers = [
             ContentType::KEY => ContentType::JSON

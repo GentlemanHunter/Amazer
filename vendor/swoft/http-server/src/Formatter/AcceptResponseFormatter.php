@@ -1,9 +1,16 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Http\Server\Formatter;
 
 use Swoft\Bean\Annotation\Mapping\Bean;
-use Swoft\Exception\SwoftException;
 use Swoft\Http\Message\ContentType;
 use Swoft\Http\Message\Contract\ResponseFormatterInterface;
 use Swoft\Http\Message\Response;
@@ -44,7 +51,6 @@ class AcceptResponseFormatter implements ResponseFormatterInterface
      * @param Response $response
      *
      * @return Response
-     * @throws SwoftException
      */
     public function format(Response $response): Response
     {

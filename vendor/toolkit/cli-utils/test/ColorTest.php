@@ -1,4 +1,11 @@
-<?php
+<?php declare(strict_types=1);
+/**
+ * This file is part of toolkit/cli-utils.
+ *
+ * @link     https://github.com/php-toolkit/cli-utils
+ * @author   https://github.com/inhere
+ * @license  MIT
+ */
 
 namespace Toolkit\CliTest;
 
@@ -18,6 +25,12 @@ class ColorTest extends TestCase
         if (!Cli::isSupportColor()) {
             return;
         }
+
+        $this->assertTrue(Color::isShouldRenderColor());
+
+        Color::println('text', '');
+        $text = Color::render('text', '');
+        $this->assertSame('text', $text);
 
         $text = Color::render('text', 'info');
         $this->assertStringContainsString(Color::STYLES['info'], $text);

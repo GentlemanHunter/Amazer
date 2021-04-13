@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Http\Server\Router;
 
@@ -18,6 +26,7 @@ trait RouterConfigTrait
     /**
      * some available patterns regex
      * $router->get('/user/{id}', 'handler');
+     *
      * @var array
      */
     protected static $globalParams = [
@@ -41,31 +50,37 @@ trait RouterConfigTrait
 
     /**
      * Ignore last slash char('/'). If is True, will clear last '/'.
+     *
      * @var bool
      */
     public $ignoreLastSlash = false;
 
     /**
      * The param route cache number.
+     *
      * @var int
      */
     public $tmpCacheNumber = 500;
 
     /**
      * whether handle method not allowed. If True, will find allowed methods.
+     *
      * @var bool
      */
     public $handleMethodNotAllowed = false;
 
     /**
      * Controller suffix. eg: 'Controller'
+     *
      * @var string
      */
     public $controllerSuffix = 'Controller';
 
     /**
      * config the router
+     *
      * @param array $config
+     *
      * @throws LogicException
      */
     public function config(array $config): void

@@ -290,7 +290,7 @@ class TextTemplate {
             if (is_numeric($cur))
                 $cur = (int)$cur;
             if (is_array($value)) {
-                if ( ! isset ( $value[$cur] )) {
+                if ( ! array_key_exists($cur, $value)) {
                     if ( ! $softFail) {
                         throw new UndefinedVariableException("ParsingError: Can't parse element: '{$name}' Error on subelement: '$cur'", $name);
                     }
@@ -505,7 +505,7 @@ class TextTemplate {
         try {
             $func = $this->sections[$command];
             $out = $func(
-                $content, $funcParams["paramArr"], $command, $context, $cmdParam
+                $content, $funcParams["paramArr"], $command, $context, $cmdParam, $this
             );
             if ($funcParams["retAs"] !== null) {
                 if ($funcParams["append"]) {
@@ -611,7 +611,7 @@ class TextTemplate {
                     try {
                         $func = $this->mFunctions[$command];
                         $out = $func(
-                            $funcParams["paramArr"], $command, $context, $cmdParam
+                            $funcParams["paramArr"], $command, $context, $cmdParam, $this
                         );
                         if ($funcParams["retAs"] !== null) {
                             if ($funcParams["append"]) {

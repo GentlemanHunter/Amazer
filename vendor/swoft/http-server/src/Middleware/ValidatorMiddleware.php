@@ -1,4 +1,12 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace Swoft\Http\Server\Middleware;
 
@@ -52,7 +60,7 @@ class ValidatorMiddleware implements MiddlewareInterface
 
         $data  = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $path = $route->getParams();
+        $path  = $route->getParams();
 
         // ParsedBody is empty string
         $parsedBody    = $data = empty($data) ? [] : $data;

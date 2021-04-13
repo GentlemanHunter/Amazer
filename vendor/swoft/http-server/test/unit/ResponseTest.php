@@ -1,8 +1,15 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace SwoftTest\Http\Server\Unit;
 
-use Swoft\Exception\SwoftException;
 use Swoft\Http\Message\ContentType;
 use SwoftTest\Http\Server\Testing\Controller\TestController;
 use SwoftTest\Http\Server\Testing\MockRequest;
@@ -12,11 +19,16 @@ use SwoftTest\Http\Server\Testing\MockRequest;
  *
  * @package SwoftTest\Http\Server\Unit
  */
-class ResponseTest extends TestCase
+class ResponseTest extends HttpServerTestCase
 {
-    /**
-     * @throws SwoftException
-     */
+    public function testRoute(): void
+    {
+        /** @see TestController */
+        $response = $this->mockServer->request(MockRequest::GET, '/fixture/test');
+
+        $response->assertEqualJson(['data' => 'home']);
+    }
+
     public function testCookie(): void
     {
         /** @see TestController */
@@ -27,9 +39,6 @@ class ResponseTest extends TestCase
         $this->assertSame('ck=val', $cks['ck']);
     }
 
-    /**
-     * @throws SwoftException
-     */
     public function testHtml(): void
     {
         /** @see TestController */

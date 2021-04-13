@@ -1,11 +1,18 @@
 <?php declare(strict_types=1);
+/**
+ * This file is part of Swoft.
+ *
+ * @link     https://swoft.org
+ * @document https://swoft.org/docs
+ * @contact  group@swoft.org
+ * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
+ */
 
 namespace SwoftTest\Http\Server\Testing;
 
 use RuntimeException;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\BeanFactory;
-use Swoft\Exception\SwoftException;
 use Swoft\Http\Message\Request as ServerRequest;
 use Swoft\Http\Message\Response as ServerResponse;
 use Swoft\Http\Server\HttpDispatcher;
@@ -30,7 +37,6 @@ class MockHttpServer
      * @param array  $ext
      *
      * @return MockResponse
-     * @throws SwoftException
      */
     public function request(
         string $method,
@@ -89,7 +95,6 @@ class MockHttpServer
      * @param Response $response
      *
      * @return ServerResponse
-     * @throws SwoftException
      */
     public function onRequest(Request $request, Response $response): ServerResponse
     {

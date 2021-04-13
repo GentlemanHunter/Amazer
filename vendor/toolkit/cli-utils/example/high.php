@@ -1,13 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: inhere
- * Date: 2018/5/4
- * Time: 下午3:13
+ * This file is part of toolkit/cli-utils.
+ *
+ * @link     https://github.com/php-toolkit/cli-utils
+ * @author   https://github.com/inhere
+ * @license  MIT
  */
 
 use Toolkit\Cli\Cli;
-use Toolkit\Cli\Highlighter;
+use Toolkit\Cli\Util\Highlighter;
 
 require dirname(__DIR__) . '/test/boot.php';
 
