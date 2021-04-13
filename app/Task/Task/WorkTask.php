@@ -34,13 +34,13 @@ class WorkTask
      * @Inject()
      * @var TaskWorkLogic
      */
-    private $taskWorkLogic;
+    public $taskWorkLogic;
 
     /**
      * @Inject()
      * @var RedisLogic
      */
-    private $redisLogic;
+    public $redisLogic;
 
     /**
      * @TaskMapping(name="consumption")
@@ -80,17 +80,12 @@ class WorkTask
 
                 $handlerState = HandlerStack::create(new CurlHandler());
                 $handlerState->push(Middleware::retry($handRetry->retryDecider(), $handRetry->retryDelay()));
-                $client = new Client(['handler' => $handlerState]);
+                $client = new Client(['handler' => $handlerState, 'delay' => 1]);
                 $reponse = $client->request($method, $url, $data);
 
                 CLog::info("response:" . serialize($reponse->getBody()->getContents()));
-
-                /** @var MemoryTable $memoryTable */
-                $memoryTable = bean('App\Helper\MemoryTable');
-                $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
-                Redis::hDel('hash_data', (string)$taskId);
-            } catch (\Exception $exception) {
-                Redis::hSet('timer:error', $taskId, serialize([
+            } catch (\Throwable $exception) {
+                Redis::hSet('timer:error', $taskId, json_encode([
                     'url' => $url,
                     'method' => $method,
                     'data' => $data,
@@ -105,9 +100,14 @@ class WorkTask
                         $taskId,
                         date('Y/m/d H:i:s', time()),
                         $url,
-                        $data
+                        json_encode($data)
                     )
                 );
+            } finally {
+                Redis::hDel('hash_data', (string)$taskId);
+                /** @var MemoryTable $memoryTable */
+                $memoryTable = bean('App\Helper\MemoryTable');
+                $memoryTable->forget(MemoryTable::TASK_TO_ID, (string)$taskId);
             }
         }, $url, $method, $data, $retry, $taskId);
 

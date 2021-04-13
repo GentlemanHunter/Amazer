@@ -23,13 +23,13 @@ class LogConsumptionProcess extends UserProcess
      * @Inject()
      * @var RedisListDao
      */
-    private $redisListDao;
+    public $redisListDao;
 
     /**
      * @Inject()
      * @var TaskWorkLogic
      */
-    private $taskWorkLogic;
+    public $taskWorkLogic;
 
     public function run(Process $process): void
     {
@@ -38,7 +38,6 @@ class LogConsumptionProcess extends UserProcess
             if ($data) {
                 $log = json_decode($data, true);
                 $this->taskWorkLogic->createTaskLogData($log);
-                CLog::info(json_encode($log));
                 $this->taskWorkLogic->updateByTaskId($log['task_id'],$log['status']);
             }
             Coroutine::sleep(1);

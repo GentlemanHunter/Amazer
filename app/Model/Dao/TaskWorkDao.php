@@ -24,7 +24,7 @@ class TaskWorkDao
      * @Inject()
      * @var TaskWork
      */
-    private $taskWorkEntity;
+    public $taskWorkEntity;
 
     /**
      * 根据 task 任务id 返回 task 信息

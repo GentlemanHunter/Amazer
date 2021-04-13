@@ -29,7 +29,7 @@ class ApiExceptionHandler extends AbstractHttpErrorHandler
 {
     /**
      * @param Throwable $except
-     * @param Response  $response
+     * @param Response $response
      *
      * @return Response
      */
@@ -44,16 +44,16 @@ class ApiExceptionHandler extends AbstractHttpErrorHandler
         $message = $except->getMessage();
 
 
-
         // Debug is true
         if (APP_DEBUG) {
             $message = sprintf('(%s) %s', get_class($except), $except->getMessage());
         }
-        return throwApiException(
+        /*return throwApiException(
             $code,
             $message,
             sprintf('At %s line %d', $except->getFile(), $except->getLine()),
             $except->getTraceAsString()
-        );
+        );*/
+        return apiError($code, $message);
     }
 }

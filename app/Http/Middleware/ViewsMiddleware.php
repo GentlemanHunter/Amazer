@@ -17,6 +17,10 @@ use Swoft\Bean\Annotation\Mapping\Bean;
  */
 class ViewsMiddleware implements MiddlewareInterface
 {
+    /**
+     * @throws \App\Exception\ApiException
+     * @throws \Swoft\Db\Exception\DbException
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $response = context()->getResponse();
