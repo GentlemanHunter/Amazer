@@ -10,7 +10,9 @@
 
 namespace App\Http\Controller;
 
+use App\Model\Entity\TaskWork;
 use Exception;
+use Swoft\Co;
 use Swoft\Timer;
 use Swoft\Task\Task;
 use Swoft\Redis\Redis;
@@ -55,37 +57,34 @@ class TimerController
      * @Validate(validator="TaskWorkValidator",fields={"names","describe","execution","retry","bodys"})
      * @param Request $request
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @throws \App\Exception\ApiException
      */
     public function createTask(Request $request)
     {
-        try {
-            $names = $request->parsedBody('names');
-            $describe = $request->parsedBody('describe');
-            $execution = isTimestamp($request->parsedBody('execution'));
-            $retry = $request->parsedBody('retry');
-            $bodys = $request->parsedBody('bodys');
-            if (!isJSON($bodys)) {
-                throw new ApiException("body 不是 JSON", -1);
-            }
-            $bodys = json_decode($bodys, true);
-            keyExists($bodys, 'url');
-            keyExists($bodys, 'method');
-            if (time() >= $execution || ($execution - time()) < 5) {
-                throw new ApiException("不允许 设定 超过时间", -1);
-            }
-            $id = $this->redisLogic->createTaskWork(
-                $names,
-                $describe,
-                $execution,
-                $retry,
-                $bodys,
-                1
-            );
-
-            return apiSuccess(['taskId' => $id]);
-        } catch (\Throwable $throwable) {
-            return apiError($throwable->getCode(), $throwable->getMessage());
+        $names = $request->parsedBody('names');
+        $describe = $request->parsedBody('describe');
+        $execution = isTimestamp($request->parsedBody('execution'));
+        $retry = $request->parsedBody('retry');
+        $bodys = $request->parsedBody('bodys');
+        if (!isJSON($bodys)) {
+            throw new ApiException("body 不是 JSON", -1);
         }
+        $bodys = json_decode($bodys, true);
+        keyExists($bodys, 'url');
+        keyExists($bodys, 'method');
+        if (time() >= $execution || ($execution - time()) < 5) {
+            throw new ApiException("不允许 设定 超过时间", -1);
+        }
+        $id = $this->redisLogic->createTaskWork(
+            $names,
+            $describe,
+            $execution,
+            $retry,
+            $bodys,
+            1
+        );
+
+        return apiSuccess(['taskId' => $id]);
     }
 
     /**
@@ -94,41 +93,41 @@ class TimerController
      * @Validate(validator="TaskWorkValidator",fields={"taskId"})
      * @param Request $request
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @throws ApiException
+     * @throws \Swoft\Db\Exception\DbException|\Swoft\Task\Exception\TaskException
      */
     public function cancelTaskWork(Request $request)
     {
-        try {
-            $taskId = $request->parsedBody('taskId');
+        $taskId = $request->parsedBody('taskId');
 
-            /** @var RedisHashDao $redisHashDao */
-            $redisHashDao = bean('App\Model\Dao\RedisHashDao');
-            $value = $redisHashDao->findByKeyAux($taskId);
+        /** @var RedisHashDao $redisHashDao */
+        $redisHashDao = bean('App\Model\Dao\RedisHashDao');
+        $value = $redisHashDao->findByKeyAux($taskId);
 
-            if (!$value) {
-                /** @var TaskWorkLogic $taskWorkLogic */
-                $taskWorkLogic = bean('App\Model\Logic\TaskWorkLogic');
-                $value = $taskWorkLogic->findByTaskIdInfo($taskId);
+        if (!$value) {
+            /** @var TaskWorkLogic $taskWorkLogic */
+            $taskWorkLogic = bean('App\Model\Logic\TaskWorkLogic');
+            /** @var TaskWork $value */
+            $value = $taskWorkLogic->findByTaskIdInfo($taskId);
 
-                if (!$value) throw new ApiException("任务不存在", -1);
+            if (!$value) throw new ApiException("任务不存在", -1);
 
-                if ($value->getStatus(true) > TaskStatus::UNEXECUTED)
-                    throw new ApiException(TaskStatus::$errorMessages[$value->getStatus(true)], -1);
+            if ($value->getStatus() > TaskStatus::UNEXECUTED)
+                throw new ApiException(TaskStatus::$errorMessages[$value->getStatus()], -1);
 
-                if (($value->getExecution(true) - time()) <= 2)
-                    throw new ApiException("任务执行时间小于 2 秒 禁止操作!!", -1);
+            if (($value->getExecution() - time()) <= 2)
+                throw new ApiException("任务执行时间小于 2 秒 禁止操作!!", -1);
 
-            } else {
-                $value = redisHashArray($value);
-                if (($value['execution'] - time()) <= 2)
-                    throw new ApiException("任务执行时间 小于 2秒 禁止操作!!", -1);
-            }
-
-            Task::co('work', 'delQueue', [$taskId]);
-
-            return apiSuccess(['taskId' => $taskId]);
-        } catch (\Throwable $throwable) {
-            return apiError($throwable->getCode(), $throwable->getMessage());
+        } else {
+            $value = redisHashArray($value);
+            if (($value['execution'] - time()) <= 2)
+                throw new ApiException("任务执行时间 小于 2秒 禁止操作!!", -1);
         }
+
+        Task::co('work', 'delQueue', [$taskId]);
+
+        return apiSuccess(['taskId' => $taskId]);
+
     }
 
     /**
@@ -140,37 +139,33 @@ class TimerController
      */
     public function editTask(Request $request)
     {
-        try {
-            $taskId = $request->parsedBody('taskId');
-            $names = $request->parsedBody('names');
-            $describe = $request->parsedBody('describe');
-            $execution = isTimestamp($request->parsedBody('execution'));
-            $retry = $request->parsedBody('retry');
-            $bodys = $request->parsedBody('bodys');
-            if (!isJSON($bodys)) {
-                throw new ApiException("body 不是 JSON", -1);
-            }
-            $bodys = json_decode($bodys, true);
-            keyExists($bodys, 'url');
-            keyExists($bodys, 'method');
-            if (time() >= $execution || ($execution - time()) < 5) {
-                throw new ApiException("不允许 设定 超过时间", -1);
-            }
-
-            Task::co('work','editQueue',[
-                $taskId
-                ,$names
-                ,$describe
-                ,$execution
-                ,$retry
-                ,$bodys
-                ,1
-            ]);
-
-            return apiSuccess(['taskId' => $taskId]);
-        } catch (\Throwable $throwable){
-            return apiError($throwable->getCode(),$throwable->getMessage());
+        $taskId = $request->parsedBody('taskId');
+        $names = $request->parsedBody('names');
+        $describe = $request->parsedBody('describe');
+        $execution = isTimestamp($request->parsedBody('execution'));
+        $retry = $request->parsedBody('retry');
+        $bodys = $request->parsedBody('bodys');
+        if (!isJSON($bodys)) {
+            throw new ApiException("body 不是 JSON", -1);
         }
+        $bodys = json_decode($bodys, true);
+        keyExists($bodys, 'url');
+        keyExists($bodys, 'method');
+        if (time() >= $execution || ($execution - time()) < 5) {
+            throw new ApiException("不允许 设定 超过时间", -1);
+        }
+
+        Task::co('work', 'editQueue', [
+            $taskId
+            , $names
+            , $describe
+            , $execution
+            , $retry
+            , $bodys
+            , 1
+        ]);
+
+        return apiSuccess(['taskId' => $taskId]);
     }
 
     /**

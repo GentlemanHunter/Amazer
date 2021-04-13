@@ -24,7 +24,7 @@ class GuzzleRetry
      * @Inject()
      * @var RedisLogic
      */
-    private $redisLogic;
+    public $redisLogic;
 
     protected static $taskid = '';
     protected static $startTime = '';
@@ -37,7 +37,7 @@ class GuzzleRetry
      * 重试定时器任务
      * @return \Closure
      */
-    public function retryDecider()
+    public function retryDecider(): \Closure
     {
         return function (
             $retries,
@@ -74,7 +74,7 @@ class GuzzleRetry
      * delay 1s 2s 3s 4s 5s
      * @return \Closure
      */
-    public function retryDelay()
+    public function retryDelay(): \Closure
     {
         return function ($numberOfRetries) {
             return 1000 * $numberOfRetries;
@@ -85,31 +85,31 @@ class GuzzleRetry
      * 管理 重试次数
      * @author yxk yangxiukang@ketangpai.com
      */
-    public function setRetry(int $retry)
+    public function setRetry(int $retry): GuzzleRetry
     {
         self::$retry = $retry;
         return $this;
     }
 
-    public function setTaskId($task)
+    public function setTaskId($task): GuzzleRetry
     {
         self::$taskid = $task;
         return $this;
     }
 
-    public function setStartTime($startTime)
+    public function setStartTime($startTime): GuzzleRetry
     {
         self::$startTime = $startTime;
         return $this;
     }
 
-    public function setOvertime($overtime)
+    public function setOvertime($overtime): GuzzleRetry
     {
         self::$overtime = $overtime;
         return $this;
     }
 
-    public function setBodys($bodys)
+    public function setBodys($bodys): GuzzleRetry
     {
         self::$bodys = $bodys;
         return $this;

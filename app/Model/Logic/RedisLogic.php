@@ -105,12 +105,12 @@ class RedisLogic
      * @param $length
      * @param $overtime
      * @param $bodys
-     * @param $excution
+     * @param $execution
      * @param $complete
      * @param $implement
      * @param $result
      * @param $status
-     * @return bool|int|string
+     * @return bool|int
      * @throws ApiException
      */
     public function addTaskWorkLog(

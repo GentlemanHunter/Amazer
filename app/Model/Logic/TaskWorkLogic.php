@@ -108,7 +108,6 @@ class TaskWorkLogic
      */
     public function createTaskLogData(array $data): string
     {
-        CLog::info(json_encode($data));
         return $this->taskWorkLogDao->createLogData($data);
     }
 
@@ -164,7 +163,7 @@ class TaskWorkLogic
     {
         $where = ['uid' => (string)$uid];
 
-        if (!is_null($taskId)) {
+        if (!is_null($taskId) && strlen($taskId) > 0) {
             $where[] = ['task_id', $taskId];
         }
 

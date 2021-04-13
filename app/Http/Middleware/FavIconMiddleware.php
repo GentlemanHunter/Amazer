@@ -34,7 +34,6 @@ class FavIconMiddleware implements MiddlewareInterface
      *
      * @return ResponseInterface
      * @inheritdoc
-     * @throws SwoftException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
