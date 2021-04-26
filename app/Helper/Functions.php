@@ -149,8 +149,8 @@ if (!function_exists('isJSON')) {
     function isJSON($string)
     {
         return is_string($string) &&
-        is_array(json_decode($string, true)) &&
-        (json_last_error() == JSON_ERROR_NONE);
+            is_array(json_decode($string, true)) &&
+            (json_last_error() == JSON_ERROR_NONE);
     }
 }
 
@@ -204,16 +204,21 @@ if (!function_exists('redisHashArray')) {
 
 if (!function_exists('getUserInfo')) {
     /**
-     * 获取用户的 姓名
-     * @param $uid
+     * 获取用户的 信息
+     * @param int $uid
      * @return object|Builder|Collection|Model|null
      * @throws DbException
      */
-    function getUserInfo($uid)
+    function getUserInfo($uid = 0)
     {
-        /** @var UserDao $userDao */
-        $userDao = bean('App\Model\Dao\UserDao');
-        return $userDao->findUserInfoById($uid);
+        if ($uid > 0) {
+            /** @var UserDao $userDao */
+            $userDao = bean('App\Model\Dao\UserDao');
+            return $userDao->findUserInfoById($uid);
+        }
+
+        $request = context()->getRequest();
+        return $request->userInfo;
     }
 }
 
@@ -236,5 +241,28 @@ if (!function_exists('isTimestamp')) {
         }
 
         throw new ApiException('参数不是时间规格', -1);
+    }
+}
+
+if (!function_exists('actionLog')) {
+    /**
+     * Notes: user action log
+     */
+    function actionLog($event, $target, $params = [])
+    {
+        Swoft::triggerByArray($event, $target, $params);
+    }
+}
+
+if (!function_exists('getRequestIp')) {
+    /**
+     * Notes: request ip
+     * @return mixed|string
+     */
+    function getRequestIp()
+    {
+        $request = context()->getRequest();
+        return empty($request->getHeaderLine('x-real-ip')) ? $request->getServerParams()['remote_addr']
+            : $request->getHeaderLine('x-real-ip');
     }
 }
