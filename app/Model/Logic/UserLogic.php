@@ -11,12 +11,14 @@
 namespace App\Model\Logic;
 
 use App\Enum\ActionEnum;
+use App\Exception\ApiException;
 use App\ExceptionCode\ApiCode;
 use App\Listener\ActionLog;
 use App\Model\Dao\UserDao;
 use App\Model\Entity\User;
 use Swoft\Bean\Annotation\Mapping\Bean;
 use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Db\Exception\DbException;
 
 /**
  * Class UserLogic
@@ -29,13 +31,13 @@ class UserLogic
      * @Inject()
      * @var UserDao
      */
-    private $userDao;
+    public $userDao;
 
     /**
      * 根据用户账号 返回信息
      * @param string $account
      * @return object|\Swoft\Db\Eloquent\Builder|\Swoft\Db\Eloquent\Model|null
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function findUserInfoByAccount(string $account)
     {
@@ -50,13 +52,13 @@ class UserLogic
      * @param string $username
      * @param string $code
      * @return bool
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException|\Exception
      */
     public function register(string $account, string $password, string $username, string $code)
     {
         $userInfo = $this->findUserInfoByAccount($account);
         if ($userInfo) {
-            throw new \Exception('', ApiCode::USER_ACCOUNT_ALREADY_USER);
+            throw new ApiException(ApiCode::USER_ACCOUNT_ALREADY_USER);
         }
 
 //        \bean(VerifyLogic::class)->enterVerify($account, $code);
@@ -65,7 +67,7 @@ class UserLogic
         $ip = empty($request->getHeaderLine('x-real-ip')) ? $request->getServerParams()['remote_addr']
             : $request->getHeaderLine('x-real-ip');
 
-        return $this->createUser(
+        return $this->userDao->createUser(
             [
                 'account' => $account,
                 'username' => $username,
@@ -78,21 +80,11 @@ class UserLogic
     }
 
     /**
-     * 创建用户
-     * @param array $data
-     * @return bool
-     */
-    public function createUser(array $data)
-    {
-        return $this->userDao->createUser($data);
-    }
-
-    /**
      * 登陆事件
      * @param string $account
      * @param string $password
      * @return array
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      * @throws \Exception
      */
     public function login(string $account, string $password)
@@ -100,15 +92,15 @@ class UserLogic
         /** @var User $userInfo */
         $userInfo = $this->findUserInfoByAccount($account);
         if (!$userInfo || $userInfo['delete_at'] != null) {
-            throw new \Exception('User does not exist', ApiCode::USER_NOT_FOUND);
+            throw new ApiException(ApiCode::USER_NOT_FOUND);
         }
         if (!password_verify($password, $userInfo['password'])) {
-            throw new \Exception('Password Error', ApiCode::USER_PASSWORD_ERROR);
+            throw new ApiException(ApiCode::USER_PASSWORD_ERROR);
         }
 
         $this->updateUserLogVisitor($userInfo->getId());
 
-        actionLog(ActionLog::USERLOGIN, ActionEnum::USERLOGIN,[
+        actionLog(ActionLog::USERLOGIN, ActionEnum::USERLOGIN, [
             'uid' => $userInfo->getId()
         ]);
 
@@ -119,7 +111,7 @@ class UserLogic
      * 更新用户登录ip
      * @param int $userId
      * @return int
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function updateUserLogVisitor(int $userId)
     {
@@ -137,7 +129,7 @@ class UserLogic
      * @param int $userId
      * @param string $username
      * @return int
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function updateInfo(int $userId, string $username)
     {

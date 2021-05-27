@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @author yxk yangxiukang@ketangpai.com
- */
-
 return [
     'private_key' => 'Wharfs20200505',
     'public_key' => 'Wharfs20200505',

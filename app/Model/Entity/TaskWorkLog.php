@@ -20,42 +20,6 @@ use Swoft\Db\Eloquent\Model;
 class TaskWorkLog extends Model
 {
     /**
-     * 执行体
-     *
-     * @Column()
-     *
-     * @var array
-     */
-    private $bodys;
-
-    /**
-     * 完成时间
-     *
-     * @Column()
-     *
-     * @var int
-     */
-    private $complete;
-
-    /**
-     * 创建时间
-     *
-     * @Column(name="created_at", prop="createdAt")
-     *
-     * @var int
-     */
-    private $createdAt;
-
-    /**
-     * 开始时间
-     *
-     * @Column()
-     *
-     * @var int
-     */
-    private $execution;
-
-    /**
      * 任务日志id
      * @Id()
      * @Column()
@@ -65,13 +29,13 @@ class TaskWorkLog extends Model
     private $id;
 
     /**
-     * 执行时间
+     * 任务id
      *
-     * @Column()
+     * @Column(name="task_id", prop="taskId")
      *
-     * @var int
+     * @var string
      */
-    private $implement;
+    private $taskId;
 
     /**
      * 当前执行次数 排序
@@ -92,6 +56,42 @@ class TaskWorkLog extends Model
     private $overtime;
 
     /**
+     * 执行体
+     *
+     * @Column()
+     *
+     * @var array
+     */
+    private $bodys;
+
+    /**
+     * 开始时间
+     *
+     * @Column()
+     *
+     * @var int
+     */
+    private $execution;
+
+    /**
+     * 完成时间
+     *
+     * @Column()
+     *
+     * @var int
+     */
+    private $complete;
+
+    /**
+     * 执行时间
+     *
+     * @Column()
+     *
+     * @var int
+     */
+    private $implement;
+
+    /**
      * 任务执行结果
      *
      * @Column()
@@ -110,13 +110,13 @@ class TaskWorkLog extends Model
     private $status;
 
     /**
-     * 任务id
+     * 创建时间
      *
-     * @Column(name="task_id", prop="taskId")
+     * @Column(name="created_at", prop="createdAt")
      *
-     * @var string
+     * @var int
      */
-    private $taskId;
+    private $createdAt;
 
     /**
      * 更新时间
@@ -127,54 +127,6 @@ class TaskWorkLog extends Model
      */
     private $updatedAt;
 
-
-    /**
-     * @param array $bodys
-     *
-     * @return self
-     */
-    public function setBodys(array $bodys): self
-    {
-        $this->bodys = $bodys;
-
-        return $this;
-    }
-
-    /**
-     * @param int $complete
-     *
-     * @return self
-     */
-    public function setComplete(int $complete): self
-    {
-        $this->complete = $complete;
-
-        return $this;
-    }
-
-    /**
-     * @param int $createdAt
-     *
-     * @return self
-     */
-    public function setCreatedAt(int $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * @param int $execution
-     *
-     * @return self
-     */
-    public function setExecution(int $execution): self
-    {
-        $this->execution = $execution;
-
-        return $this;
-    }
 
     /**
      * @param int $id
@@ -189,13 +141,13 @@ class TaskWorkLog extends Model
     }
 
     /**
-     * @param int $implement
+     * @param string $taskId
      *
      * @return self
      */
-    public function setImplement(int $implement): self
+    public function setTaskId(string $taskId): self
     {
-        $this->implement = $implement;
+        $this->taskId = $taskId;
 
         return $this;
     }
@@ -225,6 +177,54 @@ class TaskWorkLog extends Model
     }
 
     /**
+     * @param array $bodys
+     *
+     * @return self
+     */
+    public function setBodys(array $bodys): self
+    {
+        $this->bodys = $bodys;
+
+        return $this;
+    }
+
+    /**
+     * @param int $execution
+     *
+     * @return self
+     */
+    public function setExecution(int $execution): self
+    {
+        $this->execution = $execution;
+
+        return $this;
+    }
+
+    /**
+     * @param int $complete
+     *
+     * @return self
+     */
+    public function setComplete(int $complete): self
+    {
+        $this->complete = $complete;
+
+        return $this;
+    }
+
+    /**
+     * @param int $implement
+     *
+     * @return self
+     */
+    public function setImplement(int $implement): self
+    {
+        $this->implement = $implement;
+
+        return $this;
+    }
+
+    /**
      * @param string $result
      *
      * @return self
@@ -249,13 +249,13 @@ class TaskWorkLog extends Model
     }
 
     /**
-     * @param string $taskId
+     * @param int $createdAt
      *
      * @return self
      */
-    public function setTaskId(string $taskId): self
+    public function setCreatedAt(int $createdAt): self
     {
-        $this->taskId = $taskId;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -273,64 +273,25 @@ class TaskWorkLog extends Model
     }
 
     /**
-     * @return array
-     */
-    public function getBodys(): ?array
-    
-    {
-        return $this->bodys;
-    }
-
-    /**
-     * @return int
-     */
-    public function getComplete(): ?int
-    
-    {
-        return $this->complete;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCreatedAt(): ?int
-    
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @return int
-     */
-    public function getExecution(): ?int
-    
-    {
-        return $this->execution;
-    }
-
-    /**
      * @return int
      */
     public function getId(): ?int
-    
     {
         return $this->id;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getImplement(): ?int
-    
+    public function getTaskId(): ?string
     {
-        return $this->implement;
+        return $this->taskId;
     }
 
     /**
      * @return int
      */
     public function getLength(): ?int
-    
     {
         return $this->length;
     }
@@ -339,16 +300,46 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getOvertime(): ?int
-    
     {
         return $this->overtime;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBodys(): ?array
+    {
+        return $this->bodys;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExecution(): ?int
+    {
+        return $this->execution;
+    }
+
+    /**
+     * @return int
+     */
+    public function getComplete(): ?int
+    {
+        return $this->complete;
+    }
+
+    /**
+     * @return int
+     */
+    public function getImplement(): ?int
+    {
+        return $this->implement;
     }
 
     /**
      * @return string
      */
     public function getResult(): ?string
-    
     {
         return $this->result;
     }
@@ -357,27 +348,24 @@ class TaskWorkLog extends Model
      * @return int
      */
     public function getStatus(): ?int
-    
     {
         return $this->status;
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getTaskId(): ?string
-    
+    public function getCreatedAt(): ?int
     {
-        return $this->taskId;
+        return $this->createdAt;
     }
 
     /**
      * @return int
      */
     public function getUpdatedAt(): ?int
-    
     {
         return $this->updatedAt;
-    }
+    }
 
 }

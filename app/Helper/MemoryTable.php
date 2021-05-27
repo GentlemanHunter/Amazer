@@ -18,6 +18,7 @@ class MemoryTable
 {
 
     const TASK_TO_ID = 'taskToId';
+    const TASK_ADMIN = 'taskAdmin';
 
     private $table;
 

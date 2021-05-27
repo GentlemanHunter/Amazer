@@ -10,7 +10,7 @@ use Swoft\Db\Eloquent\Model;
 
 
 /**
- * 系统用户表
+ * System User Table
  * Class User
  *
  * @since 2.0
@@ -20,34 +20,7 @@ use Swoft\Db\Eloquent\Model;
 class User extends Model
 {
     /**
-     * 用户登录帐号
-     *
-     * @Column()
-     *
-     * @var string
-     */
-    private $account;
-
-    /**
-     * 创建时间
-     *
-     * @Column(name="create_at", prop="createAt")
-     *
-     * @var int
-     */
-    private $createAt;
-
-    /**
-     * 删除时间 为NULL未删除
-     *
-     * @Column(name="delete_at", prop="deleteAt")
-     *
-     * @var int|null
-     */
-    private $deleteAt;
-
-    /**
-     * 主键
+     * ID
      * @Id()
      * @Column()
      *
@@ -56,25 +29,34 @@ class User extends Model
     private $id;
 
     /**
-     * 用户密码
+     * User`s account
      *
-     * @Column(hidden=true)
+     * @Column()
      *
      * @var string
      */
-    private $password;
+    private $account;
 
     /**
-     * 更新时间
+     * User`s email
      *
-     * @Column(name="update_at", prop="updateAt")
+     * @Column()
      *
-     * @var int
+     * @var string
      */
-    private $updateAt;
+    private $email;
 
     /**
-     * 用户昵称
+     * User`s mobile
+     *
+     * @Column()
+     *
+     * @var string
+     */
+    private $mobile;
+
+    /**
+     * User`s nickname
      *
      * @Column()
      *
@@ -83,7 +65,16 @@ class User extends Model
     private $username;
 
     /**
-     * 用户上次登录ip地址
+     * User`s password
+     *
+     * @Column(hidden=true)
+     *
+     * @var string
+     */
+    private $password;
+
+    /**
+     * Last login ip
      *
      * @Column()
      *
@@ -91,42 +82,51 @@ class User extends Model
      */
     private $visitor;
 
+    /**
+     * Creation time
+     *
+     * @Column(name="create_at", prop="createAt")
+     *
+     * @var int
+     */
+    private $createAt;
 
     /**
-     * @param string $account
+     * Update time
      *
-     * @return self
+     * @Column(name="update_at", prop="updateAt")
+     *
+     * @var int
      */
-    public function setAccount(string $account): self
-    {
-        $this->account = $account;
-
-        return $this;
-    }
+    private $updateAt;
 
     /**
-     * @param int $createAt
+     * Delete time, null is not deleted
      *
-     * @return self
+     * @Column(name="delete_at", prop="deleteAt")
+     *
+     * @var int|null
      */
-    public function setCreateAt(int $createAt): self
-    {
-        $this->createAt = $createAt;
-
-        return $this;
-    }
+    private $deleteAt;
 
     /**
-     * @param int|null $deleteAt
+     * Whether it is created by the system, 0 is not
      *
-     * @return self
+     * @Column(name="is_sys", prop="isSys")
+     *
+     * @var int
      */
-    public function setDeleteAt(?int $deleteAt): self
-    {
-        $this->deleteAt = $deleteAt;
+    private $isSys;
 
-        return $this;
-    }
+    /**
+     * user status
+     *
+     * @Column()
+     *
+     * @var int
+     */
+    private $status;
+
 
     /**
      * @param int $id
@@ -141,25 +141,37 @@ class User extends Model
     }
 
     /**
-     * @param string $password
+     * @param string $account
      *
      * @return self
      */
-    public function setPassword(string $password): self
+    public function setAccount(string $account): self
     {
-        $this->password = $password;
+        $this->account = $account;
 
         return $this;
     }
 
     /**
-     * @param int $updateAt
+     * @param string $email
      *
      * @return self
      */
-    public function setUpdateAt(int $updateAt): self
+    public function setEmail(string $email): self
     {
-        $this->updateAt = $updateAt;
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @param string $mobile
+     *
+     * @return self
+     */
+    public function setMobile(string $mobile): self
+    {
+        $this->mobile = $mobile;
 
         return $this;
     }
@@ -177,6 +189,18 @@ class User extends Model
     }
 
     /**
+     * @param string $password
+     *
+     * @return self
+     */
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
      * @param string $visitor
      *
      * @return self
@@ -189,37 +213,69 @@ class User extends Model
     }
 
     /**
-     * @return string
+     * @param int $createAt
+     *
+     * @return self
      */
-    public function getAccount(): ?string
-    
+    public function setCreateAt(int $createAt): self
     {
-        return $this->account;
+        $this->createAt = $createAt;
+
+        return $this;
     }
 
     /**
-     * @return int
+     * @param int $updateAt
+     *
+     * @return self
      */
-    public function getCreateAt(): ?int
-    
+    public function setUpdateAt(int $updateAt): self
     {
-        return $this->createAt;
+        $this->updateAt = $updateAt;
+
+        return $this;
     }
 
     /**
-     * @return int|null
+     * @param int|null $deleteAt
+     *
+     * @return self
      */
-    public function getDeleteAt(): ?int
-    
+    public function setDeleteAt(?int $deleteAt): self
     {
-        return $this->deleteAt;
+        $this->deleteAt = $deleteAt;
+
+        return $this;
+    }
+
+    /**
+     * @param int $isSys
+     *
+     * @return self
+     */
+    public function setIsSys(int $isSys): self
+    {
+        $this->isSys = $isSys;
+
+        return $this;
+    }
+
+    /**
+     * @param int $status
+     *
+     * @return self
+     */
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
+
+        return $this;
     }
 
     /**
      * @return int
      */
     public function getId(): ?int
-    
     {
         return $this->id;
     }
@@ -227,26 +283,31 @@ class User extends Model
     /**
      * @return string
      */
-    public function getPassword(): ?string
-    
+    public function getAccount(): ?string
     {
-        return $this->password;
+        return $this->account;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getUpdateAt(): ?int
-    
+    public function getEmail(): ?string
     {
-        return $this->updateAt;
+        return $this->email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMobile(): ?string
+    {
+        return $this->mobile;
     }
 
     /**
      * @return string
      */
     public function getUsername(): ?string
-    
     {
         return $this->username;
     }
@@ -254,10 +315,57 @@ class User extends Model
     /**
      * @return string
      */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    /**
+     * @return string
+     */
     public function getVisitor(): ?string
-    
     {
         return $this->visitor;
-    }
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreateAt(): ?int
+    {
+        return $this->createAt;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdateAt(): ?int
+    {
+        return $this->updateAt;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getDeleteAt(): ?int
+    {
+        return $this->deleteAt;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIsSys(): ?int
+    {
+        return $this->isSys;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
 
 }

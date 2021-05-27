@@ -176,7 +176,7 @@ class TaskWorkLogic
         $username = getUserInfo($uid)->getUsername() ?? '此用户异常';
         foreach ($data as &$item) {
             $item['username'] = $username;
-            $item['status'] = TaskStatus::$errorMessages[$item['status']];
+            $item['status'] = TaskStatus::message($item['status']);
         }
 
         return ['data' => $data, 'total' => $count];
@@ -239,7 +239,7 @@ class TaskWorkLogic
         $list = $this->taskWorkLogDao->getPaging($where, $page, $pageSize) ?? [];
 
         foreach ($list as &$item) {
-            $item['statusMessage'] = TaskStatus::$errorMessages[$item['status']];
+            $item['statusMessage'] = TaskStatus::message($item['status']);
         }
 
         return ['total' => $count, 'data' => $list];
