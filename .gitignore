@@ -13,3 +13,4 @@ runtime/
 public/devtool/
 bin/php-cs-fixer
 docker-compose.yml
+vendor

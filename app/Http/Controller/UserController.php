@@ -3,6 +3,7 @@
 
 namespace App\Http\Controller;
 
+use App\Listener\ActionLog;
 use Swoft\Db\DB;
 use App\Helper\JwtHelper;
 use App\Helper\AuthHelper;
@@ -50,13 +51,13 @@ class UserController
         try {
             $account = $request->parsedBody('account');
             $password = $request->parsedBody('password');
-            $code = $request->parsedBody('code')??1;
-            $this->userLogic->register($account,$password,$account,$code);
+            $code = $request->parsedBody('code') ?? 1;
+            $this->userLogic->register($account, $password, $account, $code);
             DB::commit();
             return apiSuccess();
-        } catch (\Throwable $throwable){
+        } catch (\Throwable $throwable) {
             DB::rollBack();
-            return apiError($throwable->getCode(),$throwable->getMessage());
+            return apiError($throwable->getCode(), $throwable->getMessage());
         }
     }
 
@@ -70,22 +71,18 @@ class UserController
      */
     public function login(Request $request, Response $response)
     {
-        try {
-            $account = $request->parsedBody('account');
-            $password = $request->parsedBody('password');
+        $account = $request->parsedBody('account');
+        $password = $request->parsedBody('password');
 
-            /** @var User $userInfo */
-            $userInfo = $this->userLogic->login($account, $password);
+        /** @var User $userInfo */
+        $userInfo = $this->userLogic->login($account, $password);
 
-            $token = JwtHelper::encrypt($userInfo['id']);
-            $userInfo['token'] = $token;
-            return $response->withCookie('TOKEN_WHARF', [
-                'value' => $token,
-                'path' => '/',
-            ])->withData(['code' => 0, 'msg' => 'Success', 'data' => $userInfo]);
-        } catch (\Throwable $throwable) {
-            return apiError($throwable->getCode(), $throwable->getMessage());
-        }
+        $token = JwtHelper::encrypt($userInfo['id']);
+        $userInfo['token'] = $token;
+        return $response->withCookie('TOKEN_WHARF', [
+            'value' => $token,
+            'path' => '/',
+        ])->withData(['code' => 0, 'msg' => 'Success', 'data' => $userInfo]);
     }
 
     /**
@@ -113,11 +110,8 @@ class UserController
      */
     public function userInfo(Request $request)
     {
-        try {
-            return apiSuccess($request->userInfo);
-        } catch (\Throwable $throwable) {
-            return apiError($throwable->getCode(), $throwable->getMessage());
-        }
+
+        return apiSuccess($request->userInfo);
     }
 
     /**

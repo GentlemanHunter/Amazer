@@ -10,7 +10,9 @@
 
 namespace App\Model\Logic;
 
+use App\Enum\ActionEnum;
 use App\ExceptionCode\ApiCode;
+use App\Listener\ActionLog;
 use App\Model\Dao\UserDao;
 use App\Model\Entity\User;
 use Swoft\Bean\Annotation\Mapping\Bean;
@@ -91,18 +93,24 @@ class UserLogic
      * @param string $password
      * @return array
      * @throws \Swoft\Db\Exception\DbException
+     * @throws \Exception
      */
     public function login(string $account, string $password)
     {
+        /** @var User $userInfo */
         $userInfo = $this->findUserInfoByAccount($account);
         if (!$userInfo || $userInfo['delete_at'] != null) {
-            throw new \Exception('', ApiCode::USER_NOT_FOUND);
+            throw new \Exception('User does not exist', ApiCode::USER_NOT_FOUND);
         }
         if (!password_verify($password, $userInfo['password'])) {
-            throw new \Exception('', ApiCode::USER_PASSWORD_ERROR);
+            throw new \Exception('Password Error', ApiCode::USER_PASSWORD_ERROR);
         }
 
         $this->updateUserLogVisitor($userInfo->getId());
+
+        actionLog(ActionLog::USERLOGIN, ActionEnum::USERLOGIN,[
+            'uid' => $userInfo->getId()
+        ]);
 
         return $userInfo->toArray();
     }
