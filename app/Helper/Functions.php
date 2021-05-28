@@ -75,6 +75,7 @@ if (!function_exists('throwApiException')) {
         $result = [
             'code' => $code,
             'msg' => $msg,
+            'data' => []
         ];
         if (APP_DEBUG) {
             $result = array_merge($result, [
@@ -268,5 +269,36 @@ if (!function_exists('getRequestIp')) {
         $request = context()->getRequest();
         return empty($request->getHeaderLine('x-real-ip')) ? $request->getServerParams()['remote_addr']
             : $request->getHeaderLine('x-real-ip');
+    }
+}
+
+if (!function_exists('existApiCode')) {
+    /**
+     * Notes: 返回国际化语言包字段
+     * @param $code
+     * @return string
+     * @date: 2021/5/28 10:05 下午
+     * @author: higanbana
+     */
+    function existApiCode($code)
+    {
+        /* @var \Swoft\I18n\I18n $i18n */
+        $i18n = \Swoft\Bean\BeanFactory::getBean('i18n');
+        return $i18n->translate($code, [], context()->get('language', 'en'));
+    }
+}
+
+if (!function_exists('getCodeMessage')) {
+    /**
+     * Notes: 返回对应的状态码消息
+     * @param $code
+     * @param $array
+     * @return array|\ArrayAccess|mixed
+     * @date: 2021/5/28 11:11 下午
+     * @author: higanbana
+     */
+    function getCodeMessage($code, $array)
+    {
+        return \Swoft\Stdlib\Helper\ArrayHelper::get($array, $code);
     }
 }

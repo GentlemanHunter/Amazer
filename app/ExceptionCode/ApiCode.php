@@ -29,7 +29,11 @@ class ApiCode
         USER_APPLICATION_NOT_FOUND = 3007,
         USER_APPLICATION_PROCESSED = 3008,
         USER_APPLICATION_TYPE_WRONG = 3009,
-        USER_ACCOUNT_ALREADY_USER = 3010;
+        USER_ACCOUNT_ALREADY_USER = 3010,
+        USER_PASSWORD_LENGTH_DOES_NOT_MATCH = 3011,
+        USER_ACCOUNT_LENGTH_DOES_NOT_MATCH = 3012,
+        USER_NICKNAME_CANNOT_BE_EMPTY = 3013,
+        USER_NICKNAME_EXCEEDS_MAXIMUM_LENGTH = 3014;
 
 
     // ext 9000~9999
@@ -44,6 +48,18 @@ class ApiCode
 
 
     public static $errorMessages = [
+
+        self::SUCCESS => 'Success',
+        self::AUTH_ERROR => 'Authorization has been denied for this request !',
+        self::NO_PERMISSION_PROCESS => 'No permission to process !',
+        self::NO_DATA_AVAILABLE => 'No data available !',
+        self::USER_NOT_FOUND => 'User not found!',
+        self::USER_ID_INVALID => 'The user id is invalid !',
+        self::USER_PASSWORD_ERROR => 'User password input error !',
+        self::USER_ACCOUNT_LENGTH_DOES_NOT_MATCH => 'User account length does not match !',
+        self::USER_PASSWORD_LENGTH_DOES_NOT_MATCH => 'User password length does not match !',
+        self::USER_NICKNAME_CANNOT_BE_EMPTY => 'User nickname cannot be empty',
+        self::USER_NICKNAME_EXCEEDS_MAXIMUM_LENGTH => 'The maximum length of user nickname is 30',
 
         self::USER_CREATE_APPLICATION_FAIL => 'Failed to create user application !',
         self::USER_APPLICATION_SET_READ_FAIL => 'application set to read failed',
@@ -72,9 +88,12 @@ class ApiCode
      */
     public static function result($code, array $params = [], $local = null): string
     {
-        if (is_null($local)) {
-            $local = context()->get('language');
+        if (is_numeric($code)) {
+            $code = self::$errorMessages[$code];
         }
-        return \Swoft::t($code, $params, $local);
+        if (is_null($local)) {
+            $local = context()->get('language', 'en');
+        }
+        return $local == 'en' ? $code : \Swoft::t($code, $params, $local);
     }
 }

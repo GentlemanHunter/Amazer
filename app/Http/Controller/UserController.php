@@ -64,10 +64,10 @@ class UserController
     /**
      * 用户登录
      * @RequestMapping(route="login",method={RequestMethod::POST})
-     * @Validate(validator="UserValidator",fields={"account","password"})
+     * @Validate(validator="UserValidator",fields={"account"})
      * @param Request $request
      * @param Response $response
-     * @return CookiesTrait|Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
+     * @return CookiesTrait|Response
      */
     public function login(Request $request, Response $response)
     {
