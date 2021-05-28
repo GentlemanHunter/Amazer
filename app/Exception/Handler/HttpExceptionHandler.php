@@ -29,7 +29,7 @@ class HttpExceptionHandler extends AbstractHttpErrorHandler
 {
     /**
      * @param Throwable $e
-     * @param Response  $response
+     * @param Response $response
      *
      * @return Response
      */
@@ -40,12 +40,7 @@ class HttpExceptionHandler extends AbstractHttpErrorHandler
         CLog::error('%s. (At %s line %d)', $e->getMessage(), $e->getFile(), $e->getLine());
 
         $code = ($e->getCode() == 0) ? -1 : $e->getCode();
-        $message = $e->getMessage();
-
-        // Debug is false
-        if (!APP_DEBUG) {
-            $message = sprintf('(%s) %s', get_class($e), $e->getMessage());
-        }
+        $message = existApiCode($e->getMessage());
 
         return throwApiException(
             $code,

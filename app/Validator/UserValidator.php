@@ -27,7 +27,7 @@ class UserValidator
      * @IsString()
      * @Required()
      * @NotEmpty(message="账号不能为空")
-     * @Length(min=5,max=50)
+     * @Length(min=5,max=50,message="User account length does not match !")
      * @var string
      */
     protected $account = '';
@@ -36,8 +36,8 @@ class UserValidator
     /**
      * @IsString()
      * @Required()
-     * @NotEmpty(message="用户昵称不能为空")
-     * @Length(max=30)
+     * @NotEmpty(message="User nickname cannot be empty")
+     * @Length(max=30,message="The maximum length of user nickname is 30")
      * @var string
      */
     protected $username = '';
@@ -47,7 +47,7 @@ class UserValidator
      * @AlphaDash(message="必须是大小写字母、数字、短横 -、下划线 _")
      * @Required()
      * @NotEmpty(message="密码不能为空")
-     * @Length(min=8,max=20)
+     * @Length(min=8,max=20,message="User password length does not match !")
      * @var string
      */
     protected $password = '';

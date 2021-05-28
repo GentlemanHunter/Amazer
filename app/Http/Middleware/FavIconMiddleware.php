@@ -42,7 +42,9 @@ class FavIconMiddleware implements MiddlewareInterface
         }
 
         $language = $request->getHeaderLine('Accept-Language');
-        context()->set('language', $language);
+        $language = explode(',', $language);
+        if ($language[0] == 'zh-CN') $language[0] = 'zh';
+        if (!empty($language)) context()->set('language', $language[0]);
 
         return $handler->handle($request);
     }

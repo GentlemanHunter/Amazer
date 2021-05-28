@@ -13,6 +13,14 @@ class TaskStatus
         EXECUTEDSUCCESS = 1003,
         EXECUTEVERSION = 1004;
 
+    public static $message = [
+        self::UNEXECUTED => 'preparing !(:>',
+        self::EXECUTEDCANCEL => 'Cancelled !(:<',
+        self::EXECUTEDFAIL => 'failure(:<',
+        self::EXECUTEDSUCCESS => 'success!(:',
+        self::EXECUTEVERSION => "Expired-:)."
+    ];
+
     /**
      * task result
      * @param $code
@@ -21,9 +29,12 @@ class TaskStatus
      */
     public static function message($code, $local = null): string
     {
-        if (is_null($local)) {
-            $local = context()->get('language');
+        if (is_numeric($code)) {
+            $code = self::$message[$code];
         }
-        return \Swoft::t('task.' . $code, [], $local);
+        if (is_null($local)) {
+            $local = context()->get('language', 'en');
+        }
+        return $local == 'en' ? $code : \Swoft::t('task.' . $code, [], $local);
     }
 }
