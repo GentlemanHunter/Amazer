@@ -11,6 +11,7 @@
 namespace App\Exception;
 
 use App\ExceptionCode\ApiCode;
+use phpDocumentor\Reflection\Types\This;
 use Throwable;
 
 /**
@@ -18,11 +19,42 @@ use Throwable;
  *
  * @since 2.0
  */
-class ApiException extends \Exception
+class ApiException extends \Exception implements Throwable
 {
-    public function __construct($message = "", $code = 0, Throwable $previous = null)
+    /** @var array 消息体内容 */
+    protected $params = [];
+
+    /**
+     * ApiException constructor.
+     * @param int $code ApiCode 状态码
+     * @param array $content i18n 内容体
+     * @param Throwable|null $previous
+     */
+    public function __construct($code = 0, array $content = [], Throwable $previous = null)
     {
-        empty($message) && $message = ApiCode::$errorMessages[$code];
-        parent::__construct($message, $code, $previous);
+        if (!empty($content)) {
+            $this->params = $content;
+        }
+        parent::__construct('', $code, $previous);
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams(): array
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param array $params
+     * @return $this
+     */
+    public function setParams(array $params): self
+    {
+        if (empty($params)) {
+            $this->params = $params;
+        }
+        return $this;
     }
 }

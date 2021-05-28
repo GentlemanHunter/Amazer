@@ -49,11 +49,18 @@ class TaskController
      */
     public function getList(Request $request, Response $response)
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 10);
-        $taskId = $request->get('taskId');
+        $page = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', 10);
+        $taskId = (string)$request->get('taskId');
 
-        return apiSuccess($this->taskWorkLogic->getTaskWorkPagingByUid(UID(), (int)$page, (int)$limit, (string)$taskId));
+        return apiSuccess(
+            $this->taskWorkLogic->getTaskWorkPagingByUid(
+                UID(),
+                $page,
+                $limit,
+                $taskId
+            )
+        );
     }
 
     /**
@@ -69,9 +76,15 @@ class TaskController
     public function getLogList(Request $request)
     {
         $taskId = $request->get('taskId');
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 10);
+        $page = (int)$request->get('page', 1);
+        $limit = (int)$request->get('limit', 10);
 
-        return apiSuccess($this->taskWorkLogic->getTaskWorkLogPagingByTaskId($taskId, (int)$page, (int)$limit));
+        return apiSuccess(
+            $this->taskWorkLogic->getTaskWorkLogPagingByTaskId(
+                $taskId,
+                $page,
+                $limit
+            )
+        );
     }
 }

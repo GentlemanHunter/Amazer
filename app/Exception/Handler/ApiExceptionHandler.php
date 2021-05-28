@@ -11,6 +11,7 @@
 namespace App\Exception\Handler;
 
 use App\Exception\ApiException;
+use App\ExceptionCode\ApiCode;
 use Swoft\Error\Annotation\Mapping\ExceptionHandler;
 use Swoft\Http\Message\Response;
 use Swoft\Http\Server\Exception\Handler\AbstractHttpErrorHandler;
@@ -28,32 +29,26 @@ use Throwable;
 class ApiExceptionHandler extends AbstractHttpErrorHandler
 {
     /**
-     * @param Throwable $except
+     * @param ApiException $e
      * @param Response $response
      *
      * @return Response
      */
-    public function handle(Throwable $except, Response $response): Response
+    public function handle($e, Response $response): Response
     {
         // Log error message
-        Log::error($except->getMessage());
-        CLog::error('%s. (At %s line %d)', $except->getMessage(), $except->getFile(), $except->getLine());
+        Log::error($e->getMessage());
+        CLog::error('%s. (At %s line %d)', $e->getMessage(), $e->getFile(), $e->getLine());
 
         // 这里code默认为-1 因为api成功返回的code为0
-        $code = ($except->getCode() == 0) ? -1 : $except->getCode();
-        $message = $except->getMessage();
-
+        $code = ($e->getCode() == 0) ? ApiCode::UNKNOWN : $e->getCode();
+        $message = ApiCode::result($code);
 
         // Debug is true
         if (APP_DEBUG) {
-            $message = sprintf('(%s) %s', get_class($except), $except->getMessage());
+            $message = sprintf('(%s) %s', get_class($e), $e->getMessage());
         }
-        /*return throwApiException(
-            $code,
-            $message,
-            sprintf('At %s line %d', $except->getFile(), $except->getLine()),
-            $except->getTraceAsString()
-        );*/
+
         return apiError($code, $message);
     }
 }

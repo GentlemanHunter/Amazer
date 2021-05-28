@@ -5,6 +5,7 @@ namespace Database\Migration;
 
 
 use Swoft\Db\Schema\Blueprint;
+use Swoft\Db\Exception\DbException;
 use Swoft\Devtool\Annotation\Mapping\Migration;
 use Swoft\Devtool\Migration\Migration as BaseMigration;
 
@@ -21,18 +22,20 @@ class UserLog extends BaseMigration
 
     /**
      * @return void
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function up(): void
     {
-        $this->schema->createIfNotExists(self::TABLE,function (Blueprint $table){
+        $this->schema->createIfNotExists(self::TABLE, function (Blueprint $table) {
             $table->engine = 'InnoDB';
 
             $table->increments('id')->comment('主键');
-            $table->integer('uid')->index('uid_ix')->comment('用户ID');
+            $table->integer('uid')->index('idx_uid')
+                ->comment('用户ID');
             $table->integer('action')->comment('用户操作行为');
             $table->text('log')->comment('用户日志');
-            $table->integer('create_at')->comment("创建时间");
+            $table->integer('create_at')->index('idx_create_time')
+                ->comment("创建时间");
             $table->ipAddress('visitor')->comment("操作ip地址");
 
             $table->comment('用户操作日志表');
@@ -43,7 +46,7 @@ class UserLog extends BaseMigration
 
     /**
      * @return void
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function down(): void
     {

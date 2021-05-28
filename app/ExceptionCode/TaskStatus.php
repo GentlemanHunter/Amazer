@@ -6,20 +6,24 @@ namespace App\ExceptionCode;
 
 class TaskStatus
 {
-    /** 执行任务状态 1000-1999 */
+    /** task status 1000-1999 */
     const UNEXECUTED = 1000,
-          EXECUTEDCANCEL = 1001,
-          EXECUTEDFAIL = 1002,
-          EXECUTEDSUCCESS = 1003,
-          EXECUTEVERSION = 1004;
+        EXECUTEDCANCEL = 1001,
+        EXECUTEDFAIL = 1002,
+        EXECUTEDSUCCESS = 1003,
+        EXECUTEVERSION = 1004;
 
-
-
-    public static $errorMessages = [
-        self::UNEXECUTED => '待执行!(:>',
-        self::EXECUTEDCANCEL => '执行取消!(:<',
-        self::EXECUTEDFAIL => '执行失败(:<',
-        self::EXECUTEDSUCCESS => '执行成功!(:',
-        self::EXECUTEVERSION => "编辑的版本-:)."
-    ];
+    /**
+     * task result
+     * @param $code
+     * @param null $local
+     * @return string
+     */
+    public static function message($code, $local = null): string
+    {
+        if (is_null($local)) {
+            $local = context()->get('language');
+        }
+        return \Swoft::t('task.' . $code, [], $local);
+    }
 }

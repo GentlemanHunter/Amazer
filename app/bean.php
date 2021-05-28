@@ -9,10 +9,12 @@
  * @license  https://github.com/swoft-cloud/swoft/blob/master/LICENSE
  */
 
+use App\Listener\Service\StartServiceListener;
 use Swoft\Db\Pool;
 use Swoft\Db\Database;
 use Swoft\Redis\RedisDb;
 use Swoft\Server\SwooleEvent;
+use App\Event\HttpServiceEvent;
 use Swoft\Http\Server\HttpServer;
 use Swoft\Task\Swoole\TaskListener;
 use Swoft\Task\Swoole\FinishListener;
@@ -41,7 +43,7 @@ return [
         ],
         'on' => [
             SwooleEvent::TASK => bean(TaskListener::class),  // Enable task must task and finish event
-            SwooleEvent::FINISH => bean(FinishListener::class)
+            SwooleEvent::FINISH => bean(FinishListener::class),
         ],
         /* @see HttpServer::$setting */
         'setting' => [
@@ -116,4 +118,9 @@ return [
         'class' => \Swoft\Rpc\Client\Pool::class,
         'client' => bean('task')
     ],
+    'i18n' => [
+        'resoucePath' => '@resource/language/',
+        'defaultLanguage' => 'zh',
+        'defualtCategory'   => 'default',
+    ]
 ];

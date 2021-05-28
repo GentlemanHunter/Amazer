@@ -1,7 +1,5 @@
 <?php
-/**
- * @author yxk higanbana98@hotmail.com
- */
+
 return [
     [
         'title' => '设备管理',

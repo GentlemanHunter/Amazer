@@ -113,7 +113,7 @@ class TimerController
             if (!$value) throw new ApiException("任务不存在", -1);
 
             if ($value->getStatus() > TaskStatus::UNEXECUTED)
-                throw new ApiException(TaskStatus::$errorMessages[$value->getStatus()], -1);
+                throw new ApiException(TaskStatus::message($value->getStatus()), -1);
 
             if (($value->getExecution() - time()) <= 2)
                 throw new ApiException("任务执行时间小于 2 秒 禁止操作!!", -1);

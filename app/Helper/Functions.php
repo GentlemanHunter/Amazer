@@ -13,6 +13,7 @@ use App\Exception\ApiException;
 use App\ExceptionCode\ApiCode;
 use App\Helper\JwtHelper;
 use App\Model\Dao\UserDao;
+use App\Model\Entity\User;
 use Swoft\Db\Eloquent\Builder;
 use Swoft\Db\Eloquent\Collection;
 use Swoft\Db\Eloquent\Model;
@@ -22,17 +23,20 @@ use Swoft\Http\Message\Response;
 
 if (!function_exists('apiError')) {
     /**
-     * @param $code
+     * @param int $code
      * @param string $msg
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
-    function apiError($code = -1, $msg = 'Error')
+    function apiError(int $code = -1, string $msg = 'Error')
     {
-        $code = ($code == 0) ? -1 : $code;
-        $msg = ApiCode::$errorMessages[$code] ?? $msg;
+        if ($code !== -1) {
+            $msg = ApiCode::result($code);
+        }
+
         $result = [
             'code' => $code,
             'msg' => $msg,
+            'data' => []
         ];
         return context()->getResponse()->withStatus(200)->withData($result);
     }
@@ -41,16 +45,16 @@ if (!function_exists('apiError')) {
 if (!function_exists('apiSuccess')) {
 
     /**
-     * @param $data
+     * @param array $data
      * @param int $code
      * @param string $msg
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
-    function apiSuccess($data = [], $code = 0, $msg = 'Success')
+    function apiSuccess(array $data = [], int $code = 0)
     {
         $result = [
             'code' => $code,
-            'msg' => $msg,
+            'msg' => ApiCode::result(ApiCode::SUCCESS),
             'data' => $data
         ];
         return context()->getResponse()->withStatus(200)->withData($result);
@@ -66,7 +70,7 @@ if (!function_exists('throwApiException')) {
      * @param string $trace
      * @return Response|\Swoft\Rpc\Server\Response|\Swoft\Task\Response
      */
-    function throwApiException($code, $msg = 'Error', $file = '', $trace = '')
+    function throwApiException($code, string $msg = 'Error', string $file = '', string $trace = '')
     {
         $result = [
             'code' => $code,
@@ -206,10 +210,10 @@ if (!function_exists('getUserInfo')) {
     /**
      * 获取用户的 信息
      * @param int $uid
-     * @return object|Builder|Collection|Model|null
+     * @return User|null|Builder
      * @throws DbException
      */
-    function getUserInfo($uid = 0)
+    function getUserInfo(int $uid = 0)
     {
         if ($uid > 0) {
             /** @var UserDao $userDao */

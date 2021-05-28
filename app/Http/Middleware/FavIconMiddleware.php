@@ -30,7 +30,7 @@ class FavIconMiddleware implements MiddlewareInterface
      * Process an incoming server request.
      *
      * @param ServerRequestInterface|Request $request
-     * @param RequestHandlerInterface        $handler
+     * @param RequestHandlerInterface $handler
      *
      * @return ResponseInterface
      * @inheritdoc
@@ -40,6 +40,9 @@ class FavIconMiddleware implements MiddlewareInterface
         if ($request->getUriPath() === '/favicon.ico') {
             return context()->getResponse()->withStatus(404);
         }
+
+        $language = $request->getHeaderLine('Accept-Language');
+        context()->set('language', $language);
 
         return $handler->handle($request);
     }

@@ -34,31 +34,31 @@ class AuthMiddleware implements MiddlewareInterface
         $prefix = 'Bearer ';
 
         if (empty($authorization)) {
-            $params = array_merge($request->getParsedBody(),$request->getQueryParams());
+            $params = array_merge($request->getParsedBody(), $request->getQueryParams());
             $authorization = $prefix . ($params['token'] ?? '');
         }
 
         $publicKey = config('jwt.public_key');
 
         if (empty($publicKey)) {
-            throw new ApiException('', ApiCode::JWT_PUBLIC_KEY_EMPTY);
+            throw new ApiException(ApiCode::JWT_PUBLIC_KEY_EMPTY);
         }
 
         if (empty($authorization) || !is_string($authorization) || strpos($authorization, $prefix) !== 0) {
-            throw new ApiException('', ApiCode::AUTH_ERROR);
+            throw new ApiException(ApiCode::AUTH_ERROR);
         }
 
         $jwt = substr($authorization, strlen($prefix));
 
         if (strlen(trim($jwt)) <= 0) {
-            throw new ApiException('', ApiCode::AUTH_ERROR);
+            throw new ApiException(ApiCode::AUTH_ERROR);
         }
 
         $payload = JWT::decode($jwt, $publicKey, [config('jwt.alg')]);
 
 
         if (isset($payload->user) && !is_numeric($payload->user)) {
-            throw new ApiException('', ApiCode::AUTH_ERROR);
+            throw new ApiException(ApiCode::AUTH_ERROR);
         }
 
         $request->user = $payload->user;
@@ -66,7 +66,7 @@ class AuthMiddleware implements MiddlewareInterface
         $userInfo = bean('App\Model\Dao\UserDao')->findUserInfoById($request->user);
 
         if (empty($userInfo)) {
-            throw new ApiException('', ApiCode::AUTH_ERROR);
+            throw new ApiException(ApiCode::AUTH_ERROR);
         }
 
         $request->userInfo = $userInfo;

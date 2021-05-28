@@ -6,6 +6,7 @@ namespace App\Listener;
 
 use App\Enum\ActionEnum;
 use App\Model\Entity\UserLog;
+use Swoft\Db\Exception\DbException;
 use Swoft\Event\Annotation\Mapping\Subscriber;
 use Swoft\Event\EventInterface;
 use Swoft\Event\Listener\ListenerPriority;
@@ -27,7 +28,7 @@ class ActionLog implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Swoft\Db\Exception\DbException
+     * @throws DbException
      */
     public function addLog(EventInterface $event)
     {

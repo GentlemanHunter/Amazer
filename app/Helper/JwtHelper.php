@@ -61,18 +61,18 @@ trait JwtHelper
         $privateKey = config('jwt.private_key', '');
 
         if (empty($privateKey)) {
-            throw new ApiException('', ApiCode::JWT_PRIVATE_KEY_EMPTY);
+            throw new ApiException(ApiCode::JWT_PRIVATE_KEY_EMPTY);
         }
 
         $publicKey = config('jwt.public_key', '');
 
         if (empty($publicKey)) {
-            throw new ApiException('', ApiCode::JWT_PUBLIC_KEY_EMPTY);
+            throw new ApiException(ApiCode::JWT_PUBLIC_KEY_EMPTY);
         }
 
         $alg = config('jwt.alg');
         if (empty($alg)) {
-            throw new ApiException('', ApiCode::JWT_ALG_EMPTY);
+            throw new ApiException(ApiCode::JWT_ALG_EMPTY);
         }
 
         return [$privateKey, $publicKey, $alg];
