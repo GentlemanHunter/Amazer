@@ -11,12 +11,14 @@
 namespace App\Http\Controller;
 
 use App\Common\Wechat;
+use App\ExceptionCode\ApiCode;
 use Swoft\Http\Message\ContentType;
 use Swoft\Http\Message\Request;
 use Swoft\Http\Message\Response;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
 use Swoft\Http\Server\Annotation\Mapping\Middleware;
+use Swoft\Redis\Redis;
 use Swoft\View\Annotation\Mapping\View;
 use App\Http\Middleware\ViewsMiddleware;
 use Throwable;
@@ -31,42 +33,45 @@ use Throwable;
 class ViewController
 {
     /**
-     * @RequestMapping("index")
-     *
-     * @param Response $response
-     *
-     * @return Response
-     */
-    public function index(Response $response): Response
-    {
-        $response = $response->withContent('<html lang="en"><h1>Swoft framework</h1></html>');
-        $response = $response->withContentType(ContentType::HTML);
-        return $response;
-    }
-
-    /**
-     * Will render view by annotation tag View
-     *
-     * @RequestMapping("/home")
-     * @View("home/index")
-     *
-     * @throws Throwable
-     */
-    public function indexByViewTag(): array
-    {
-        return [
-            'msg' => 'hello'
-        ];
-    }
-
-    /**
      * @RequestMapping(route="login", method={"GET"})
      * @return Response
      * @throws Throwable
      */
-    public function login()
+    public function login(): Response
     {
         return view('home/login');
+    }
+
+    /**
+     * Notes:
+     * @RequestMapping(route="rest/password",method={"GET"})
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     * @throws Throwable
+     */
+    public function resetPassword(Request $request, Response $response): Response
+    {
+        $refToken = $request->input('ref-token') ?? $request->getHeaderLine('ref-token');
+        if (!empty($refToken) && is_string($refToken)) {
+            $account = $request->input('account');
+            $refTokenRedis = Redis::get($account . date('Y-m-d-H', time()));
+            if ($refTokenRedis && $refToken === $refTokenRedis) {
+                return view('user/reset', [
+                    'select' => 'password',
+                    'data' => [
+                        'account' => $account,
+                        'ref-token' => $refTokenRedis
+                    ]
+                ]);
+            }
+        }
+
+        return $response->withData([
+            'code' => ApiCode::AUTH_ERROR,
+            'msg' => ApiCode::result(ApiCode::AUTH_ERROR),
+            'data' => []
+        ])->redirect('/views/login');
     }
 
     /**
@@ -74,7 +79,7 @@ class ViewController
      * @return Response
      * @throws Throwable
      */
-    public function register()
+    public function register(): Response
     {
         return view('home/register');
     }
@@ -84,11 +89,10 @@ class ViewController
      * @RequestMapping(route="home", method={"GET"})
      * @Middleware(ViewsMiddleware::class)
      * @param Request $request
-     * @param Response $response
      * @return Response
      * @throws Throwable
      */
-    public function home(Request $request, Response $response)
+    public function home(Request $request): Response
     {
         $menus = config('menu');
         $userInfo = $request->userInfo;
@@ -100,12 +104,10 @@ class ViewController
 
     /**
      * @RequestMapping(route="userInfo",method={"GET"})
-     * @param Request $request
-     * @param Response $response
      * @return Response
      * @throws Throwable
      */
-    public function userInfo(Request $request, Response $response)
+    public function userInfo(): Response
     {
         return view('user/info');
     }

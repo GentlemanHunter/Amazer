@@ -1,48 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<?= $this->include('layouts/common/header', ['title' => '登录']) ?>
-<style>
-  .father {
-    width: 1000px;
-    height: auto;
-    margin: 0 auto;
-  }
-
-  .layui-input {
-    width: 300px;
-  }
-
-  .login-main {
-    margin-top: 230px;
-    margin-left: 350px;
-    width: 300px;
-    height: 400px; /* border:1px solid #e6e6e6; */
-  }
-
-  .layui-form {
-    margin-top: 20px;
-  }
-
-  .layui-input-inline {
-    margin-top: 30px;
-  }
-
-  button {
-    width: 300px;
-  }
-</style>
+<?= $this->include('layouts/common/header', ['title' => '重置密码']) ?>
 <body>
 
 <div class="father">
   <div class="login-main">
-    <p style="color:#009688;font-size:25px;text-align:center;">欢迎登录 ~
+    <p style="color:#009688;font-size:25px;text-align:center;">重置密码
       <a href="/" style="color:#009688;font-size:25px;text-align:center;">返回首页</a>
     </p>
     <form class="layui-form">
       <div class="layui-input-inline">
-        <input type="text" class="layui-input" name="account" required lay-verify="required" placeholder="请输入账号"
-               autocomplete="off"
-               class="layui-input">
+        <input type="text" class="layui-input" name="account" placeholder="请输入账号" autocomplete="off"
+               class="layui-input" value="<?= $data['account'] ?>">
       </div>
       <br>
       <div class="layui-input-inline">
@@ -51,11 +20,9 @@
       </div>
       <br>
       <div class="layui-input-inline login-btn">
-        <button lay-submit lay-filter="login" class="layui-btn">登录</button>
+        <button lay-submit lay-filter="login" class="layui-btn">重置密码</button>
       </div>
       <hr/>
-
-      <p><a href="/views/register" class="fl">立即注册</a></p>
     </form>
   </div>
 </div>

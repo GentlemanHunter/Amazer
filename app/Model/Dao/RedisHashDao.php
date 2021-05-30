@@ -20,7 +20,7 @@ class RedisHashDao
      * 存储单条 redis 数据
      * @param string $gid
      * @param array $data
-     * @return int|bool
+     * @return bool
      */
     public function addHashDataAux($gid, $data)
     {

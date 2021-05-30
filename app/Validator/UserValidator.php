@@ -24,36 +24,36 @@ use Swoft\Validator\Annotation\Mapping\Validator;
 class UserValidator
 {
     /**
-     * @IsString()
+     * @IsString(message="2000")
      * @Required()
      * @NotEmpty(message="账号不能为空")
-     * @Length(min=5,max=50,message="User account length does not match !")
+     * @Length(min=5,max=50,message="3012")
      * @var string
      */
     protected $account = '';
 
 
     /**
-     * @IsString()
+     * @IsString(message="2000")
      * @Required()
-     * @NotEmpty(message="User nickname cannot be empty")
-     * @Length(max=30,message="The maximum length of user nickname is 30")
+     * @NotEmpty(message="3013")
+     * @Length(max=30,message="3014")
      * @var string
      */
     protected $username = '';
 
     /**
-     * @IsString()
-     * @AlphaDash(message="必须是大小写字母、数字、短横 -、下划线 _")
+     * @IsString(message="2000")
+     * @AlphaDash(message="3015")
      * @Required()
-     * @NotEmpty(message="密码不能为空")
-     * @Length(min=8,max=20,message="User password length does not match !")
+     * @NotEmpty(message="3016")
+     * @Length(min=8,max=20,message="3011")
      * @var string
      */
     protected $password = '';
 
     /**
-     * @IsInt()
+     * @IsInt(message="2002")
      * @Required()
      * @Enum(values={0,1})
      * @var int
@@ -61,9 +61,9 @@ class UserValidator
     protected $status = 0;
 
     /**
-     * @IsString()
+     * @IsString(message="2000")
      * @Required()
-     * @NotEmpty()
+     * @NotEmpty(message="2001")
      * @var string
      */
     protected $code = '';

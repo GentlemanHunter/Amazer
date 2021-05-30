@@ -19,8 +19,15 @@ class ApiCode
     const NO_PERMISSION_PROCESS = 402;
     const NO_DATA_AVAILABLE = 403;
 
+    // 系统级别错误
+    const IS_STRING = 2000,
+        IS_PARAMS = 2001,
+        IS_INT = 2002;
+
     //用户错误码 3000～3999
-    const USER_NOT_FOUND = 3001,
+    const
+        USER_NOT_INITIALIZED = 3000,
+        USER_NOT_FOUND = 3001,
         USER_ID_INVALID = 3002,
         USER_PASSWORD_ERROR = 3003,
         USER_CREATE_APPLICATION_FAIL = 3004,
@@ -33,7 +40,9 @@ class ApiCode
         USER_PASSWORD_LENGTH_DOES_NOT_MATCH = 3011,
         USER_ACCOUNT_LENGTH_DOES_NOT_MATCH = 3012,
         USER_NICKNAME_CANNOT_BE_EMPTY = 3013,
-        USER_NICKNAME_EXCEEDS_MAXIMUM_LENGTH = 3014;
+        USER_NICKNAME_EXCEEDS_MAXIMUM_LENGTH = 3014,
+        USER_PASSWORD_RULE_ERROR = 3015,
+        PASSWORD_CANNOT_BE_EMPTY = 3016;
 
 
     // ext 9000~9999
@@ -46,39 +55,6 @@ class ApiCode
         VERIFY_CODE_IS_INVALID = 9007,
         VERiFY_CODE_USED = 9008;
 
-
-    public static $errorMessages = [
-
-        self::SUCCESS => 'Success',
-        self::AUTH_ERROR => 'Authorization has been denied for this request !',
-        self::NO_PERMISSION_PROCESS => 'No permission to process !',
-        self::NO_DATA_AVAILABLE => 'No data available !',
-        self::USER_NOT_FOUND => 'User not found!',
-        self::USER_ID_INVALID => 'The user id is invalid !',
-        self::USER_PASSWORD_ERROR => 'User password input error !',
-        self::USER_ACCOUNT_LENGTH_DOES_NOT_MATCH => 'User account length does not match !',
-        self::USER_PASSWORD_LENGTH_DOES_NOT_MATCH => 'User password length does not match !',
-        self::USER_NICKNAME_CANNOT_BE_EMPTY => 'User nickname cannot be empty',
-        self::USER_NICKNAME_EXCEEDS_MAXIMUM_LENGTH => 'The maximum length of user nickname is 30',
-
-        self::USER_CREATE_APPLICATION_FAIL => 'Failed to create user application !',
-        self::USER_APPLICATION_SET_READ_FAIL => 'application set to read failed',
-        self::USER_INFO_MODIFY_FAIL => 'Failed to modify user information !',
-        self::USER_APPLICATION_NOT_FOUND => 'Application information does not exist !',
-        self::USER_APPLICATION_PROCESSED => 'Application information has been processed !',
-        self::USER_APPLICATION_TYPE_WRONG => 'Wrong application type !',
-
-
-        self::JWT_PRIVATE_KEY_EMPTY => 'The private key is invalid !',
-        self::JWT_PUBLIC_KEY_EMPTY => 'The public key is invalid !',
-        self::JWT_ALG_EMPTY => 'The alg is invalid !',
-        self::CONFIG_NOT_FOUND => 'Configuration not found !',
-        self::FILE_DOES_NOT_EXIST => 'File does not exist !',
-        self::VERIFY_CODE_ERROR => 'Verification code error !',
-        self::VERIFY_CODE_IS_INVALID => 'Verification code is invalid !',
-        self::VERiFY_CODE_USED => 'Verification code used !'
-    ];
-
     /**
      * 返回状态码对应的字符串
      * @param $code
@@ -88,12 +64,9 @@ class ApiCode
      */
     public static function result($code, array $params = [], $local = null): string
     {
-        if (is_numeric($code)) {
-            $code = self::$errorMessages[$code];
-        }
         if (is_null($local)) {
             $local = context()->get('language', 'en');
         }
-        return $local == 'en' ? $code : \Swoft::t($code, $params, $local);
+        return \Swoft::t($code, $params, $local);
     }
 }

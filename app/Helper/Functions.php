@@ -98,7 +98,6 @@ if (!function_exists('checkAuth')) {
         $request = context()->getRequest();
         $token = $request->getCookieParams()['TOKEN_WHARF'] ?? '';
         if (!$token || !is_string($token) || !$userId = JwtHelper::decrypt($token)) {
-            vdump($token);
             return false;
         }
         $userInfo = bean('App\Model\Dao\UserDao')->findUserInfoById($userId);

@@ -24,31 +24,31 @@ class RedisLogic
      * @Inject()
      * @var RedisHashDao
      */
-    private $redisHashDao;
+    public $redisHashDao;
 
     /**
      * @Inject()
      * @var TaskWorkDao
      */
-    private $taskWorkDao;
+    public $taskWorkDao;
 
     /**
      * @Inject()
      * @var RedisListDao
      */
-    private $redisListDao;
+    public $redisListDao;
 
     /**
      * @Inject()
      * @var RedisSsetDao
      */
-    private $redisSsetDao;
+    public $redisSsetDao;
 
     /**
      * @Inject()
      * @var TaskWorkLogic
      */
-    private $taskWorkLogic;
+    public $taskWorkLogic;
 
     /**
      * 创建一个 redis hash
@@ -60,6 +60,8 @@ class RedisLogic
      * @param $uid
      * @param int $status
      * @return bool|int
+     * @throws ApiException
+     * @throws \Swoft\Task\Exception\TaskException
      */
     public function createTaskWork(
         $names,
