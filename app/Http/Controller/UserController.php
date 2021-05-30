@@ -3,23 +3,24 @@
 
 namespace App\Http\Controller;
 
-use App\Listener\ActionLog;
 use Swoft\Db\DB;
 use App\Helper\JwtHelper;
 use App\Helper\AuthHelper;
 use App\Model\Entity\User;
 use App\Model\Logic\UserLogic;
-use Swoft\Http\Message\Concern\CookiesTrait;
+use App\ExceptionCode\ApiCode;
 use Swoft\Http\Message\Request;
-use Swoft\Bean\Annotation\Mapping\Inject;
 use Swoft\Http\Message\Response;
-use Swoft\Http\Server\Annotation\Mapping\Middleware;
+use App\Http\Middleware\AuthMiddleware;
+use App\Http\Middleware\ViewsMiddleware;
+use Swoft\Bean\Annotation\Mapping\Inject;
+use Swoft\Http\Message\Concern\CookiesTrait;
+use Swoft\Redis\Redis;
 use Swoft\Validator\Annotation\Mapping\Validate;
+use Swoft\Http\Server\Annotation\Mapping\Middleware;
 use Swoft\Http\Server\Annotation\Mapping\Controller;
 use Swoft\Http\Server\Annotation\Mapping\RequestMethod;
 use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
-use App\Http\Middleware\AuthMiddleware;
-use App\Http\Middleware\ViewsMiddleware;
 
 /**
  * Class UserController
@@ -68,6 +69,8 @@ class UserController
      * @param Request $request
      * @param Response $response
      * @return CookiesTrait|Response
+     * @throws \App\Exception\ApiException
+     * @throws \Exception
      */
     public function login(Request $request, Response $response)
     {
@@ -76,6 +79,19 @@ class UserController
 
         /** @var User $userInfo */
         $userInfo = $this->userLogic->login($account, $password);
+
+        if (empty($userInfo)) {
+            $key = $account . date('Y-m-d-H', time());
+            $refToken = md5($account . time());
+            Redis::set($key, $refToken, 5 * 60);
+            return $response->withData([
+                'code' => ApiCode::USER_NOT_INITIALIZED,
+                'msg' => ApiCode::result(ApiCode::USER_NOT_INITIALIZED),
+                'data' => [
+                    'ref-token' => $refToken
+                ]
+            ]);
+        }
 
         $token = JwtHelper::encrypt($userInfo['id']);
         $userInfo['token'] = $token;
@@ -110,7 +126,6 @@ class UserController
      */
     public function userInfo(Request $request)
     {
-
         return apiSuccess($request->userInfo);
     }
 

@@ -29,12 +29,9 @@ class TaskStatus
      */
     public static function message($code, $local = null): string
     {
-        if (is_numeric($code)) {
-            $code = self::$message[$code];
-        }
         if (is_null($local)) {
             $local = context()->get('language', 'en');
         }
-        return $local == 'en' ? $code : \Swoft::t('task.' . $code, [], $local);
+        return \Swoft::t($code, [], $local);
     }
 }

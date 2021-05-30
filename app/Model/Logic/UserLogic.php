@@ -94,6 +94,11 @@ class UserLogic
         if (!$userInfo || $userInfo['delete_at'] != null) {
             throw new ApiException(ApiCode::USER_NOT_FOUND);
         }
+
+        if (empty($userInfo['password']) && $userInfo['is_sys'] === 1) {
+            return [];
+        }
+
         if (!password_verify($password, $userInfo['password'])) {
             throw new ApiException(ApiCode::USER_PASSWORD_ERROR);
         }
